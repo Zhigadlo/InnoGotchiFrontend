@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "All pets";
+}
+@model IEnumerable<Pet>;
+<div class="text-center">
+    <h1 class="display-4">Pets</h1>
+    <table class="table">
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Nose</th>
+            <th>Mouth</th>
+            <th>Eyes</th>
+            <th>Body</th>
+            <th>FarmId</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Appearance.NoseURL</td>
+                <td>@item.Appearance.MouthURL</td>
+                <td>@item.Appearance.EyesURL</td>
+                <td>@item.Appearance.BodyURL</td>
+                <td>@item.FarmId</td>
+            </tr>
+        }
+    </table>
+</div>

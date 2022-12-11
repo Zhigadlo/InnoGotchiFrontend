@@ -1,0 +1,26 @@
+﻿@model Pet;
+<div class="text-center">
+    <h1 class="display-4">Pet @Model.Id</h1>
+    <table class="table">
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Nose</th>
+            <th>Mouth</th>
+            <th>Eyes</th>
+            <th>Body</th>
+            <th>FarmId</th>
+        </tr>
+        
+        <tr>
+            <td>@Model.Id</td>
+            <td>@Model.Name</td>
+            <td>@Model.Appearance.NoseURL</td>
+            <td>@Model.Appearance.MouthURL</td>
+            <td>@Model.Appearance.EyesURL</td>
+            <td>@Model.Appearance.BodyURL</td>
+            <td>@Model.FarmId</td>
+        </tr>
+        
+    </table>
+</div>
