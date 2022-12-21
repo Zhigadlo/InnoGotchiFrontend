@@ -7,7 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClientForPet(baseRoot);
 builder.Services.AddHttpClientForUser(baseRoot);
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -22,6 +21,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseHttpLogging();
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

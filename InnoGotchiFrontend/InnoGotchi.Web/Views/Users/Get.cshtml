@@ -1,0 +1,24 @@
+﻿@model User;
+<div class="text-center">
+    <h1 class="display-4">User @Model.Id</h1>
+    <table class="table">
+        <tr>
+            <th>Id</th>
+            <th>FirstName</th>
+            <th>LastName</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>AvatarURL</th>
+        </tr>
+        
+        <tr>
+            <td>@Model.Id</td>
+            <td>@Model.FirstName</td>
+            <td>@Model.LastName</td>
+            <td>@Model.Email</td>
+            <td>@Model.PasswordHash</td>
+            <td>@Model.AvatarURL</td>
+        </tr>
+        
+    </table>
+</div>

@@ -4,16 +4,39 @@ using System.Text.Json;
 
 namespace InnoGotchi.Web.Controllers
 {
-    public class PetsController : BaseController
+    public class UsersController : BaseController
     {
-        public PetsController(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        public UsersController(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
         {
-            
+        }
+        
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> Token(string email, string password)
+        {
+            var httpClient = GetHttpClient("Users");
+            var parameters = new Dictionary<string, string>();
+            parameters["email"] = email;
+            parameters["password"] = password;
+
+            var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress + "/token", new FormUrlEncodedContent(parameters));
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                _token = await httpResponseMessage.Content.ReadAsStringAsync();
+                HttpContext.Response.Cookies.Append(_tokenKey, _token);
+                return RedirectToAction("GetAll", "Pets");
+            }
+            else
+                return BadRequest();
         }
 
         public async Task<IActionResult> Get(int id)
         {
-            var httpClient = GetHttpClient("Pets");
+            var httpClient = GetHttpClient("Users");
             var httpRequestMessage = new HttpRequestMessage
             (
                 HttpMethod.Get,
@@ -29,9 +52,9 @@ namespace InnoGotchi.Web.Controllers
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                Pet? pet = await JsonSerializer.DeserializeAsync<Pet>(contentStream, options);
-           
-                return View(pet);
+                User? user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
+
+                return View(user);
             }
             else
                 return BadRequest();
@@ -40,8 +63,7 @@ namespace InnoGotchi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var httpClient = GetHttpClient("Pets");
-
+            var httpClient = GetHttpClient("Users");
             var httpRequestMessage = new HttpRequestMessage
             (
                 HttpMethod.Get,
@@ -57,10 +79,10 @@ namespace InnoGotchi.Web.Controllers
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                IEnumerable<Pet>? pets = await JsonSerializer.DeserializeAsync<IEnumerable<Pet>>(contentStream, options);
-                if (pets == null)
-                    pets = new List<Pet>();
-                return View(pets);
+                IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
+                if (users == null)
+                    users = new List<User>();
+                return View(users);
             }
             else
                 return BadRequest();
