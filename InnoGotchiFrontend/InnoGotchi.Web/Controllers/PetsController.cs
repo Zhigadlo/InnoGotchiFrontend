@@ -1,4 +1,4 @@
-﻿using InnoGotchi.Web.Models;
+﻿using InnoGotchi.DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 

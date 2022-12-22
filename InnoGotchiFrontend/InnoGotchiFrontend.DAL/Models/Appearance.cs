@@ -1,4 +1,4 @@
-﻿namespace InnoGotchi.Web.Models
+﻿namespace InnoGotchi.DAL.Models
 {
     public class Appearance
     {
