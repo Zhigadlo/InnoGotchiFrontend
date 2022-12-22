@@ -1,4 +1,5 @@
-﻿using InnoGotchi.Web.Models;
+﻿using InnoGotchi.DAL.Models;
+using InnoGotchi.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -6,13 +7,21 @@ namespace InnoGotchi.Web.Controllers
 {
     public class UsersController : BaseController
     {
-        public UsersController(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        private AuthorizedUserModel _userModel;
+        public UsersController(IHttpClientFactory httpClientFactory, AuthorizedUserModel userModel) : base(httpClientFactory)
         {
+            _userModel = userModel;
         }
         
         public IActionResult Login()
         {
             return View();
+        }
+        public IActionResult Logout()
+        {
+            _userModel.AccessToken = null;
+            HttpContext.Response.Cookies.Delete("access_token");
+            return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> Token(string email, string password)
@@ -26,12 +35,37 @@ namespace InnoGotchi.Web.Controllers
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                _token = await httpResponseMessage.Content.ReadAsStringAsync();
-                HttpContext.Response.Cookies.Append(_tokenKey, _token);
-                return RedirectToAction("GetAll", "Pets");
+                var token = (await httpResponseMessage.Content.ReadAsStringAsync()).Replace("\"", String.Empty);
+                HttpContext.Response.Cookies.Append(_tokenKey, token);
+                _userModel.User = await GetAuthorizedUser();
+                return RedirectToAction("Index", "Home");
             }
             else
                 return BadRequest();
+        }
+
+        private async Task<User?> GetAuthorizedUser()
+        {
+            var httpClient = GetHttpClient("Users");
+
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Get,
+                httpClient.BaseAddress + $"/authUser"
+            );
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                return await JsonSerializer.DeserializeAsync<User>(contentStream, options);
+            }
+            else
+                return null;
         }
 
         public async Task<IActionResult> Get(int id)

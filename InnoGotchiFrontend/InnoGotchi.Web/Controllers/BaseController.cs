@@ -6,7 +6,6 @@ namespace InnoGotchi.Web.Controllers
     public class BaseController : Controller
     {
         private IHttpClientFactory _httpClientFactory;
-        protected string? _token = null;
         protected const string _tokenKey = "access_token";
         public BaseController(IHttpClientFactory httpClientFactory)
         {
@@ -17,12 +16,11 @@ namespace InnoGotchi.Web.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient(clientName);
 
-            if (_token == null)
-                _token = HttpContext.Request.Cookies[_tokenKey];
+            string? token = HttpContext.Request.Cookies[_tokenKey];
 
-            if(_token != null)
+            if(token != null)
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
             return httpClient;
         }

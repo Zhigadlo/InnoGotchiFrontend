@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject AuthorizedUserModel UserModel
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -22,16 +24,32 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Pets" asp-action="GetAll">Pets</a>
-                        </li>
+                        @if (UserModel.AccessToken != null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Pets" asp-action="GetAll">Pets</a>
+                            </li>
+                        }
                     </ul>
-
-                    <ul class="navbar-nav">
-                        <li class="navbar-nav flex-grow-0">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Login">Login</a>
-                        </li>
-                    </ul>
+                    @if (UserModel.AccessToken == null)
+                    {
+                        <ul class="navbar-nav">
+                            <li class="navbar-nav flex-grow-0">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Login">Login</a>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav">
+                            <li class="navbar-nav flex-grow-0">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Get">Hello @UserModel.User.FirstName @UserModel.User.LastName</a>
+                            </li>
+                            <li class="navbar-nav flex-grow-0">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </div>
         </nav>
