@@ -1,4 +1,6 @@
-﻿using InnoGotchi.DAL.Models;
+﻿using Hanssens.Net;
+using InnoGotchi.DAL.Models;
+using InnoGotchi.Web.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -6,9 +8,12 @@ namespace InnoGotchi.Web.Controllers
 {
     public class PetsController : BaseController
     {
-        public PetsController(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        private PetService _service;
+        public PetsController(IHttpClientFactory httpClientFactory, 
+                              PetService service,
+                              LocalStorage storage) : base(httpClientFactory, storage)
         {
-            
+            _service = service;
         }
 
         public async Task<IActionResult> Get(int id)
@@ -30,8 +35,8 @@ namespace InnoGotchi.Web.Controllers
                     PropertyNameCaseInsensitive = true
                 };
                 Pet? pet = await JsonSerializer.DeserializeAsync<Pet>(contentStream, options);
-           
-                return View(pet);
+
+                return View(_service.Get(pet));
             }
             else
                 return BadRequest();
@@ -58,9 +63,8 @@ namespace InnoGotchi.Web.Controllers
                     PropertyNameCaseInsensitive = true
                 };
                 IEnumerable<Pet>? pets = await JsonSerializer.DeserializeAsync<IEnumerable<Pet>>(contentStream, options);
-                if (pets == null)
-                    pets = new List<Pet>();
-                return View(pets);
+
+                return View(_service.GetAll(pets));
             }
             else
                 return BadRequest();
