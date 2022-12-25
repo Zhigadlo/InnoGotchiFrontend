@@ -1,6 +1,4 @@
-﻿@inject AuthorizedUserModel UserModel
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -24,14 +22,14 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if (UserModel.AccessToken != null)
+                        @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Pets" asp-action="GetAll">Pets</a>
                             </li>
                         }
                     </ul>
-                    @if (UserModel.AccessToken == null)
+                    @if (!User.Identity.IsAuthenticated)
                     {
                         <ul class="navbar-nav">
                             <li class="navbar-nav flex-grow-0">
@@ -43,7 +41,7 @@
                     {
                         <ul class="navbar-nav">
                             <li class="navbar-nav flex-grow-0">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Get">Hello @UserModel.User.FirstName @UserModel.User.LastName</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Get">Hello @User.Identity.Name</a>
                             </li>
                             <li class="navbar-nav flex-grow-0">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
