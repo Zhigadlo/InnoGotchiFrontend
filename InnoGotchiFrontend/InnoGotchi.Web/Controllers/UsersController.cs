@@ -4,6 +4,7 @@ using InnoGotchi.Web.BLL.Identity;
 using InnoGotchi.Web.BLL.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -31,6 +32,15 @@ namespace InnoGotchi.Web.Controllers
             return View();
         }
 
+        public async Task<IActionResult> ChangeAvatar(IFormFile FormFile)
+        {
+            bool result = await AvatarUpdate(FormFile);
+            if (result)
+                return RedirectToAction("UserProfile");
+            else
+                return BadRequest();
+        }
+
         public async Task<IActionResult> UserProfile()
         {
             int userId = int.Parse(HttpContext.User.FindFirstValue("user_id"));
@@ -44,7 +54,6 @@ namespace InnoGotchi.Web.Controllers
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
-
         public async Task<IActionResult> Authenticate(string email, string password)
         {
             string? token = await Token(email, password);
@@ -67,9 +76,6 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
-
-
-
         private async Task SignIn(SecurityToken securityToken)
         {
             var claims = new List<Claim>
@@ -120,7 +126,7 @@ namespace InnoGotchi.Web.Controllers
                     PropertyNameCaseInsensitive = true
                 };
                 var user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
-                return _userService.Get(user);
+                return _userService.GetUserDTO(user);
             }
             else
                 return null;
@@ -145,7 +151,7 @@ namespace InnoGotchi.Web.Controllers
                 };
                 User? user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
 
-                return _userService.Get(user);
+                return _userService.GetUserDTO(user);
             }
             else
                 return null;
@@ -180,7 +186,7 @@ namespace InnoGotchi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UserDTO? user)
         {
-            User? person = _userService.Create(user);
+            User? person = _userService.GetUser(user);
             person.Avatar = _imageService.GetBytesFromFormFile(user.FormFile);
 
             var httpClient = await GetHttpClient("Users");
@@ -200,6 +206,19 @@ namespace InnoGotchi.Web.Controllers
             }
             else
                 return BadRequest();
+        }
+
+        [HttpPut]
+        public async Task<bool> AvatarUpdate(IFormFile FormFile)
+        {
+            var httpClient = await GetHttpClient("Users");
+
+            var parameters = new Dictionary<string, string>();
+            parameters["Id"] = HttpContext.User.FindFirstValue("user_id");
+            parameters["Avatar"] = Convert.ToBase64String(_imageService.GetBytesFromFormFile(FormFile));
+
+            var httpResponseMessage = await httpClient.PutAsync(httpClient.BaseAddress + "/avatarChange", new FormUrlEncodedContent(parameters));
+            return httpResponseMessage.IsSuccessStatusCode;
         }
     }
 }

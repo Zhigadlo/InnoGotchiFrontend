@@ -14,12 +14,11 @@ namespace InnoGotchi.Web.Middleware
             this._next = next;
         }
 
-
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Cookies.ContainsKey("security_token"))
+            if (context.Request.Cookies.ContainsKey("security_token") && !context.User.Identity.IsAuthenticated)
             {
-                string jsonToken = context.Request.Cookies["security_token"];
+                string? jsonToken = context.Request.Cookies["security_token"];
                 SecurityToken? securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
 
                 if (securityToken != null)
