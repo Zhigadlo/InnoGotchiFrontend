@@ -12,20 +12,36 @@ namespace InnoGotchi.Web.Controllers
 {
     public class UsersController : BaseController
     {
-        private UserService _service;
+        private UserService _userService;
         private LocalStorage _storage;
+        private ImageService _imageService;
         public UsersController(IHttpClientFactory httpClientFactory,
-                               UserService service,
-                               LocalStorage storage) : base(httpClientFactory, storage)
+                               UserService userService,
+                               LocalStorage storage,
+                               ImageService imageService) : base(httpClientFactory, storage)
         {
-            _service = service;
+            _userService = userService;
             _storage = storage;
+            _imageService = imageService;
         }
 
         public IActionResult Login()
         {
             return View();
         }
+
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> UserProfile()
+        {
+            int userId = int.Parse(HttpContext.User.FindFirstValue("user_id"));
+            UserDTO ? user = await Get(userId);
+            return View(user);
+        }
+
         public async Task<IActionResult> Logout()
         {
             _storage.Remove(_securityTokenKey);
@@ -48,10 +64,28 @@ namespace InnoGotchi.Web.Controllers
                     ExpireAt = DateTime.UtcNow.AddHours(6)
                 };
                 _storage.Store(_securityTokenKey, securityToken);
+                await SignIn(securityToken);
                 return RedirectToAction("Index", "Home");
             }
             else
                 return BadRequest();
+        }
+
+        
+
+        private async Task SignIn(SecurityToken securityToken)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, securityToken.Email),
+                new Claim(ClaimTypes.Name, securityToken.UserName),
+                new Claim("access_token", securityToken.AccessToken),
+                new Claim("expiredAt", securityToken.ExpireAt.ToString()),
+                new Claim("user_id", securityToken.UserId.ToString())
+            };
+            var identity = new ClaimsIdentity(claims, "Bearer");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(claimsPrincipal);
         }
         private async Task<string?> Token(string email, string password)
         {
@@ -73,8 +107,6 @@ namespace InnoGotchi.Web.Controllers
         {
             var httpClient = GetHttpClient("Users");
 
-            var parameters = new Dictionary<string, string>();
-
             var httpRequestMessage = new HttpRequestMessage
             (
                 HttpMethod.Get,
@@ -91,13 +123,12 @@ namespace InnoGotchi.Web.Controllers
                     PropertyNameCaseInsensitive = true
                 };
                 var user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
-                return _service.Get(user);
+                return _userService.Get(user);
             }
             else
                 return null;
         }
-
-        public async Task<IActionResult> Get(int id)
+        public async Task<UserDTO?> Get(int id)
         {
             var httpClient = GetHttpClient("Users");
             var httpRequestMessage = new HttpRequestMessage
@@ -117,13 +148,11 @@ namespace InnoGotchi.Web.Controllers
                 };
                 User? user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
 
-                return View(_service.Get(user));
+                return _userService.Get(user);
             }
             else
-                return BadRequest();
+                return null;
         }
-
-        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var httpClient = GetHttpClient("Users");
@@ -145,7 +174,32 @@ namespace InnoGotchi.Web.Controllers
                 IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
                 if (users == null)
                     users = new List<User>();
-                return View(_service.GetAll(users));
+                return View(_userService.GetAll(users));
+            }
+            else
+                return BadRequest();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(UserDTO? user)
+        {
+            User? person = _userService.Create(user);
+            person.Avatar = _imageService.GetBytesFromFormFile(user.FormFile);
+
+            var httpClient = GetHttpClient("Users");
+
+            var parameters = new Dictionary<string, string>();
+            parameters["FirstName"] = person.FirstName;
+            parameters["LastName"] = person.LastName;
+            parameters["Password"] = person.Password;
+            parameters["Email"] = person.Email;
+            parameters["Avatar"] = Convert.ToBase64String(person.Avatar);
+
+            var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index", "Home");
             }
             else
                 return BadRequest();

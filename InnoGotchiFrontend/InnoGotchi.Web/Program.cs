@@ -1,6 +1,5 @@
 using AutoMapper;
 using Hanssens.Net;
-using InnoGotchi.Web.BLL.Identity;
 using InnoGotchi.Web.BLL.Mapper;
 using InnoGotchi.Web.BLL.Services;
 using InnoGotchi.Web.Extensions;
@@ -25,6 +24,7 @@ builder.Services.AddSingleton<LocalStorage>();
 
 builder.Services.AddScoped<PetService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ImageService>();
 
 var app = builder.Build();
 

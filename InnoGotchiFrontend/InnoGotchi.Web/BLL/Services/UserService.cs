@@ -20,9 +20,9 @@ namespace InnoGotchi.Web.BLL.Services
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
 
-        public void Login()
+        public User Create(UserDTO user)
         {
-
+            return _mapper.Map<User>(user);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@using (Html.BeginForm("Create", "Users"))
+﻿@using (Html.BeginForm("Create", "Users", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <h3>Registration form</h3>
     <div>
@@ -20,7 +20,7 @@
     <div id="imageSelector" class="row mb-3">
         <div class="col">
             <label for="formFile" class="form-label">Choose image for avatar (jpg, png)</label>
-            <input accept=".jpg, .png, .jpeg" class="form-control" type="file" id="formFile" name="AvatarURL">
+            <input type="file" name="FormFile" accept=".jpg, .png, .jpeg" class="form-control" id="formFile">
         </div>
         <div id="imageHolder" class="col">
             <img id="avatar" class="img-thumbnail" width="100" height="100" style="opacity:0;vertical-align:central;"/>
@@ -32,13 +32,13 @@
 
     <script>
 
-        var input = document.querySelector('#formFile');
+        var input = document.getElementById('formFile');
         input.addEventListener('change', updateImageDisplay);
 
         function updateImageDisplay() {
 
-            var imageSelector = document.querySelector('#imageSelector');
-            var image = document.querySelector('#avatar')
+            var imageSelector = document.getElementById('imageSelector');
+            var image = document.getElementById('avatar')
 
             while (input.firstChild) {
                 console.log(input.firstChild)
@@ -54,6 +54,7 @@
                     if (validFileType(curFiles[i])) {
                         para.textContent = 'File name ' + curFiles[i].name + ', file size ' + returnFileSize(curFiles[i].size) + '.';
                         image.style.opacity = 1;
+                        
                         image.src = window.URL.createObjectURL(curFiles[i]);
                     } else {
                         para.textContent = 'File name ' + curFiles[i].name + ': Not a valid file type. Update your selection.';

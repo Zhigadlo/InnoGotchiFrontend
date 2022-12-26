@@ -1,0 +1,13 @@
+﻿@using InnoGotchi.Web.BLL.DTO;
+@model UserDTO;
+
+<img id="avatar" src="data:image/png;base64,@(Convert.ToBase64String(Model.Avatar))" />
+<h1>@Model.FirstName @Model.LastName</h1>
+<h2>Email: @Model.Email</h2>
+
+@*<script>
+    if(@Model.Avatar !== null)
+    {
+        document.getElementById('avatar').src = "data:image/png;base64," + @Model.Avatar;
+    }
+</script>*@
