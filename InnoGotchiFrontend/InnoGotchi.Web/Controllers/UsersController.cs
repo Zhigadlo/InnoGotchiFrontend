@@ -66,7 +66,7 @@ namespace InnoGotchi.Web.Controllers
                     Email = email,
                     UserName = user.FirstName + " " + user.LastName,
                     UserId = user.Id,
-                    ExpireAt = DateTime.UtcNow.AddHours(6)
+                    ExpireAt = DateTime.UtcNow.AddHours(1)
                 };
                 string jsonToken = JsonSerializer.Serialize(securityToken);
                 HttpContext.Response.Cookies.Append(_securityTokenKey, jsonToken);

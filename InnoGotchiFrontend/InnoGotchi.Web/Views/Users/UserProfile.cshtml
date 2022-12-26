@@ -7,7 +7,7 @@
 
 <a id="avatarChangeButton" class="btn btn-sm btn-primary" onclick=createFileInput>Change avatar</a>
 @Html.ActionLink("Change password", "ChangePassword", "Users", new {}, new { @class = "btn btn-sm btn-primary"})
-
+<a></a>
 <form method="post" asp-action="ChangeAvatar" asp-controller="Users" id="formForFileInput" style="visibility:hidden;" enctype="multipart/form-data">
     <div>
         <label for="formFile" class="form-label">Choose image for avatar (jpg, png)</label>

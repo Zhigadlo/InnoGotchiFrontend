@@ -16,17 +16,41 @@ namespace InnoGotchi.Web.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Cookies.ContainsKey("security_token") && !context.User.Identity.IsAuthenticated)
+            SecurityToken? securityToken = GetSecurityToken(context);
+
+            if(securityToken != null)
+            {
+                if(context.User.Identity.IsAuthenticated)
+                {
+                    if (securityToken.ExpireAt < DateTime.UtcNow)
+                    {
+                        context.Response.Cookies.Delete("security_token");
+                        await context.SignOutAsync();
+                    }
+                }
+                else
+                {
+                    if(securityToken.ExpireAt < DateTime.UtcNow)
+                    {
+                        context.Response.Cookies.Delete("security_token");
+                    }
+                    else
+                        await SignIn(securityToken, context);
+                }
+            }
+
+            await _next.Invoke(context);
+        }
+
+        private SecurityToken? GetSecurityToken(HttpContext context)
+        {
+            if (context.Request.Cookies.ContainsKey("security_token"))
             {
                 string? jsonToken = context.Request.Cookies["security_token"];
                 SecurityToken? securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
-
-                if (securityToken != null)
-                {
-                    await SignIn(securityToken, context);
-                }
+                return securityToken;
             }
-            await _next.Invoke(context);
+            return null;
         }
 
         private async Task SignIn(SecurityToken securityToken, HttpContext context)
