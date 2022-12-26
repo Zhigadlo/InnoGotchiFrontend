@@ -1,5 +1,4 @@
-﻿using Hanssens.Net;
-using InnoGotchi.Web.BLL.Identity;
+﻿using InnoGotchi.Web.BLL.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -10,21 +9,23 @@ namespace InnoGotchi.Web.Controllers
     {
         private IHttpClientFactory _httpClientFactory;
         protected const string _securityTokenKey = "security_token";
-        private LocalStorage _storage;
-        public BaseController(IHttpClientFactory httpClientFactory, LocalStorage storage)
+        public BaseController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
-            _storage = storage;
         }
 
-        protected HttpClient GetHttpClient(string clientName)
+        protected async Task<HttpClient> GetHttpClient(string clientName)
         {
             var httpClient = _httpClientFactory.CreateClient(clientName);
-            
-            if (_storage.Exists(_securityTokenKey))
+
+            if (HttpContext.Request.Cookies.ContainsKey("security_token"))
             {
-                var securityToken = _storage.Get<SecurityToken>(_securityTokenKey);
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", securityToken.AccessToken);
+                string jsonToken = HttpContext.Request.Cookies["security_token"];
+                SecurityToken? securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
+                if (securityToken != null)
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", securityToken.AccessToken);
+                }
             }
             return httpClient;
         }

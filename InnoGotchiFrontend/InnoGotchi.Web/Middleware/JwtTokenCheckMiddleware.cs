@@ -1,7 +1,7 @@
-﻿using Hanssens.Net;
-using InnoGotchi.Web.BLL.Identity;
+﻿using InnoGotchi.Web.BLL.Identity;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace InnoGotchi.Web.Middleware
 {
@@ -14,12 +14,18 @@ namespace InnoGotchi.Web.Middleware
             this._next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, LocalStorage localStorage)
+
+        public async Task InvokeAsync(HttpContext context)
         {
-            if (localStorage.Exists("security_token") && !context.User.Identity.IsAuthenticated)
+            if (context.Request.Cookies.ContainsKey("security_token"))
             {
-                SecurityToken securityToken = localStorage.Get<SecurityToken>("security_token");
-                await SignIn(securityToken, context);
+                string jsonToken = context.Request.Cookies["security_token"];
+                SecurityToken? securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
+
+                if (securityToken != null)
+                {
+                    await SignIn(securityToken, context);
+                }
             }
             await _next.Invoke(context);
         }

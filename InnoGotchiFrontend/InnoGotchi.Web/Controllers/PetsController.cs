@@ -1,5 +1,4 @@
-﻿using Hanssens.Net;
-using InnoGotchi.DAL.Models;
+﻿using InnoGotchi.DAL.Models;
 using InnoGotchi.Web.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -9,16 +8,15 @@ namespace InnoGotchi.Web.Controllers
     public class PetsController : BaseController
     {
         private PetService _service;
-        public PetsController(IHttpClientFactory httpClientFactory, 
-                              PetService service,
-                              LocalStorage storage) : base(httpClientFactory, storage)
+        public PetsController(IHttpClientFactory httpClientFactory,
+                              PetService service) : base(httpClientFactory)
         {
             _service = service;
         }
 
         public async Task<IActionResult> Get(int id)
         {
-            var httpClient = GetHttpClient("Pets");
+            var httpClient = await GetHttpClient("Pets");
             var httpRequestMessage = new HttpRequestMessage
             (
                 HttpMethod.Get,
@@ -45,7 +43,7 @@ namespace InnoGotchi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var httpClient = GetHttpClient("Pets");
+            var httpClient = await GetHttpClient("Pets");
 
             var httpRequestMessage = new HttpRequestMessage
             (

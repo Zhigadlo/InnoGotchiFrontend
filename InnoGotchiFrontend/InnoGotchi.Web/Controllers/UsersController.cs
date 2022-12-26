@@ -1,5 +1,4 @@
-﻿using Hanssens.Net;
-using InnoGotchi.DAL.Models;
+﻿using InnoGotchi.DAL.Models;
 using InnoGotchi.Web.BLL.DTO;
 using InnoGotchi.Web.BLL.Identity;
 using InnoGotchi.Web.BLL.Services;
@@ -13,15 +12,12 @@ namespace InnoGotchi.Web.Controllers
     public class UsersController : BaseController
     {
         private UserService _userService;
-        private LocalStorage _storage;
         private ImageService _imageService;
         public UsersController(IHttpClientFactory httpClientFactory,
                                UserService userService,
-                               LocalStorage storage,
-                               ImageService imageService) : base(httpClientFactory, storage)
+                               ImageService imageService) : base(httpClientFactory)
         {
             _userService = userService;
-            _storage = storage;
             _imageService = imageService;
         }
 
@@ -38,13 +34,13 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> UserProfile()
         {
             int userId = int.Parse(HttpContext.User.FindFirstValue("user_id"));
-            UserDTO ? user = await Get(userId);
+            UserDTO? user = await Get(userId);
             return View(user);
         }
 
         public async Task<IActionResult> Logout()
         {
-            _storage.Remove(_securityTokenKey);
+            HttpContext.Response.Cookies.Delete(_securityTokenKey);
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
@@ -63,7 +59,8 @@ namespace InnoGotchi.Web.Controllers
                     UserId = user.Id,
                     ExpireAt = DateTime.UtcNow.AddHours(6)
                 };
-                _storage.Store(_securityTokenKey, securityToken);
+                string jsonToken = JsonSerializer.Serialize(securityToken);
+                HttpContext.Response.Cookies.Append(_securityTokenKey, jsonToken);
                 await SignIn(securityToken);
                 return RedirectToAction("Index", "Home");
             }
@@ -71,7 +68,7 @@ namespace InnoGotchi.Web.Controllers
                 return BadRequest();
         }
 
-        
+
 
         private async Task SignIn(SecurityToken securityToken)
         {
@@ -89,7 +86,7 @@ namespace InnoGotchi.Web.Controllers
         }
         private async Task<string?> Token(string email, string password)
         {
-            var httpClient = GetHttpClient("Users");
+            var httpClient = await GetHttpClient("Users");
             var parameters = new Dictionary<string, string>();
             parameters["email"] = email;
             parameters["password"] = password;
@@ -105,7 +102,7 @@ namespace InnoGotchi.Web.Controllers
         }
         private async Task<UserDTO?> GetUser(string email, string password)
         {
-            var httpClient = GetHttpClient("Users");
+            var httpClient = await GetHttpClient("Users");
 
             var httpRequestMessage = new HttpRequestMessage
             (
@@ -130,7 +127,7 @@ namespace InnoGotchi.Web.Controllers
         }
         public async Task<UserDTO?> Get(int id)
         {
-            var httpClient = GetHttpClient("Users");
+            var httpClient = await GetHttpClient("Users");
             var httpRequestMessage = new HttpRequestMessage
             (
                 HttpMethod.Get,
@@ -155,7 +152,7 @@ namespace InnoGotchi.Web.Controllers
         }
         public async Task<IActionResult> GetAll()
         {
-            var httpClient = GetHttpClient("Users");
+            var httpClient = await GetHttpClient("Users");
             var httpRequestMessage = new HttpRequestMessage
             (
                 HttpMethod.Get,
@@ -186,7 +183,7 @@ namespace InnoGotchi.Web.Controllers
             User? person = _userService.Create(user);
             person.Avatar = _imageService.GetBytesFromFormFile(user.FormFile);
 
-            var httpClient = GetHttpClient("Users");
+            var httpClient = await GetHttpClient("Users");
 
             var parameters = new Dictionary<string, string>();
             parameters["FirstName"] = person.FirstName;
