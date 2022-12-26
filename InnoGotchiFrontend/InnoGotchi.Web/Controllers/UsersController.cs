@@ -32,6 +32,11 @@ namespace InnoGotchi.Web.Controllers
             return View();
         }
 
+        public IActionResult ChangePasswordView()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> ChangeAvatar(IFormFile FormFile)
         {
             bool result = await AvatarUpdate(FormFile);
@@ -48,6 +53,25 @@ namespace InnoGotchi.Web.Controllers
             return View(user);
         }
 
+
+        public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
+        {
+            var httpClient = await GetHttpClient("Users");
+
+            var parameters = new Dictionary<string, string>();
+            parameters["Id"] = HttpContext.User.FindFirstValue("user_id");
+            parameters["OldPassword"] = oldPassword;
+            parameters["NewPassword"] = newPassword;
+            parameters["ConfirmPassword"] = confirmPassword;
+
+            var httpResponseMessage = await httpClient.PutAsync(httpClient.BaseAddress + "/passwordChange", new FormUrlEncodedContent(parameters));
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                return await Logout();
+            }
+            else
+                return BadRequest();
+        }
         public async Task<IActionResult> Logout()
         {
             HttpContext.Response.Cookies.Delete(_securityTokenKey);
