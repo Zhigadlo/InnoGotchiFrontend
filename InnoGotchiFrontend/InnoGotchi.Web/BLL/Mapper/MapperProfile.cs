@@ -10,7 +10,7 @@ namespace InnoGotchi.Web.BLL.Mapper
         {
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<Pet, PetDTO>().ReverseMap();
-            //CreateMap<Farm, FarmDTO>().ReverseMap();
+            CreateMap<Farm, FarmDTO>().ReverseMap();
             CreateMap<Appearance, AppearanceDTO>().ReverseMap();
             //CreateMap<ColoborationRequest, ColoborationRequestDTO>().ReverseMap();
         }
