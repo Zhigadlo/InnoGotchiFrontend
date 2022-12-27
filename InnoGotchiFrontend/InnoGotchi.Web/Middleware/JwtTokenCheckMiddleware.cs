@@ -61,7 +61,8 @@ namespace InnoGotchi.Web.Middleware
                 new Claim(ClaimTypes.Name, securityToken.UserName),
                 new Claim("access_token", securityToken.AccessToken),
                 new Claim("expiredAt", securityToken.ExpireAt.ToString()),
-                new Claim("user_id", securityToken.UserId.ToString())
+                new Claim("user_id", securityToken.UserId.ToString()),
+                new Claim("farm_id", securityToken.FarmId.ToString())
             };
             var identity = new ClaimsIdentity(claims, "Bearer");
             var claimsPrincipal = new ClaimsPrincipal(identity);

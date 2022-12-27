@@ -90,7 +90,8 @@ namespace InnoGotchi.Web.Controllers
                     Email = email,
                     UserName = user.FirstName + " " + user.LastName,
                     UserId = user.Id,
-                    ExpireAt = DateTime.UtcNow.AddHours(1)
+                    ExpireAt = DateTime.UtcNow.AddHours(1),
+                    FarmId = user.Farm == null ? -1 : user.Farm.Id
                 };
                 string jsonToken = JsonSerializer.Serialize(securityToken);
                 HttpContext.Response.Cookies.Append(_securityTokenKey, jsonToken);
@@ -108,7 +109,8 @@ namespace InnoGotchi.Web.Controllers
                 new Claim(ClaimTypes.Name, securityToken.UserName),
                 new Claim("access_token", securityToken.AccessToken),
                 new Claim("expiredAt", securityToken.ExpireAt.ToString()),
-                new Claim("user_id", securityToken.UserId.ToString())
+                new Claim("user_id", securityToken.UserId.ToString()),
+                new Claim("farm_id", securityToken.FarmId.ToString())
             };
             var identity = new ClaimsIdentity(claims, "Bearer");
             var claimsPrincipal = new ClaimsPrincipal(identity);

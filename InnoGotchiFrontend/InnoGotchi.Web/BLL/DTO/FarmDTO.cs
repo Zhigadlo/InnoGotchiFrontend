@@ -9,6 +9,6 @@ namespace InnoGotchi.Web.BLL.DTO
         public DateTime CreateTime { get; set; }
         public List<PetDTO> Pets { get; set; }
         public int OwnerId { get; set; }
-        public FarmDTO Farm { get; set; }
+        public FarmDTO? Farm { get; set; }
     }
 }
