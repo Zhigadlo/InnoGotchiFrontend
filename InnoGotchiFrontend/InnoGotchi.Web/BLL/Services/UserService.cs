@@ -10,7 +10,7 @@ namespace InnoGotchi.Web.BLL.Services
         {
         }
 
-        public UserDTO GetUserDTO(User? user)
+        public UserDTO? GetUserDTO(User? user)
         {
             return _mapper.Map<UserDTO>(user);
         }

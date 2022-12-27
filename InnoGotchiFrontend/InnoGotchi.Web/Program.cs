@@ -10,8 +10,9 @@ string baseRoot = "https://localhost:7200/api";
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddHttpClientForPet(baseRoot);
-builder.Services.AddHttpClientForUser(baseRoot);
+builder.Services.AddHttpClient(baseRoot, "Users");
+builder.Services.AddHttpClient(baseRoot, "Pets");
+builder.Services.AddHttpClient(baseRoot, "Farms");
 
 var config = new MapperConfiguration(cnf => cnf.AddProfile<MapperProfile>());
 builder.Services.AddTransient<IMapper>(x => new Mapper(config));
@@ -20,6 +21,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<PetService>();
+builder.Services.AddScoped<FarmService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ImageService>();
 

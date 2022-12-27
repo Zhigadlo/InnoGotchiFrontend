@@ -9,5 +9,6 @@
         public string Password { get; set; }
         public IFormFile FormFile { get; set; }
         public byte[]? Avatar { get; set; }
+        public FarmDTO Farm { get; set; }
     }
 }
