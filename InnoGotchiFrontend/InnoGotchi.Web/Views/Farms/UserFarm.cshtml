@@ -15,11 +15,12 @@ else
     if (Model.Pets == null || Model.Pets.Count() == 0)
     {
         <h1>You have no pets yet</h1>
+        <a class="btn btn-info" asp-action="PetConstructor" asp-controller="Pets">Create new pet</a>
     }
     else
     {
         <div class="text-center">
-            <h1 class="display-4">@Model.Name</h1>
+            <h1 class="display-4">Your pets</h1>
             <table class="table">
                 <tr>
                     <th>Id</th>
@@ -28,7 +29,6 @@ else
                     <th>Mouth</th>
                     <th>Eyes</th>
                     <th>Body</th>
-                    <th>FarmId</th>
                 </tr>
                 @foreach (var item in Model.Pets)
                 {
@@ -42,6 +42,9 @@ else
                     </tr>
                 }
             </table>
+        </div>
+        <div>
+            <a class="btn btn-info" asp-action="PetConstructor" asp-controller="Pets">Create new pet</a>
         </div>
     }
 

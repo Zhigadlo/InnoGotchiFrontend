@@ -17,14 +17,15 @@ namespace InnoGotchi.Web.Controllers
             _farmService = farmService;
         }
 
-        public IActionResult UserFarm(FarmDTO? farm)
+        public async Task<IActionResult> UserFarm(int id)
         {
+            FarmDTO? farm = await Get(id);
             return View(farm);
         }
 
         public async Task<IActionResult> CreateFarm(string name)
         {
-            var httpClient = await GetHttpClient("Farms");
+            var httpClient = GetHttpClient("Farms");
 
             var parameters = new Dictionary<string, string>();
             parameters["Name"] = name;
@@ -33,24 +34,23 @@ namespace InnoGotchi.Web.Controllers
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                int id = JsonSerializer.Deserialize<int>(await httpResponseMessage.Content.ReadAsStringAsync());
-                FarmDTO? farm = await Get(id);
-                return RedirectToAction("UserFarm", new { farm = farm });
+                int farmId = JsonSerializer.Deserialize<int>(await httpResponseMessage.Content.ReadAsStringAsync());
+                
+                return RedirectToAction("UserFarm", new { id = farmId });
             }
             else
                 return BadRequest();
         }
 
-        public async Task<IActionResult> GetUserFarm()
+        public IActionResult GetUserFarm()
         {
             int farmId = int.Parse(HttpContext.User.FindFirstValue("farm_id"));
-            FarmDTO? farm = await Get(farmId);
-            return RedirectToAction("UserFarm", new { farm = farm });
+            return RedirectToAction("UserFarm", new { id = farmId} );
         }
 
         public async Task<FarmDTO?> Get(int id)
         {
-            var httpClient = await GetHttpClient("Farms");
+            var httpClient = GetHttpClient("Farms");
             var httpRequestMessage = new HttpRequestMessage
             (
                 HttpMethod.Get,

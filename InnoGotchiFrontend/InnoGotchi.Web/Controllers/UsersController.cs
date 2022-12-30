@@ -4,7 +4,6 @@ using InnoGotchi.Web.BLL.Identity;
 using InnoGotchi.Web.BLL.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -56,7 +55,7 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
         {
-            var httpClient = await GetHttpClient("Users");
+            var httpClient = GetHttpClient("Users");
 
             var parameters = new Dictionary<string, string>();
             parameters["Id"] = HttpContext.User.FindFirstValue("user_id");
@@ -118,7 +117,7 @@ namespace InnoGotchi.Web.Controllers
         }
         private async Task<string?> Token(string email, string password)
         {
-            var httpClient = await GetHttpClient("Users");
+            var httpClient = GetHttpClient("Users");
             var parameters = new Dictionary<string, string>();
             parameters["email"] = email;
             parameters["password"] = password;
@@ -134,7 +133,7 @@ namespace InnoGotchi.Web.Controllers
         }
         private async Task<UserDTO?> GetUser(string email, string password)
         {
-            var httpClient = await GetHttpClient("Users");
+            var httpClient = GetHttpClient("Users");
 
             var httpRequestMessage = new HttpRequestMessage
             (
@@ -159,7 +158,7 @@ namespace InnoGotchi.Web.Controllers
         }
         public async Task<UserDTO?> Get(int id)
         {
-            var httpClient = await GetHttpClient("Users");
+            var httpClient = GetHttpClient("Users");
             var httpRequestMessage = new HttpRequestMessage
             (
                 HttpMethod.Get,
@@ -184,7 +183,7 @@ namespace InnoGotchi.Web.Controllers
         }
         public async Task<IActionResult> GetAll()
         {
-            var httpClient = await GetHttpClient("Users");
+            var httpClient = GetHttpClient("Users");
             var httpRequestMessage = new HttpRequestMessage
             (
                 HttpMethod.Get,
@@ -215,7 +214,7 @@ namespace InnoGotchi.Web.Controllers
             User? person = _userService.GetUser(user);
             person.Avatar = _imageService.GetBytesFromFormFile(user.FormFile);
 
-            var httpClient = await GetHttpClient("Users");
+            var httpClient = GetHttpClient("Users");
 
             var parameters = new Dictionary<string, string>();
             parameters["FirstName"] = person.FirstName;
@@ -237,7 +236,7 @@ namespace InnoGotchi.Web.Controllers
         [HttpPut]
         public async Task<bool> AvatarUpdate(IFormFile FormFile)
         {
-            var httpClient = await GetHttpClient("Users");
+            var httpClient = GetHttpClient("Users");
 
             var parameters = new Dictionary<string, string>();
             parameters["Id"] = HttpContext.User.FindFirstValue("user_id");

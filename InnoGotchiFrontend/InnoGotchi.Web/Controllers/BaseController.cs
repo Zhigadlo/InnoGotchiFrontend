@@ -14,7 +14,7 @@ namespace InnoGotchi.Web.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        protected async Task<HttpClient> GetHttpClient(string clientName)
+        protected HttpClient GetHttpClient(string clientName)
         {
             var httpClient = _httpClientFactory.CreateClient(clientName);
 
