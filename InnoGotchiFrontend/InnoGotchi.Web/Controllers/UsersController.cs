@@ -35,7 +35,13 @@ namespace InnoGotchi.Web.Controllers
         {
             return View();
         }
-
+        public async Task<IActionResult> AllUsers()
+        {
+            List<UserDTO> users = (await GetAll()).ToList();
+            UserDTO authorizedUser = users.Find(u => u.Id == int.Parse(HttpContext.User.FindFirstValue("user_id")));
+            users.Remove(authorizedUser);
+            return View(users);
+        }
         public async Task<IActionResult> ChangeAvatar(IFormFile FormFile)
         {
             bool result = await AvatarUpdate(FormFile);
@@ -181,7 +187,7 @@ namespace InnoGotchi.Web.Controllers
             else
                 return null;
         }
-        public async Task<IActionResult> GetAll()
+        public async Task<IEnumerable<UserDTO>?> GetAll()
         {
             var httpClient = GetHttpClient("Users");
             var httpRequestMessage = new HttpRequestMessage
@@ -202,10 +208,10 @@ namespace InnoGotchi.Web.Controllers
                 IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
                 if (users == null)
                     users = new List<User>();
-                return View(_userService.GetAll(users));
+                return _userService.GetAll(users);
             }
-            else
-                return BadRequest();
+
+            return null;
         }
 
         [HttpPost]

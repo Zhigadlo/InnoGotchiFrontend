@@ -1,0 +1,27 @@
+﻿@using InnoGotchi.Web.BLL.DTO;
+@{
+    ViewData["Title"] = "All users";
+}
+@model IEnumerable<UserDTO>;
+<div class="text-center">
+    <h1 class="display-4">Users</h1>
+    <table class="table">
+        <tr>
+            <th></th>
+            <th>User</th>
+            <th></th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <img src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="50" height="50" />
+                </td>
+                <td>@item.FirstName @item.LastName</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-action="Create" asp-controller="Requests">Send friendship request</a>
+                </td>
+            </tr>
+        }
+    </table>
+</div>
