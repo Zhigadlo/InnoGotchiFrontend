@@ -1,0 +1,38 @@
+﻿@model UserRequestsViewModel
+
+<div class="text-center">
+    <h1 class="display-4">Sent requests</h1>
+    <table class="table">
+        <tr>
+            <th>RequestOwnerId</th>
+            <th>ReceiverId</th>
+            <th>IsConfirmed</th>
+        </tr>
+        @foreach (var item in Model.SentRequests)
+        {
+            <tr>
+                <td>@item.RequestOwnerId</td>
+                <td>@item.RequestReceipientId</td>
+                <td>@item.IsConfirmed</td>
+            </tr>
+        }
+    </table>
+</div>
+<div class="text-center">
+    <h1 class="display-4">Received requests</h1>
+    <table class="table">
+        <tr>
+            <th>RequestOwnerId</th>
+            <th>ReceiverId</th>
+            <th>IsConfirmed</th>
+        </tr>
+        @foreach (var item in Model.ReceivedRequests)
+        {
+            <tr>
+                <td>@item.RequestOwnerId</td>
+                <td>@item.RequestReceipientId</td>
+                <td>@item.IsConfirmed</td>
+            </tr>
+        }
+    </table>
+</div>

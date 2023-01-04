@@ -2,7 +2,6 @@
 using InnoGotchi.Web.BLL.DTO;
 using InnoGotchi.Web.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -45,7 +44,7 @@ namespace InnoGotchi.Web.Controllers
         public IActionResult GetUserFarm()
         {
             int farmId = int.Parse(HttpContext.User.FindFirstValue("farm_id"));
-            return RedirectToAction("UserFarm", new { id = farmId} );
+            return RedirectToAction("UserFarm", new { id = farmId } );
         }
 
         public async Task<FarmDTO?> Get(int id)

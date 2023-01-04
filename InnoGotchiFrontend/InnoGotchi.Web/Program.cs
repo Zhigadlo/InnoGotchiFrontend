@@ -13,6 +13,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient(baseRoot, "Users");
 builder.Services.AddHttpClient(baseRoot, "Pets");
 builder.Services.AddHttpClient(baseRoot, "Farms");
+builder.Services.AddHttpClient(baseRoot, "Requests");
 
 var config = new MapperConfiguration(cnf => cnf.AddProfile<MapperProfile>());
 builder.Services.AddTransient<IMapper>(x => new Mapper(config));
@@ -24,6 +25,7 @@ builder.Services.AddScoped<PetService>();
 builder.Services.AddScoped<FarmService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ImageService>();
+builder.Services.AddScoped<RequestService>();
 
 var app = builder.Build();
 

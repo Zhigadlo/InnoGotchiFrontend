@@ -18,26 +18,21 @@ namespace InnoGotchi.Web.Middleware
         {
             SecurityToken? securityToken = GetSecurityToken(context);
 
-            if(securityToken != null)
+            if (securityToken != null)
             {
-                if(context.User.Identity.IsAuthenticated)
+                if (securityToken.ExpireAt < DateTime.UtcNow)
                 {
-                    if (securityToken.ExpireAt < DateTime.UtcNow)
-                    {
-                        context.Response.Cookies.Delete("security_token");
-                        await context.SignOutAsync();
-                    }
+                    context.Response.Cookies.Delete("security_token");
+                    await context.SignOutAsync();
                 }
-                else
+                
+                if (!context.User.Identity.IsAuthenticated && securityToken.ExpireAt > DateTime.UtcNow)
                 {
-                    if(securityToken.ExpireAt < DateTime.UtcNow)
-                    {
-                        context.Response.Cookies.Delete("security_token");
-                    }
-                    else
-                        await SignIn(securityToken, context);
+                    await SignIn(securityToken, context);
                 }
             }
+            else
+                await context.SignOutAsync();
 
             await _next.Invoke(context);
         }

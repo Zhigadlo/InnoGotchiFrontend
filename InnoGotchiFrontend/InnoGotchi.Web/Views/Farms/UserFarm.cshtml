@@ -1,7 +1,7 @@
 ﻿@using InnoGotchi.Web.BLL.DTO;
 @model FarmDTO
 
-@if (Model.CreateTime == DateTime.MinValue)
+@if (Model == null)
 {
     <h1>You have no farm yet</h1>
     <form method="post" asp-controller="Farms" asp-action="CreateFarm">
