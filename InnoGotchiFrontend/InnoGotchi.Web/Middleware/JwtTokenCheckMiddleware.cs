@@ -25,7 +25,7 @@ namespace InnoGotchi.Web.Middleware
                     context.Response.Cookies.Delete("security_token");
                     await context.SignOutAsync();
                 }
-                
+
                 if (!context.User.Identity.IsAuthenticated && securityToken.ExpireAt > DateTime.UtcNow)
                 {
                     await SignIn(securityToken, context);

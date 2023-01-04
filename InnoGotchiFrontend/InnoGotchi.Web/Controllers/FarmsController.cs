@@ -34,7 +34,7 @@ namespace InnoGotchi.Web.Controllers
             if (httpResponseMessage.IsSuccessStatusCode)
             {
                 int farmId = JsonSerializer.Deserialize<int>(await httpResponseMessage.Content.ReadAsStringAsync());
-                
+
                 return RedirectToAction("UserFarm", new { id = farmId });
             }
             else
@@ -44,7 +44,7 @@ namespace InnoGotchi.Web.Controllers
         public IActionResult GetUserFarm()
         {
             int farmId = int.Parse(HttpContext.User.FindFirstValue("farm_id"));
-            return RedirectToAction("UserFarm", new { id = farmId } );
+            return RedirectToAction("UserFarm", new { id = farmId });
         }
 
         public async Task<FarmDTO?> Get(int id)

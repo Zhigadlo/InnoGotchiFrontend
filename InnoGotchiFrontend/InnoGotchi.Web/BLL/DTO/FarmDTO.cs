@@ -1,6 +1,4 @@
-﻿using InnoGotchi.DAL.Models;
-
-namespace InnoGotchi.Web.BLL.DTO
+﻿namespace InnoGotchi.Web.BLL.DTO
 {
     public class FarmDTO
     {

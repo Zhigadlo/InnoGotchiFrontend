@@ -9,5 +9,7 @@
         public string Password { get; set; }
         public byte[] Avatar { get; set; }
         public Farm Farm { get; set; }
+        public List<ColoborationRequest> SentRequests { get; set; }
+        public List<ColoborationRequest> ReceivedRequests { get; set; }
     }
 }

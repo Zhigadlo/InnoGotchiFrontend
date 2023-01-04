@@ -10,6 +10,13 @@ namespace InnoGotchi.Web.BLL.Services
         {
         }
 
+        public bool IsExist(int ownerId, int receipientId, IEnumerable<ColoborationRequestDTO> requests)
+        {
+            ColoborationRequestDTO? request = requests.FirstOrDefault(r => r.RequestOwnerId == ownerId
+                                                                        && r.RequestReceipientId == receipientId);
+            return requests.Contains(request);
+        }
+
         public ColoborationRequestDTO? GetColoborationRequestDTO(ColoborationRequest request)
         {
             return _mapper.Map<ColoborationRequestDTO>(request);

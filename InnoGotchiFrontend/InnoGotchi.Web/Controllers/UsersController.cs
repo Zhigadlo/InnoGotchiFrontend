@@ -35,6 +35,13 @@ namespace InnoGotchi.Web.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> UserRequests()
+        {
+            UserDTO? user = await GetCurrentUser();
+            return View(user);
+        }
+
         public async Task<IActionResult> AllUsers()
         {
             List<UserDTO> users = (await GetAll()).ToList();
@@ -53,12 +60,15 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<IActionResult> UserProfile()
         {
-            int userId = int.Parse(HttpContext.User.FindFirstValue("user_id"));
-            UserDTO? user = await Get(userId);
+            UserDTO? user = await GetCurrentUser();
             return View(user);
         }
 
-
+        private async Task<UserDTO?> GetCurrentUser()
+        {
+            int userId = int.Parse(HttpContext.User.FindFirstValue("user_id"));
+            return await Get(userId);
+        }
         public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
         {
             var httpClient = GetHttpClient("Users");

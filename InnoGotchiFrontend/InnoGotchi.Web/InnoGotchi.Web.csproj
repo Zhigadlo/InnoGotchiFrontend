@@ -21,4 +21,8 @@
     <ProjectReference Include="..\InnoGotchiFrontend.DAL\InnoGotchi.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Requests\" />
+  </ItemGroup>
+
 </Project>

@@ -1,8 +1,6 @@
 ﻿using InnoGotchi.DAL.Models;
-using InnoGotchi.Web.BLL.DTO;
 using InnoGotchi.Web.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Security.Claims;
 using System.Text.Json;
 
