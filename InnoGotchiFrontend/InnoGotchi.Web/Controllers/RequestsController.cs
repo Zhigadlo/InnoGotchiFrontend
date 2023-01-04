@@ -27,7 +27,23 @@ namespace InnoGotchi.Web.Controllers
 
             return View(requests);
         }
+        public async Task<IActionResult> Create(int receiverId)
+        {
+            var httpClient = GetHttpClient("Requests");
 
+            var parameters = new Dictionary<string, string>();
+            parameters["IsConfirm"] = false.ToString();
+            parameters["RequestOwnerId"] = HttpContext.User.FindFirstValue("user_id");
+            parameters["RequestReceipientId"] = receiverId.ToString();
+
+            var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                return RedirectToAction("UserRequests");
+            }
+            else
+                return BadRequest();
+        }
 
         public async Task<IEnumerable<ColoborationRequestDTO>?> GetSentRequests()
         {
