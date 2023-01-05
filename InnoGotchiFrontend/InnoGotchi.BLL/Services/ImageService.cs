@@ -1,4 +1,6 @@
-﻿namespace InnoGotchi.Web.BLL.Services
+﻿using Microsoft.AspNetCore.Http;
+
+namespace InnoGotchi.BLL.Services
 {
     public class ImageService
     {

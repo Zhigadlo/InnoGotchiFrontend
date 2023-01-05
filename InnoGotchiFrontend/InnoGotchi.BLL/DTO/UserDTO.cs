@@ -1,4 +1,6 @@
-﻿namespace InnoGotchi.Web.BLL.DTO
+﻿using Microsoft.AspNetCore.Http;
+
+namespace InnoGotchi.BLL.DTO
 {
     public class UserDTO
     {

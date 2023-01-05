@@ -1,7 +1,7 @@
-﻿using InnoGotchi.DAL.Models;
-using InnoGotchi.Web.BLL.DTO;
-using InnoGotchi.Web.BLL.Identity;
-using InnoGotchi.Web.BLL.Services;
+﻿using InnoGotchi.BLL.DTO;
+using InnoGotchi.BLL.Identity;
+using InnoGotchi.BLL.Services;
+using InnoGotchi.DAL.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

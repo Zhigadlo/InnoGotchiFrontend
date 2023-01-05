@@ -1,4 +1,4 @@
-﻿using InnoGotchi.Web.BLL.Identity;
+﻿using InnoGotchi.BLL.Identity;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using System.Text.Json;
@@ -32,8 +32,10 @@ namespace InnoGotchi.Web.Middleware
                 }
             }
             else
+            {
+                context.Response.Cookies.Delete("security_token");
                 await context.SignOutAsync();
-
+            }
             await _next.Invoke(context);
         }
 

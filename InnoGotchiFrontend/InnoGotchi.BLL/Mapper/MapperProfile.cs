@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using InnoGotchi.BLL.DTO;
 using InnoGotchi.DAL.Models;
-using InnoGotchi.Web.BLL.DTO;
 
-namespace InnoGotchi.Web.BLL.Mapper
+namespace InnoGotchi.BLL.Mapper
 {
     public class MapperProfile : Profile
     {

@@ -1,4 +1,4 @@
-﻿namespace InnoGotchi.Web.BLL.Identity
+﻿namespace InnoGotchi.BLL.Identity
 {
     public class SecurityToken
     {

@@ -1,4 +1,4 @@
-﻿using InnoGotchi.Web.BLL.DTO;
+﻿using InnoGotchi.BLL.DTO;
 
 namespace InnoGotchi.Web.Models
 {

@@ -1,6 +1,6 @@
 using AutoMapper;
-using InnoGotchi.Web.BLL.Mapper;
-using InnoGotchi.Web.BLL.Services;
+using InnoGotchi.BLL.Mapper;
+using InnoGotchi.BLL.Services;
 using InnoGotchi.Web.Extensions;
 using InnoGotchi.Web.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;

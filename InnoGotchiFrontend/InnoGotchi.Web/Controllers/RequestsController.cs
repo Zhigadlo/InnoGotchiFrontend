@@ -1,4 +1,4 @@
-﻿using InnoGotchi.Web.BLL.Services;
+﻿using InnoGotchi.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 

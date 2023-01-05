@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace InnoGotchi.Web.BLL.Services
+namespace InnoGotchi.BLL.Services
 {
     public class BaseService
     {

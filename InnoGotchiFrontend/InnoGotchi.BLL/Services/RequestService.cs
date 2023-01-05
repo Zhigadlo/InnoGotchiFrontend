@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using InnoGotchi.BLL.DTO;
 using InnoGotchi.DAL.Models;
-using InnoGotchi.Web.BLL.DTO;
 
-namespace InnoGotchi.Web.BLL.Services
+namespace InnoGotchi.BLL.Services
 {
     public class RequestService : BaseService
     {

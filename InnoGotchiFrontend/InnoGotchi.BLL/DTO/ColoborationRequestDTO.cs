@@ -1,4 +1,4 @@
-﻿namespace InnoGotchi.Web.BLL.DTO
+﻿namespace InnoGotchi.BLL.DTO
 {
     public class ColoborationRequestDTO
     {

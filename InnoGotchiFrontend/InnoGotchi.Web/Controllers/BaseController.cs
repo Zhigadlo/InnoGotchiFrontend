@@ -1,4 +1,4 @@
-﻿using InnoGotchi.Web.BLL.Identity;
+﻿using InnoGotchi.BLL.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Text.Json;
