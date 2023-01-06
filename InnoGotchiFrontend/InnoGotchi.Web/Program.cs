@@ -14,6 +14,7 @@ builder.Services.AddHttpClient(baseRoot, "Users");
 builder.Services.AddHttpClient(baseRoot, "Pets");
 builder.Services.AddHttpClient(baseRoot, "Farms");
 builder.Services.AddHttpClient(baseRoot, "Requests");
+builder.Services.AddHttpClient(baseRoot, "Pictures");
 
 var config = new MapperConfiguration(cnf => cnf.AddProfile<MapperProfile>());
 builder.Services.AddTransient<IMapper>(x => new Mapper(config));

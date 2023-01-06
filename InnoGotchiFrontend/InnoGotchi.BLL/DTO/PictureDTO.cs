@@ -1,10 +1,10 @@
 ﻿namespace InnoGotchi.BLL.DTO
 {
-    public class PetDTO
+    public class PictureDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Appearance { get; set; }
-        public int FarmId { get; set; }
+        public string Description { get; set; }
+        public byte[] Image { get; set; }
     }
 }

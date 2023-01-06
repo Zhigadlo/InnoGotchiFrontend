@@ -25,20 +25,14 @@ else
                 <tr>
                     <th>Id</th>
                     <th>Name</th>
-                    <th>Nose</th>
-                    <th>Mouth</th>
-                    <th>Eyes</th>
-                    <th>Body</th>
+                    <th>Appearance</th>
                 </tr>
                 @foreach (var item in Model.Pets)
                 {
                     <tr>
                         <td>@item.Id</td>
                         <td>@item.Name</td>
-                        <td>@item.Appearance.NoseURL</td>
-                        <td>@item.Appearance.MouthURL</td>
-                        <td>@item.Appearance.EyesURL</td>
-                        <td>@item.Appearance.BodyURL</td>
+                        <td>@item.Appearance</td>
                     </tr>
                 }
             </table>

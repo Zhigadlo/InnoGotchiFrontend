@@ -75,16 +75,13 @@ namespace InnoGotchi.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string name, Appearance? appearance)
+        public async Task<IActionResult> Create(string name, string? appearance)
         {
             var httpClient = GetHttpClient("Pets");
 
             var parameters = new Dictionary<string, string>();
             parameters["Name"] = name;
-            parameters["Appearance.EyesURL"] = appearance.EyesURL;
-            parameters["Appearance.NoseURL"] = appearance.NoseURL;
-            parameters["Appearance.MouthURL"] = appearance.MouthURL;
-            parameters["Appearance.BodyURL"] = appearance.BodyURL;
+            parameters["Appearance"] = appearance;
             parameters["FarmId"] = HttpContext.User.FindFirstValue("farm_id");
 
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
