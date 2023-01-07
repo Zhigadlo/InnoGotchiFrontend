@@ -15,11 +15,6 @@ namespace InnoGotchi.Web.Controllers
             _service = service;
         }
 
-        public IActionResult PetConstructor()
-        {
-            return View();
-        }
-
         public async Task<IActionResult> Get(int id)
         {
             var httpClient = GetHttpClient("Pets");

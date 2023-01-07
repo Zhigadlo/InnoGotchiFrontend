@@ -1,11 +1,13 @@
-﻿<form method="post" asp-action="Create" asp-controller="Pets">
+﻿@model PetConstructorViewModel
+
+<form method="post" asp-action="Create" asp-controller="Pets">
     <h1>Pet constructor</h1>
     <div>
         <label>Name</label><br/>
         <input type ="text" name="name"/>
     </div>
     <div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" onload="makeDraggable(evt)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" onload="makeDraggable(evt)">
             <style>
                 .static {
                     cursor: not-allowed;
@@ -15,8 +17,12 @@
                     cursor: move;
                 }
             </style>
+            
             <rect width="100%" height="100%" fill="green" />
-            <image class="draggable" x="0" y="0" width="50" height="50" xlink:href="https://w-dog.ru/wallpapers/9/17/322057789001671/zakat-nebo-solnce-luchi-oblaka-tuchi-pole-kolosya-zelenye-trava.jpg" />
+            <image class="draggable" x="0" y="0" width="500" height="500" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies[1].Image))" />
+            <image class="draggable" x="140" y="100" width="200" height="200" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes[1].Image))" />
+            <image class="draggable" x="140" y="150" width="200" height="200" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses[1].Image))" />
+            <image class="draggable" x="140" y="200" width="200" height="200" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths[1].Image))" />
             
         </svg>
     </div>
@@ -25,6 +31,8 @@
     </div>
 </form>
 <script type="text/javascript">
+
+
     function makeDraggable(evt) {
         var svg = evt.target;
 
