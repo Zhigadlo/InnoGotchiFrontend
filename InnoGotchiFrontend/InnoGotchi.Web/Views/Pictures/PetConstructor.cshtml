@@ -1,37 +1,235 @@
-﻿@model PetConstructorViewModel
+﻿@model PetConstructorViewModel;
 
 <form method="post" asp-action="Create" asp-controller="Pets">
     <h1>Pet constructor</h1>
     <div>
-        <label>Name</label><br/>
-        <input type ="text" name="name"/>
+        <label>Name</label><br />
+        <input type="text" name="name" />
     </div>
-    <div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" onload="makeDraggable(evt)">
-            <style>
-                .static {
-                    cursor: not-allowed;
-                }
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <style type="text/css">
+                    .static {
+                        cursor: not-allowed;
+                    }
 
-                .draggable, .draggable-group {
-                    cursor: move;
-                }
-            </style>
-            
-            <rect width="100%" height="100%" fill="green" />
-            <image class="draggable" x="0" y="0" width="500" height="500" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies[1].Image))" />
-            <image class="draggable" x="140" y="100" width="200" height="200" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes[1].Image))" />
-            <image class="draggable" x="140" y="150" width="200" height="200" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses[1].Image))" />
-            <image class="draggable" x="140" y="200" width="200" height="200" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths[1].Image))" />
-            
-        </svg>
+                    .draggable, .draggable-group {
+                        cursor: move;
+                    }
+                </style>
+                <svg xmlns="http://www.w3.org/2000/svg" name="pet" width="500" height="500" onload="makeDraggable(evt)">
+
+                    <rect width="100%" height="100%" style="fill:white;stroke-width:1;stroke:black" />
+
+                    <image class="draggable" name="body" x="0" y="0" width="600" height="600" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies[0].Image))" />
+                    <image class="draggable" name="eyes" x="140" y="100" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes[0].Image))" />
+                    <image class="draggable" name="nose" x="140" y="150" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses[0].Image))" />
+                    <image class="draggable" name="mouth" x="140" y="200" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths[0].Image))" />
+
+                </svg>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-primary" onclick="setPrevBodyHref()">←Previsous body</a>
+                    </div>
+                    <div class="col align-text-center">
+                        <img name="body_icon" width="100" height="100" style="border:solid 1px;" src="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies[0].Image))" />
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-primary" onclick="setNextBodyHref()">Next body→</a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-primary" onclick="setPrevEyesHref()">←Previous eyes</a>
+                    </div>
+                    <div class="col">
+                        <img name="eyes_icon" width="100" height="100" style="border:solid 1px;" src="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes[0].Image))" />
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-primary" onclick="setNextEyesHref()">Next eyes→</a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-primary" onclick="setPrevNoseHref()">←Previous nose</a>
+                    </div>
+                    <div class="col">
+                        <img name="nose_icon" width="100" height="100" style="border:solid 1px;" src="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses[0].Image))" />
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-primary" onclick="setNextNoseHref()">Next nose→</a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-primary" onclick="setPrevMouthHref()">←Previous mouth</a>
+                    </div>
+                    <div class="col">
+                        <img name="mouth_icon" width="100" height="100" style="border:solid 1px;" src="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths[0].Image))" />
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-primary" onclick="setNextMouthHref()">Next mouth→</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div>
-        <input type="submit" value="Create"/>
+        <input type="submit" value="Create" />
     </div>
 </form>
-<script type="text/javascript">
 
+<script type="text/javascript">
+    var bodyNumber = 0;
+    var eyesNumber = 0;
+    var noseNumber = 0;
+    var mouthNumber = 0;
+    var bodies = [];
+    var eyes = [];
+    var noses = [];
+    var mouths = [];
+
+    @foreach (var body in Model.Bodies)
+    {
+        @:var bytes = [];
+        @foreach (var imByte in @body.Image)
+        {
+            @:bytes.push(@imByte)
+        }
+        @:bodies.push("data:image/svg+xml;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(bytes))));
+    }
+
+    @foreach (var eyes in Model.Eyes)
+    {
+        @:var bytes = [];
+        @foreach (var imByte in eyes.Image)
+        {
+            @:bytes.push(@imByte)
+        }
+        @:eyes.push("data:image/svg+xml;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(bytes))));
+    }
+
+    @foreach (var nose in Model.Noses)
+    {
+        @:var bytes = [];
+        @foreach (var imByte in nose.Image)
+        {
+            @:bytes.push(@imByte)
+        }
+        @:noses.push("data:image/svg+xml;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(bytes))));
+    }
+
+    @foreach (var mouth in Model.Mouths)
+    {
+        @:var bytes = [];
+        @foreach (var imByte in mouth.Image)
+        {
+            @:bytes.push(@imByte)
+        }
+        @:mouths.push("data:image/svg+xml;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(bytes))));
+    }
+
+    function setNextBodyHref() {
+        if (bodyNumber + 1 > bodies.length - 1) {
+            bodyNumber = 0;
+        }
+        else {
+            bodyNumber += 1;
+        }
+    
+        document.querySelector('[name="body"]').setAttribute('href', bodies[bodyNumber]);
+        document.querySelector('[name="body_icon"]').setAttribute('src', bodies[bodyNumber]);
+    }
+
+    function setPrevBodyHref() {
+        if (bodyNumber - 1 < 0) {
+            bodyNumber = bodies.length - 1;
+        }
+        else {
+            bodyNumber -= 1;
+        }
+
+        document.querySelector('[name="body"]').setAttribute('href', bodies[bodyNumber]);
+        document.querySelector('[name="body_icon"]').setAttribute('src', bodies[bodyNumber]);
+    }
+
+    function setNextEyesHref() {
+        if (eyesNumber + 1 > eyes.length - 1) {
+            eyesNumber = 0;
+        }
+        else {
+            eyesNumber += 1;
+        }
+
+        document.querySelector('[name="eyes"]').setAttribute('href', eyes[eyesNumber]);
+        document.querySelector('[name="eyes_icon"]').setAttribute('src', eyes[eyesNumber]);
+    }
+
+    function setPrevEyesHref() {
+        if (eyesNumber - 1 < 0) {
+            eyesNumber = eyes.length - 1;
+        }
+        else {
+            eyesNumber -= 1;
+        }
+
+        document.querySelector('[name="eyes"]').setAttribute('href', eyes[eyesNumber]);
+        document.querySelector('[name="eyes_icon"]').setAttribute('src', eyes[eyesNumber]);
+    }
+
+    function setNextNoseHref() {
+        if (noseNumber + 1 > noses.length - 1) {
+            noseNumber = 0;
+        }
+        else {
+            noseNumber += 1;
+        }
+
+        document.querySelector('[name="nose"]').setAttribute('href', noses[noseNumber]);
+        document.querySelector('[name="nose_icon"]').setAttribute('src', noses[noseNumber]);
+    }
+
+    function setPrevNoseHref() {
+        if (noseNumber - 1 < 0) {
+            noseNumber = noses.length - 1;
+        }
+        else {
+            noseNumber -= 1;
+        }
+
+        document.querySelector('[name="nose"]').setAttribute('href', noses[noseNumber]);
+        document.querySelector('[name="nose_icon"]').setAttribute('src', noses[noseNumber]);
+    }
+
+    function setNextMouthHref() {
+        if (mouthNumber + 1 > mouths.length - 1) {
+            mouthNumber = 0;
+        }
+        else {
+            mouthNumber += 1;
+        }
+
+        document.querySelector('[name="mouth"]').setAttribute('href', mouths[mouthNumber]);
+        document.querySelector('[name="mouth_icon"]').setAttribute('src', mouths[mouthNumber]);
+    }
+
+    function setPrevMouthHref() {
+        if (mouthNumber - 1 < 0) {
+            mouthNumber = mouths.length - 1;
+        }
+        else {
+            mouthNumber -= 1;
+        }
+
+        document.querySelector('[name="mouth"]').setAttribute('href', mouths[mouthNumber]);
+        document.querySelector('[name="mouth_icon"]').setAttribute('src', mouths[mouthNumber]);
+    }
 
     function makeDraggable(evt) {
         var svg = evt.target;
@@ -98,4 +296,5 @@
             selectedElement = false;
         }
     }
+
 </script>

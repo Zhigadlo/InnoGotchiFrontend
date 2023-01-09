@@ -1,4 +1,5 @@
 ﻿using InnoGotchi.BLL.DTO;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace InnoGotchi.Web.Models
 {
