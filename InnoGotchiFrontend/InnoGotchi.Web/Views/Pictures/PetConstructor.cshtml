@@ -22,7 +22,7 @@
 
                     <rect width="100%" height="100%" style="fill:white;stroke-width:1;stroke:black" />
 
-                    <image class="draggable" name="body" x="0" y="0" width="600" height="600" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies[0].Image))" />
+                    <image class="draggable" name="body" x="-25" y="-20" width="600" height="600" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies[0].Image))" />
                     <image class="draggable" name="eyes" x="140" y="100" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes[0].Image))" />
                     <image class="draggable" name="nose" x="140" y="150" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses[0].Image))" />
                     <image class="draggable" name="mouth" x="140" y="200" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths[0].Image))" />
@@ -40,6 +40,8 @@
                     <div class="col">
                         <a class="btn btn-primary" onclick="setNextBodyHref()">Next body→</a>
                     </div>
+                    <label for="body_size" class="form-label">Body size:</label>
+                    <input type="range" class="form-range" id="body_size" min="10" max="100" value="60" step="1" />
                 </div>
 
                 <div class="row">
@@ -52,6 +54,8 @@
                     <div class="col">
                         <a class="btn btn-primary" onclick="setNextEyesHref()">Next eyes→</a>
                     </div>
+                    <label for="eyes_size" class="form-label">Eyes size:</label>
+                    <input type="range" class="form-range" id="eyes_size" min="10" max="100" value="25" step="1" />
                 </div>
 
                 <div class="row">
@@ -64,6 +68,8 @@
                     <div class="col">
                         <a class="btn btn-primary" onclick="setNextNoseHref()">Next nose→</a>
                     </div>
+                    <label for="nose_size" class="form-label">Nose size:</label>
+                    <input type="range" class="form-range" id="nose_size" min="10" max="100" value="25" step="1" />
                 </div>
 
                 <div class="row">
@@ -76,6 +82,8 @@
                     <div class="col">
                         <a class="btn btn-primary" onclick="setNextMouthHref()">Next mouth→</a>
                     </div>
+                    <label for="mouth_size" class="form-label">Mouth size:</label>
+                    <input type="range" class="form-range" id="mouth_size" min="10" max="100" value="25" step="1" />
                 </div>
             </div>
         </div>
@@ -85,7 +93,51 @@
     </div>
 </form>
 
+<script>
+    var bodyImage = $('image[name="body"]');
+    var eyesImage = $('image[name="eyes"]');
+    var noseImage = $('image[name="nose"]');
+    var mouthImage = $('image[name="mouth"]');
+    var maxBodyHeight = 1000;
+    var maxBodyWidth = 1000;
+    var maxEyesHeight = 400;
+    var maxEyesWidth = 400;
+    var maxNoseHeight = 400;
+    var maxNoseWidth = 400;
+    var maxMouthHeight = 400;
+    var maxMouthWidth = 400;
+
+    $("#body_size").change(function(){
+        let value = $(this).val();
+        
+        bodyImage.attr('height', maxBodyHeight * value * 0.01);
+        bodyImage.attr('width', maxBodyWidth * value * 0.01);
+    });
+
+    $("#eyes_size").change(function () {
+        let value = $(this).val();
+
+        eyesImage.attr('height', maxEyesHeight * value * 0.01);
+        eyesImage.attr('width', maxEyesWidth * value * 0.01);
+    });
+
+    $("#nose_size").change(function () {
+        let value = $(this).val();
+
+        noseImage.attr('height', maxNoseHeight * value * 0.01);
+        noseImage.attr('width', maxNoseWidth * value * 0.01);
+    });
+
+    $("#mouth_size").change(function () {
+        let value = $(this).val();
+
+        mouthImage.attr('height', maxMouthHeight * value * 0.01);
+        mouthImage.attr('width', maxMouthWidth * value * 0.01);
+    });
+</script>
+
 <script type="text/javascript">
+
     var bodyNumber = 0;
     var eyesNumber = 0;
     var noseNumber = 0;
