@@ -1,6 +1,6 @@
 ﻿@model PetConstructorViewModel;
 
-<form method="post" asp-action="Create" asp-controller="Pets">
+<form id="petCreate" method="post" asp-action="Create" asp-controller="Pets">
     <h1>Pet constructor</h1>
     <div class="mb-3">
         <label class="form-label">Name</label><br />
@@ -18,15 +18,13 @@
                         cursor: move;
                     }
                 </style>
-                <svg xmlns="http://www.w3.org/2000/svg" name="pet" width="500" height="500" onload="makeDraggable(evt)">
-
+                
+                <svg xmlns="http://www.w3.org/2000/svg" id="pet" width="500" height="500" onload="makeDraggable(evt)">
                     <rect width="100%" height="100%" style="fill:white;stroke-width:1;stroke:black" />
-
                     <image class="draggable" name="body" x="-25" y="-20" width="600" height="600" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies[0].Image))" />
                     <image class="draggable" name="eyes" x="190" y="100" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes[0].Image))" />
                     <image class="draggable" name="nose" x="190" y="140" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses[0].Image))" />
                     <image class="draggable" name="mouth" x="190" y="170" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths[0].Image))" />
-
                 </svg>
             </div>
             <div class="col">
@@ -88,8 +86,9 @@
             </div>
         </div>
     </div>
+    <input type="text" name="appearance" onforminput="getSvg()" hidden/>
     <div class="mb-3">
-        <input type="submit" value="Create" class="btn btn-primary"/>
+        <input type="submit" id="submit" onsubmit="getSvg()" value="Create" class="btn btn-primary"/>
     </div>
 </form>
 
@@ -98,6 +97,7 @@
     var eyesImage = $('image[name="eyes"]');
     var noseImage = $('image[name="nose"]');
     var mouthImage = $('image[name="mouth"]');
+
     var maxBodyHeight = 1000;
     var maxBodyWidth = 1000;
     var maxEyesHeight = 400;
@@ -146,6 +146,13 @@
     var eyes = [];
     var noses = [];
     var mouths = [];
+
+    var form = document.getElementById('petCreate');
+    form.addEventListener('submit', () => {
+        var svg = new XMLSerializer().serializeToString(document.getElementById("pet"));
+        document.querySelector('[name="appearance"]').setAttribute('value', btoa(svg));
+        console.log(document.querySelector('[name="appearance"]').getAttribute('value'));
+    });
 
     @foreach (var body in Model.Bodies)
     {

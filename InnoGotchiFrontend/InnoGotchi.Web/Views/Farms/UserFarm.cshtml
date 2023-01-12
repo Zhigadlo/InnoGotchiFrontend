@@ -32,13 +32,13 @@ else
                     <tr>
                         <td>@item.Id</td>
                         <td>@item.Name</td>
-                        <td>@item.Appearance</td>
+                        <td><img src="data:image/svg+xml;base64,@(item.Appearance)" width="200" height="200"/></td>
                     </tr>
                 }
             </table>
         </div>
         <div>
-            <a class="btn btn-info" asp-action="PetConstructor" asp-controller="Pets">Create new pet</a>
+            <a class="btn btn-info" asp-action="PetConstructor" asp-controller="Pictures">Create new pet</a>
         </div>
     }
 
