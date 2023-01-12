@@ -1,21 +1,21 @@
 ﻿@using (Html.BeginForm("Create", "Users", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <h3>Registration form</h3>
-    <div>
-        <label>First name</label><br />
-        <input type="text" name="FirstName" /><br />
+    <div class="form-floating mb-3">
+        <input class="form-control" id="firstname_input" type="text" name="FirstName" placeholder="firstname" />
+        <label for="firstname_input">First name</label>
     </div>
-    <div>
-        <label>Last name</label><br />
-        <input type="text" name="LastName" /> <br />
+    <div class="form-floating mb-3">
+        <input id="lastname_input" class="form-control" type="text" name="LastName" placeholder="secondname"/>
+        <label for="lastname_input">Last name</label>
     </div>
-    <div>
-        <label>Email</label><br />
-        <input type="email" name="Email" /><br />
+    <div class="form-floating mb-3">
+        <input id="email_input" class="form-control" type="email" name="Email" placeholder="name@example.com"/>
+        <label for="email_input">Email</label>
     </div>
-    <div>
-        <label>Enter password</label><br />
-        <input type="password" name="Password" /><br />
+    <div class="form-floating mb-3">
+        <input id="password_input" class="form-control" type="password" name="Password" placeholder="SomePassword1234_"/>
+        <label for="password_input">Password</label>
     </div>
     <div id="imageSelector" class="row mb-3">
         <div class="col">
@@ -26,9 +26,9 @@
             <img id="avatar" class="img-thumbnail" width="100" height="100" style="opacity:0;vertical-align:central;"/>
         </div>
     </div>
-    <div>
-        <input type="submit" value="Register" />
-    </div>
+    
+    <input class="btn btn-outline-dark" type="submit" value="Register" />
+    
 
     <script>
 
