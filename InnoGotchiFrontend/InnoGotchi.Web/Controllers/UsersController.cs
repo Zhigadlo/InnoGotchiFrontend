@@ -45,7 +45,8 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> AllUsers()
         {
             List<UserDTO> users = (await GetAll()).ToList();
-            UserDTO authorizedUser = users.Find(u => u.Id == int.Parse(HttpContext.User.FindFirstValue("user_id")));
+            int authorized_id = int.Parse(HttpContext.User.FindFirstValue("user_id"));
+            UserDTO authorizedUser = users.Find(u => u.Id == authorized_id);
             users.Remove(authorizedUser);
             return View(users);
         }

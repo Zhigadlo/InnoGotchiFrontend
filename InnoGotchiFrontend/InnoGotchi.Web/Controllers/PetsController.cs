@@ -71,7 +71,7 @@ namespace InnoGotchi.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string name, string? appearance)
+        public async Task<IActionResult> Create(string name, string appearance)
         {
             var httpClient = GetHttpClient("Pets");
             

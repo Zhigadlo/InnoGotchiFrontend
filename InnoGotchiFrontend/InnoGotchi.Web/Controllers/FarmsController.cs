@@ -1,4 +1,5 @@
 ﻿using InnoGotchi.BLL.DTO;
+using InnoGotchi.BLL.Identity;
 using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,12 @@ namespace InnoGotchi.Web.Controllers
             if (httpResponseMessage.IsSuccessStatusCode)
             {
                 int farmId = JsonSerializer.Deserialize<int>(await httpResponseMessage.Content.ReadAsStringAsync());
-
+                string? jsonToken = HttpContext.Request.Cookies["security_token"];
+                SecurityToken securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
+                securityToken.FarmId = farmId;
+                HttpContext.Response.Cookies.Delete("security_token");
+                jsonToken = JsonSerializer.Serialize(securityToken);
+                HttpContext.Response.Cookies.Append("security_token", jsonToken);
                 return RedirectToAction("UserFarm", new { id = farmId });
             }
             else
