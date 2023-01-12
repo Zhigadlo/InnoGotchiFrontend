@@ -1,15 +1,16 @@
-﻿@using (Html.BeginForm("Authenticate", "Users"))
-{
+﻿<form  asp-action="Authenticate" asp-controller="Users">
     <h3>Login form</h3>
-    <p>
-        <label>Enter email</label><br/>
-        <input type="email" name="email" /> <br/>
-    </p>
-    <p>
-        <label>Enter password</label><br/>
-        <input type="password" name="password" /><br/>
-    </p>
-    <p>
-        <input type="submit" value="Login" />
-    </p>
-}
+    <div class="form-floating mb-3">
+        <input class="form-control" id="email_input" type="email" name="email" placeholder="name@example.com"/> <br />
+        <label for="email_input">Email</label>
+    </div>
+    <div class="form-floating mb-3">
+        
+        <input class="form-control" id="password_input" type="password" name="password" aria-describedby="password_help" placeholder="SomePassword1234_"/><br />
+        <label for="password_input">Password</label>
+        <div id="password_help" class="form-text">Password must contain bla bla bla</div>
+    </div>
+    
+    <input type="submit" value="Login" class="btn btn-primary"/>
+    
+</form>
