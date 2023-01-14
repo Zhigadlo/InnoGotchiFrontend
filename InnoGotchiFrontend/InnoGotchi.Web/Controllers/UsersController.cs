@@ -1,4 +1,5 @@
-﻿using InnoGotchi.BLL.DTO;
+﻿using Hanssens.Net;
+using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Identity;
 using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
@@ -15,7 +16,8 @@ namespace InnoGotchi.Web.Controllers
         private ImageService _imageService;
         public UsersController(IHttpClientFactory httpClientFactory,
                                UserService userService,
-                               ImageService imageService) : base(httpClientFactory)
+                               ImageService imageService,
+                               LocalStorage localStorage) : base(httpClientFactory, localStorage)
         {
             _userService = userService;
             _imageService = imageService;
@@ -45,7 +47,7 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> AllUsers()
         {
             List<UserDTO> users = (await GetAll()).ToList();
-            int authorized_id = int.Parse(HttpContext.User.FindFirstValue("user_id"));
+            int authorized_id = int.Parse(HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId)));
             UserDTO authorizedUser = users.Find(u => u.Id == authorized_id);
             users.Remove(authorizedUser);
             return View(users);
@@ -67,7 +69,7 @@ namespace InnoGotchi.Web.Controllers
 
         private async Task<UserDTO?> GetCurrentUser()
         {
-            int userId = int.Parse(HttpContext.User.FindFirstValue("user_id"));
+            int userId = int.Parse(HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId)));
             return await Get(userId);
         }
         public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
@@ -75,7 +77,7 @@ namespace InnoGotchi.Web.Controllers
             var httpClient = GetHttpClient("Users");
 
             var parameters = new Dictionary<string, string>();
-            parameters["Id"] = HttpContext.User.FindFirstValue("user_id");
+            parameters["Id"] = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
             parameters["OldPassword"] = oldPassword;
             parameters["NewPassword"] = newPassword;
             parameters["ConfirmPassword"] = confirmPassword;
@@ -90,7 +92,7 @@ namespace InnoGotchi.Web.Controllers
         }
         public async Task<IActionResult> Logout()
         {
-            HttpContext.Response.Cookies.Delete(_securityTokenKey);
+            _localStorage.Remove(nameof(SecurityToken));
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
@@ -110,7 +112,7 @@ namespace InnoGotchi.Web.Controllers
                     FarmId = user.Farm == null ? -1 : user.Farm.Id
                 };
                 string jsonToken = JsonSerializer.Serialize(securityToken);
-                HttpContext.Response.Cookies.Append(_securityTokenKey, jsonToken);
+                _localStorage.Store(nameof(SecurityToken), jsonToken);
                 await SignIn(securityToken);
                 return RedirectToAction("Index", "Home");
             }
@@ -123,10 +125,10 @@ namespace InnoGotchi.Web.Controllers
             {
                 new Claim(ClaimTypes.Email, securityToken.Email),
                 new Claim(ClaimTypes.Name, securityToken.UserName),
-                new Claim("access_token", securityToken.AccessToken),
-                new Claim("expiredAt", securityToken.ExpireAt.ToString()),
-                new Claim("user_id", securityToken.UserId.ToString()),
-                new Claim("farm_id", securityToken.FarmId.ToString())
+                new Claim(nameof(SecurityToken.AccessToken), securityToken.AccessToken),
+                new Claim(nameof(SecurityToken.ExpireAt), securityToken.ExpireAt.ToString()),
+                new Claim(nameof(SecurityToken.UserId), securityToken.UserId.ToString()),
+                new Claim(nameof(SecurityToken.FarmId), securityToken.FarmId.ToString())
             };
             var identity = new ClaimsIdentity(claims, "Bearer");
             var claimsPrincipal = new ClaimsPrincipal(identity);
@@ -256,7 +258,7 @@ namespace InnoGotchi.Web.Controllers
             var httpClient = GetHttpClient("Users");
 
             var parameters = new Dictionary<string, string>();
-            parameters["Id"] = HttpContext.User.FindFirstValue("user_id");
+            parameters["Id"] = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
             parameters["Avatar"] = Convert.ToBase64String(_imageService.GetBytesFromFormFile(FormFile));
 
             var httpResponseMessage = await httpClient.PutAsync(httpClient.BaseAddress + "/avatarChange", new FormUrlEncodedContent(parameters));

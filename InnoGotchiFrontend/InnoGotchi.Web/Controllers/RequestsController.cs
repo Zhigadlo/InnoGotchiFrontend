@@ -1,4 +1,6 @@
-﻿using InnoGotchi.BLL.Services;
+﻿using Hanssens.Net;
+using InnoGotchi.BLL.Identity;
+using InnoGotchi.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -8,7 +10,8 @@ namespace InnoGotchi.Web.Controllers
     {
         private RequestService _requestService;
         public RequestsController(IHttpClientFactory httpClientFactory,
-                                  RequestService requestService) : base(httpClientFactory)
+                                  LocalStorage localStorage,
+                                  RequestService requestService) : base(httpClientFactory, localStorage)
         {
             _requestService = requestService;
         }
@@ -19,7 +22,7 @@ namespace InnoGotchi.Web.Controllers
 
             var parameters = new Dictionary<string, string>();
             parameters["IsConfirm"] = false.ToString();
-            parameters["RequestOwnerId"] = HttpContext.User.FindFirstValue("user_id");
+            parameters["RequestOwnerId"] = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
             parameters["RequestReceipientId"] = receiverId.ToString();
 
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));

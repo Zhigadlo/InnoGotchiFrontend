@@ -1,4 +1,5 @@
 using AutoMapper;
+using Hanssens.Net;
 using InnoGotchi.BLL.Mapper;
 using InnoGotchi.BLL.Services;
 using InnoGotchi.Web.Extensions;
@@ -27,8 +28,11 @@ builder.Services.AddScoped<FarmService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<RequestService>();
+builder.Services.AddScoped<LocalStorage>();
 
 var app = builder.Build();
+
+app.UseMiddleware<JwtTokenCheckMiddleware>();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -40,8 +44,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseHttpLogging();
 app.UseRouting();
-
-app.UseMiddleware<JwtTokenCheckMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

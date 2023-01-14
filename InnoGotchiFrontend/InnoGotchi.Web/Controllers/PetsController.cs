@@ -1,4 +1,6 @@
-﻿using InnoGotchi.BLL.Services;
+﻿using Hanssens.Net;
+using InnoGotchi.BLL.Identity;
+using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -10,7 +12,8 @@ namespace InnoGotchi.Web.Controllers
     {
         private PetService _service;
         public PetsController(IHttpClientFactory httpClientFactory,
-                              PetService service) : base(httpClientFactory)
+                              PetService service,
+                              LocalStorage localStorage) : base(httpClientFactory, localStorage)
         {
             _service = service;
         }
@@ -77,13 +80,13 @@ namespace InnoGotchi.Web.Controllers
             var parameters = new Dictionary<string, string>();
             parameters["Name"] = name;
             parameters["Appearance"] = appearance;
-            parameters["FarmId"] = HttpContext.User.FindFirstValue("farm_id");
+            parameters["FarmId"] = HttpContext.User.FindFirstValue(nameof(SecurityToken.FarmId));
 
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                return RedirectToAction("UserFarm", "Farms", new { id = HttpContext.User.FindFirstValue("user_id") });
+                return RedirectToAction("UserFarm", "Farms", new { id = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId)) });
             }
             else
                 return BadRequest();

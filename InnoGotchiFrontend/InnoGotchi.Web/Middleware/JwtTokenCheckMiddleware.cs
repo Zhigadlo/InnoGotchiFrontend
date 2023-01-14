@@ -1,4 +1,5 @@
-﻿using InnoGotchi.BLL.Identity;
+﻿using Hanssens.Net;
+using InnoGotchi.BLL.Identity;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using System.Text.Json;
@@ -14,15 +15,15 @@ namespace InnoGotchi.Web.Middleware
             this._next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, LocalStorage localStorage)
         {
-            SecurityToken? securityToken = GetSecurityToken(context);
+            SecurityToken? securityToken = GetSecurityToken(localStorage);
 
             if (securityToken != null)
             {
                 if (securityToken.ExpireAt < DateTime.UtcNow)
                 {
-                    context.Response.Cookies.Delete("security_token");
+                    localStorage.Remove(nameof(SecurityToken));
                     await context.SignOutAsync();
                 }
 
@@ -38,17 +39,12 @@ namespace InnoGotchi.Web.Middleware
             await _next.Invoke(context);
         }
 
-        private SecurityToken? GetSecurityToken(HttpContext context)
+        private SecurityToken? GetSecurityToken(LocalStorage localStorage)
         {
-            if (context.Request.Cookies.ContainsKey("security_token"))
+            if (localStorage.Exists(nameof(SecurityToken)))
             {
-                string? jsonToken = context.Request.Cookies["security_token"];
+                string? jsonToken = localStorage.Get<string>(nameof(SecurityToken));
                 SecurityToken? securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
-                if (securityToken.ExpireAt < DateTime.UtcNow)
-                {
-                    context.Response.Cookies.Delete("security_token");
-                    return null;
-                }
                 return securityToken;
             }
             return null;
@@ -60,10 +56,10 @@ namespace InnoGotchi.Web.Middleware
             {
                 new Claim(ClaimTypes.Email, securityToken.Email),
                 new Claim(ClaimTypes.Name, securityToken.UserName),
-                new Claim("access_token", securityToken.AccessToken),
-                new Claim("expiredAt", securityToken.ExpireAt.ToString()),
-                new Claim("user_id", securityToken.UserId.ToString()),
-                new Claim("farm_id", securityToken.FarmId.ToString())
+                new Claim(nameof(SecurityToken.AccessToken), securityToken.AccessToken),
+                new Claim(nameof(SecurityToken.ExpireAt), securityToken.ExpireAt.ToString()),
+                new Claim(nameof(SecurityToken.UserId), securityToken.UserId.ToString()),
+                new Claim(nameof(SecurityToken.FarmId), securityToken.FarmId.ToString())
             };
             var identity = new ClaimsIdentity(claims, "Bearer");
             var claimsPrincipal = new ClaimsPrincipal(identity);

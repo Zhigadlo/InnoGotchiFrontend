@@ -1,4 +1,5 @@
-﻿using InnoGotchi.BLL.DTO;
+﻿using Hanssens.Net;
+using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Identity;
 using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
@@ -12,7 +13,8 @@ namespace InnoGotchi.Web.Controllers
     {
         private FarmService _farmService;
         public FarmsController(IHttpClientFactory httpClientFactory,
-                              FarmService farmService) : base(httpClientFactory)
+                              FarmService farmService,
+                              LocalStorage localStorage) : base(httpClientFactory, localStorage)
         {
             _farmService = farmService;
         }
@@ -29,18 +31,18 @@ namespace InnoGotchi.Web.Controllers
 
             var parameters = new Dictionary<string, string>();
             parameters["Name"] = name;
-            parameters["OwnerId"] = HttpContext.User.FindFirstValue("user_id");
+            parameters["OwnerId"] = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
 
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
             if (httpResponseMessage.IsSuccessStatusCode)
             {
                 int farmId = JsonSerializer.Deserialize<int>(await httpResponseMessage.Content.ReadAsStringAsync());
-                string? jsonToken = HttpContext.Request.Cookies["security_token"];
+                string? jsonToken = _localStorage.Get<string>(nameof(SecurityToken));
                 SecurityToken securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
                 securityToken.FarmId = farmId;
-                HttpContext.Response.Cookies.Delete("security_token");
+                _localStorage.Remove(nameof(SecurityToken));
                 jsonToken = JsonSerializer.Serialize(securityToken);
-                HttpContext.Response.Cookies.Append("security_token", jsonToken);
+                _localStorage.Store(nameof(SecurityToken), jsonToken);
                 return RedirectToAction("UserFarm", new { id = farmId });
             }
             else
@@ -49,7 +51,7 @@ namespace InnoGotchi.Web.Controllers
 
         public IActionResult GetUserFarm()
         {
-            int farmId = int.Parse(HttpContext.User.FindFirstValue("farm_id"));
+            int farmId = int.Parse(HttpContext.User.FindFirstValue(nameof(SecurityToken.FarmId)));
             return RedirectToAction("UserFarm", new { id = farmId });
         }
 

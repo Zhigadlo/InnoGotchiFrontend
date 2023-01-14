@@ -1,4 +1,5 @@
-﻿using InnoGotchi.BLL.DTO;
+﻿using Hanssens.Net;
+using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
 using InnoGotchi.Web.Models;
@@ -11,7 +12,8 @@ namespace InnoGotchi.Web.Controllers
     {
         private ImageService _service;
         public PicturesController(IHttpClientFactory httpClientFactory,
-                                  ImageService imageService) : base(httpClientFactory)
+                                  ImageService imageService,
+                                  LocalStorage localStorage) : base(httpClientFactory, localStorage)
         {
             _service = imageService;
         }
