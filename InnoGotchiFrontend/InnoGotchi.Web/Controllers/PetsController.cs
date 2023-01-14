@@ -2,7 +2,6 @@
 using InnoGotchi.DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Text;
 using System.Text.Json;
 
 namespace InnoGotchi.Web.Controllers
@@ -74,7 +73,7 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> Create(string name, string appearance)
         {
             var httpClient = GetHttpClient("Pets");
-            
+
             var parameters = new Dictionary<string, string>();
             parameters["Name"] = name;
             parameters["Appearance"] = appearance;

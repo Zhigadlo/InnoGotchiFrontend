@@ -33,7 +33,6 @@ namespace InnoGotchi.Web.Middleware
             }
             else
             {
-                context.Response.Cookies.Delete("security_token");
                 await context.SignOutAsync();
             }
             await _next.Invoke(context);
@@ -45,6 +44,11 @@ namespace InnoGotchi.Web.Middleware
             {
                 string? jsonToken = context.Request.Cookies["security_token"];
                 SecurityToken? securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
+                if (securityToken.ExpireAt < DateTime.UtcNow)
+                {
+                    context.Response.Cookies.Delete("security_token");
+                    return null;
+                }
                 return securityToken;
             }
             return null;

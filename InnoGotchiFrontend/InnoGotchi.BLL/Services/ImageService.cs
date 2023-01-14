@@ -16,7 +16,7 @@ namespace InnoGotchi.BLL.Services
             return _mapper.Map<PictureDTO>(picture);
         }
 
-        public IEnumerable<PictureDTO> GetAll(IEnumerable<Picture> pictures) 
+        public IEnumerable<PictureDTO> GetAll(IEnumerable<Picture> pictures)
         {
             return _mapper.Map<IEnumerable<PictureDTO>>(pictures);
         }

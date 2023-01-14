@@ -1,39 +1,87 @@
 ﻿@using InnoGotchi.BLL.DTO;
-@model UserDTO
+@model UserDTO;
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+        <a class="menu nav-link active" aria-current="page" href="#">Received requests</a>
+  </li>
+  <li class="nav-item">
+        <a class="menu nav-link" href="#" aria-current="page">Sent requests</a>
+  </li>
+</ul>
+<div id="main">
+    <div name="received_requests" class="items text-center" style="display:block;">
+        @if (Model.ReceivedRequests.Count > 0)
+        {
+            <table class="table">
+                <tr>
+                    <th>RequestOwnerId</th>
+                    <th>ReceiverId</th>
+                    <th>IsConfirmed</th>
+                </tr>
+                @foreach (var item in Model.ReceivedRequests)
+                {
+                    <tr>
+                        <td>@item.RequestOwnerId</td>
+                        <td>@item.RequestReceipientId</td>
+                        <td>@item.IsConfirmed</td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <h1>Nobody sent you any requests yet</h1>
+        }
+    </div>
+    <div name="sent_requests" class="items text-center" style="display:none;">
+        @if (Model.SentRequests.Count > 0)
+        {
+            <table class="table">
+                <tr>
+                    <th>RequestOwnerId</th>
+                    <th>ReceiverId</th>
+                    <th>IsConfirmed</th>
+                </tr>
+                @foreach (var item in Model.SentRequests)
+                {
+                    <tr>
+                        <td>@item.RequestOwnerId</td>
+                        <td>@item.RequestReceipientId</td>
+                        <td>@item.IsConfirmed</td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <h1>You haven't sent any requests yet</h1>
+        }
+    </div>
+</div>
 
-<div class="text-center">
-    <h1 class="display-4">Sent requests</h1>
-    <table class="table">
-        <tr>
-            <th>RequestOwnerId</th>
-            <th>ReceiverId</th>
-            <th>IsConfirmed</th>
-        </tr>
-        @foreach (var item in Model.SentRequests)
-        {
-            <tr>
-                <td>@item.RequestOwnerId</td>
-                <td>@item.RequestReceipientId</td>
-                <td>@item.IsConfirmed</td>
-            </tr>
-        }
-    </table>
-</div>
-<div class="text-center">
-    <h1 class="display-4">Received requests</h1>
-    <table class="table">
-        <tr>
-            <th>RequestOwnerId</th>
-            <th>ReceiverId</th>
-            <th>IsConfirmed</th>
-        </tr>
-        @foreach (var item in Model.ReceivedRequests)
-        {
-            <tr>
-                <td>@item.RequestOwnerId</td>
-                <td>@item.RequestReceipientId</td>
-                <td>@item.IsConfirmed</td>
-            </tr>
-        }
-    </table>
-</div>
+<script>
+    let btns = document.querySelectorAll('.menu');
+    
+    let items = document.querySelectorAll('.items');
+    console.log(items);
+    for (let i = 0; i < btns.length; i++) {
+        btns[i].addEventListener("click", function() {    
+            
+            btns.forEach(function(el){
+                el.classList.remove('active');
+            });
+
+            for(let j = 0; j < items.length; j++){
+                if(j === i){
+                   
+                    items[j].style.display = 'block';
+                }
+                else{
+                    items[j].style.display = 'none';
+                }
+            }
+
+            this.classList.toggle('active');
+        });
+    }
+</script>
