@@ -20,17 +20,17 @@
                     @switch (item.RequestState)
                     {
                         case RequestState.Confirmed :
-                            <a class="btn btn-success" aria-disabled="true">Your friend:)</a>
+                            <p class="fw-normal">It's your friend:)</p>
                             break;
                         case RequestState.Sent :
-                            <a class="btn btn-danger">Cancel</a>
+                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-requestId="@item.RequestId" asp-route-actionName="AllUsers" asp-route-controllerName="Users" asp-controller="Requests">Cancel</a>
                             break;
                         case RequestState.Received:
-                            <a class="btn btn-success">Accept</a>
-                            <a class="btn btn-danger">Cancel</a>
+                            <a class="btn btn-sm btn-success" asp-action="Confirm" asp-controller="Requests" asp-route-requestId="@item.RequestId" asp-route-actionName="AllUsers" asp-route-controllerName="Users">Accept</a>
+                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-requestId="@item.RequestId" asp-controller="Requests" asp-route-actionName="AllUsers" asp-route-controllerName="Users">Cancel</a>
                             break;
                         default:
-                            <a class="btn btn-sm btn-primary" asp-action="Create" asp-route-receiverId="@item.User.Id" asp-controller="Requests">Send friendship request</a>
+                            <a class="btn btn-sm btn-primary" asp-action="Create" asp-controller="Requests" asp-route-receiverId="@item.User.Id">Send friendship request</a>
                             break;
                     }
                 </td>

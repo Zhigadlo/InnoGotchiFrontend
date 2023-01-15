@@ -42,22 +42,23 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> UserRequests()
         {
             UserDTO? user = await GetCurrentUser();
-            List<UserDTO> usersWhoSentRequest = new List<UserDTO>();
+            List<KeyValuePair<int, UserDTO>> usersWhoSentRequest = new List<KeyValuePair<int, UserDTO>>();
             foreach (var sr in user.ReceivedRequests)
             {
                 if (sr.IsConfirmed == false)
                 {
                     var u = await Get(sr.RequestOwnerId);
-                    usersWhoSentRequest.Add(u);
+                    
+                    usersWhoSentRequest.Add(KeyValuePair.Create(sr.Id, u));
                 }
             };
-            List<UserDTO> usersWhoReceivedRequest = new List<UserDTO>();
+            List<KeyValuePair<int, UserDTO>> usersWhoReceivedRequest = new List<KeyValuePair<int, UserDTO>>();
             foreach(var rr in user.SentRequests)
             {
                 if (rr.IsConfirmed == false)
                 {
                     var u = await Get(rr.RequestReceipientId);
-                    usersWhoReceivedRequest.Add(u);
+                    usersWhoReceivedRequest.Add(KeyValuePair.Create(rr.Id, u));
                 }
             };
             UserRequestsViewModel vm = new UserRequestsViewModel()
@@ -91,6 +92,8 @@ namespace InnoGotchi.Web.Controllers
                         userVM.RequestState = RequestState.Confirmed;
                     else
                         userVM.RequestState = RequestState.Sent;
+
+                    userVM.RequestId = sentRequest.Id;
                 }
                 else if (receivedRequest != null)
                 {
@@ -98,6 +101,8 @@ namespace InnoGotchi.Web.Controllers
                         userVM.RequestState = RequestState.Confirmed;
                     else
                         userVM.RequestState = RequestState.Received;
+
+                    userVM.RequestId = receivedRequest.Id;
                 }
                 else
                     userVM.RequestState = RequestState.NotUsed;

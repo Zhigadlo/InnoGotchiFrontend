@@ -6,6 +6,7 @@ namespace InnoGotchi.Web.Models
     {
         public UserDTO User { get; set; }
         public RequestState RequestState { get; set; }
+        public int RequestId { get; set; }
     }
 
     public enum RequestState

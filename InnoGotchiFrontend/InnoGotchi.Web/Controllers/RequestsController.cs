@@ -28,7 +28,43 @@ namespace InnoGotchi.Web.Controllers
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                return RedirectToAction("UserRequests", "Users");
+                return RedirectToAction("AllUsers", "Users");
+            }
+            else
+                return BadRequest();
+        }
+
+        public async Task<IActionResult> Confirm(int requestId, string actionName, string controllerName)
+        {
+            var httpClient = GetHttpClient("Requests");
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Put,
+                httpClient.BaseAddress + $"/confirm/{requestId}"
+            );
+
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                return RedirectToAction(actionName, controllerName);
+            }
+            else
+                return BadRequest();
+        }
+
+        public async Task<IActionResult> Delete(int requestId, string actionName, string controllerName)
+        {
+            var httpClient = GetHttpClient("Requests");
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Delete,
+                httpClient.BaseAddress + $"/{requestId}"
+            );
+
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                return RedirectToAction(actionName, controllerName);
             }
             else
                 return BadRequest();

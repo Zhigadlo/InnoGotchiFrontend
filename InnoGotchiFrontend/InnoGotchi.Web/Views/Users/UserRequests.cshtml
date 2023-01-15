@@ -20,12 +20,12 @@
                 {
                     <tr>
                         <td align="left">
-                            <img src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="60" height="60" />
-                            @item.FirstName @item.LastName
+                            <img src="data:image/png;base64,@(Convert.ToBase64String(item.Value.Avatar))" width="60" height="60" />
+                            @item.Value.FirstName @item.Value.LastName
                         </td>
                         <td>
-                            <a class="btn btn-success">Accept</a>
-                            <a class="btn btn-danger">Deny</a>
+                            <a class="btn btn-sm btn-success" asp-controller="Requests" asp-action="Confirm" asp-route-requestId="@item.Key" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Accept</a>
+                            <a class="btn btn-sm btn-danger" asp-controller="Requests" asp-action="Delete" asp-route-requestId="@item.Key" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Deny</a>
                         </td>
                     </tr>
                 }
@@ -48,9 +48,12 @@
                 {
                     <tr>
                         <td align="left">
-                            <img src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="60" height="60" />
+                            <img src="data:image/png;base64,@(Convert.ToBase64String(item.Value.Avatar))" width="60" height="60" />
+                            @item.Value.FirstName @item.Value.LastName
                         </td>
-                        <td>@item.FirstName @item.LastName</td>
+                        <td>
+                            <a class="btn btn-sm btn-danger" asp-controller="Requests" asp-action="Delete" asp-route-requestId="@item.Key" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Cancel</a>
+                        </td>
                     </tr>
                 }
             </table>
