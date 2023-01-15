@@ -3,6 +3,7 @@ using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Identity;
 using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
+using InnoGotchi.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -41,7 +42,30 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> UserRequests()
         {
             UserDTO? user = await GetCurrentUser();
-            return View(user);
+            List<UserDTO> usersWhoSentRequest = new List<UserDTO>();
+            foreach (var sr in user.ReceivedRequests)
+            {
+                if (sr.IsConfirmed == false)
+                {
+                    var u = await Get(sr.RequestOwnerId);
+                    usersWhoSentRequest.Add(u);
+                }
+            };
+            List<UserDTO> usersWhoReceivedRequest = new List<UserDTO>();
+            foreach(var rr in user.SentRequests)
+            {
+                if (rr.IsConfirmed == false)
+                {
+                    var u = await Get(rr.RequestReceipientId);
+                    usersWhoReceivedRequest.Add(u);
+                }
+            };
+            UserRequestsViewModel vm = new UserRequestsViewModel()
+            {
+                UsersWhoSentRequest = usersWhoSentRequest,
+                UsersWhoReceivedRequest = usersWhoReceivedRequest
+            };
+            return View(vm);
         }
 
         public async Task<IActionResult> AllUsers()
@@ -50,7 +74,37 @@ namespace InnoGotchi.Web.Controllers
             int authorized_id = int.Parse(HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId)));
             UserDTO authorizedUser = users.Find(u => u.Id == authorized_id);
             users.Remove(authorizedUser);
-            return View(users);
+            List<UserViewModel> usersVM = new List<UserViewModel>();
+            foreach(UserDTO user in users)
+            {
+                UserViewModel userVM = new UserViewModel
+                {
+                    User = user
+                };
+
+                var sentRequest = authorizedUser.SentRequests.FirstOrDefault(sr => sr.RequestReceipientId == user.Id);
+                var receivedRequest = authorizedUser.ReceivedRequests.FirstOrDefault(sr => sr.RequestOwnerId == user.Id);
+                
+                if (sentRequest != null)
+                {
+                    if (sentRequest.IsConfirmed)
+                        userVM.RequestState = RequestState.Confirmed;
+                    else
+                        userVM.RequestState = RequestState.Sent;
+                }
+                else if (receivedRequest != null)
+                {
+                    if (receivedRequest.IsConfirmed)
+                        userVM.RequestState = RequestState.Confirmed;
+                    else
+                        userVM.RequestState = RequestState.Received;
+                }
+                else
+                    userVM.RequestState = RequestState.NotUsed;
+
+                usersVM.Add(userVM);
+            }
+            return View(usersVM);
         }
         public async Task<IActionResult> ChangeAvatar(IFormFile FormFile)
         {

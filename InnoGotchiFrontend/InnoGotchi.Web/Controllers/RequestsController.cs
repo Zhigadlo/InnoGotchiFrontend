@@ -28,7 +28,7 @@ namespace InnoGotchi.Web.Controllers
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                return RedirectToAction("UserRequests");
+                return RedirectToAction("UserRequests", "Users");
             }
             else
                 return BadRequest();

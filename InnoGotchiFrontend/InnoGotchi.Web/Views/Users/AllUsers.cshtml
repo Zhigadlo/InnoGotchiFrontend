@@ -1,8 +1,7 @@
-﻿@using InnoGotchi.BLL.DTO;
-@{
+﻿@{
     ViewData["Title"] = "All users";
 }
-@model IEnumerable<UserDTO>;
+@model IEnumerable<UserViewModel>;
 <div class="text-center">
     <h1 class="display-4">Users</h1>
     <table class="table">
@@ -14,11 +13,26 @@
         {
             <tr>
                 <td align="left">
-                    <img src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="60" height="60" />
-                    @item.FirstName @item.LastName
+                    <img src="data:image/png;base64,@(Convert.ToBase64String(item.User.Avatar))" width="60" height="60" />
+                    @item.User.FirstName @item.User.LastName
                 </td>
                 <td valign="middle">
-                    <a class="btn btn-sm btn-primary" asp-action="Create" asp-route-receiverId="@item.Id" asp-controller="Requests">Send friendship request</a>
+                    @switch (item.RequestState)
+                    {
+                        case RequestState.Confirmed :
+                            <a class="btn btn-success" aria-disabled="true">Your friend:)</a>
+                            break;
+                        case RequestState.Sent :
+                            <a class="btn btn-danger">Cancel</a>
+                            break;
+                        case RequestState.Received:
+                            <a class="btn btn-success">Accept</a>
+                            <a class="btn btn-danger">Cancel</a>
+                            break;
+                        default:
+                            <a class="btn btn-sm btn-primary" asp-action="Create" asp-route-receiverId="@item.User.Id" asp-controller="Requests">Send friendship request</a>
+                            break;
+                    }
                 </td>
             </tr>
         }

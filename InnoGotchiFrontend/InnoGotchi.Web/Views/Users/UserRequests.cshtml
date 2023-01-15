@@ -1,5 +1,4 @@
-﻿@using InnoGotchi.BLL.DTO;
-@model UserDTO;
+﻿@model UserRequestsViewModel;
 <ul class="nav nav-tabs">
   <li class="nav-item">
         <a class="menu nav-link active" aria-current="page" href="#">Received requests</a>
@@ -10,20 +9,24 @@
 </ul>
 <div id="main">
     <div name="received_requests" class="items text-center" style="display:block;">
-        @if (Model.ReceivedRequests.Count > 0)
+        @if (Model.UsersWhoSentRequest.Count > 0)
         {
             <table class="table">
                 <tr>
-                    <th>RequestOwnerId</th>
-                    <th>ReceiverId</th>
-                    <th>IsConfirmed</th>
+                    <th></th>
+                    <th></th>
                 </tr>
-                @foreach (var item in Model.ReceivedRequests)
+                @foreach (var item in Model.UsersWhoSentRequest)
                 {
                     <tr>
-                        <td>@item.RequestOwnerId</td>
-                        <td>@item.RequestReceipientId</td>
-                        <td>@item.IsConfirmed</td>
+                        <td align="left">
+                            <img src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="60" height="60" />
+                            @item.FirstName @item.LastName
+                        </td>
+                        <td>
+                            <a class="btn btn-success">Accept</a>
+                            <a class="btn btn-danger">Deny</a>
+                        </td>
                     </tr>
                 }
             </table>
@@ -34,20 +37,20 @@
         }
     </div>
     <div name="sent_requests" class="items text-center" style="display:none;">
-        @if (Model.SentRequests.Count > 0)
+        @if (Model.UsersWhoReceivedRequest.Count > 0)
         {
             <table class="table">
                 <tr>
-                    <th>RequestOwnerId</th>
-                    <th>ReceiverId</th>
-                    <th>IsConfirmed</th>
+                    <th></th>
+                    <th></th>
                 </tr>
-                @foreach (var item in Model.SentRequests)
+                @foreach (var item in Model.UsersWhoReceivedRequest)
                 {
                     <tr>
-                        <td>@item.RequestOwnerId</td>
-                        <td>@item.RequestReceipientId</td>
-                        <td>@item.IsConfirmed</td>
+                        <td align="left">
+                            <img src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="60" height="60" />
+                        </td>
+                        <td>@item.FirstName @item.LastName</td>
                     </tr>
                 }
             </table>

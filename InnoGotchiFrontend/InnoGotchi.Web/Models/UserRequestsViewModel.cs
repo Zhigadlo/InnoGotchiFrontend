@@ -4,7 +4,7 @@ namespace InnoGotchi.Web.Models
 {
     public class UserRequestsViewModel
     {
-        public IEnumerable<ColoborationRequestDTO>? SentRequests { get; set; }
-        public IEnumerable<ColoborationRequestDTO>? ReceivedRequests { get; set; }
+        public List<UserDTO> UsersWhoSentRequest { get; set; }
+        public List<UserDTO> UsersWhoReceivedRequest { get; set; }
     }
 }
