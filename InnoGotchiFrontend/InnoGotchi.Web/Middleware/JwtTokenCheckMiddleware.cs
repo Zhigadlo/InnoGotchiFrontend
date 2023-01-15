@@ -15,7 +15,7 @@ namespace InnoGotchi.Web.Middleware
             this._next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, LocalStorage localStorage)
+        public async Task InvokeAsync(HttpContext context, LocalStorage localStorage, IConfiguration configuration)
         {
             SecurityToken? securityToken = GetSecurityToken(localStorage);
 

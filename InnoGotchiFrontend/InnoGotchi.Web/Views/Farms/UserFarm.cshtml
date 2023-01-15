@@ -1,7 +1,7 @@
 ﻿@using InnoGotchi.BLL.DTO;
 @model FarmDTO
 
-@if (Model == null)
+@if (Model.Id == -1)
 {
     <h1>You have no farm yet</h1>
     <form method="post" asp-controller="Farms" asp-action="CreateFarm">

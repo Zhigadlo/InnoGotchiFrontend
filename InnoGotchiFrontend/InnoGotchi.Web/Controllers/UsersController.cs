@@ -5,6 +5,7 @@ using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
 using InnoGotchi.Web.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text.Json;
@@ -23,12 +24,12 @@ namespace InnoGotchi.Web.Controllers
             _userService = userService;
             _imageService = imageService;
         }
-
+        
         public IActionResult Login()
         {
             return View();
         }
-
+        
         public IActionResult Register()
         {
             return View();
@@ -42,6 +43,8 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> UserRequests()
         {
             UserDTO? user = await GetCurrentUser();
+            if(user == null) 
+                return RedirectToAction("Login");
             List<KeyValuePair<int, UserDTO>> usersWhoSentRequest = new List<KeyValuePair<int, UserDTO>>();
             foreach (var sr in user.ReceivedRequests)
             {
@@ -71,9 +74,12 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<IActionResult> AllUsers()
         {
-            List<UserDTO> users = (await GetAll()).ToList();
+            IEnumerable<UserDTO>? usersEnumerable = await GetAll();
+            if (usersEnumerable == null)
+                return RedirectToAction("Login");
+            var users = usersEnumerable.ToList();
             int authorized_id = int.Parse(HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId)));
-            UserDTO authorizedUser = users.Find(u => u.Id == authorized_id);
+            UserDTO authorizedUser = users.ToList().Find(u => u.Id == authorized_id);
             users.Remove(authorizedUser);
             List<UserViewModel> usersVM = new List<UserViewModel>();
             foreach(UserDTO user in users)
@@ -123,13 +129,19 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> UserProfile()
         {
             UserDTO? user = await GetCurrentUser();
+            if(user == null) 
+                return RedirectToAction("Login");
             return View(user);
         }
 
         private async Task<UserDTO?> GetCurrentUser()
         {
-            int userId = int.Parse(HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId)));
-            return await Get(userId);
+            string userId = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
+            if (userId == null)
+            {
+                return null;
+            }
+            return await Get(int.Parse(userId));
         }
         public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
         {
@@ -155,6 +167,7 @@ namespace InnoGotchi.Web.Controllers
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
+        
         public async Task<IActionResult> Authenticate(string email, string password)
         {
             string? token = await Token(email, password);
@@ -167,7 +180,7 @@ namespace InnoGotchi.Web.Controllers
                     Email = email,
                     UserName = user.FirstName + " " + user.LastName,
                     UserId = user.Id,
-                    ExpireAt = DateTime.UtcNow.AddHours(1),
+                    ExpireAt = DateTime.UtcNow.AddMinutes(5),
                     FarmId = user.Farm == null ? -1 : user.Farm.Id
                 };
                 string jsonToken = JsonSerializer.Serialize(securityToken);
@@ -178,6 +191,7 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
+        
         private async Task SignIn(SecurityToken securityToken)
         {
             var claims = new List<Claim>
@@ -193,6 +207,7 @@ namespace InnoGotchi.Web.Controllers
             var claimsPrincipal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(claimsPrincipal);
         }
+        
         private async Task<string?> Token(string email, string password)
         {
             var httpClient = GetHttpClient("Users");

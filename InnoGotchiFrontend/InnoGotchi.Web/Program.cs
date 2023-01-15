@@ -5,10 +5,12 @@ using InnoGotchi.BLL.Services;
 using InnoGotchi.Web.Extensions;
 using InnoGotchi.Web.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
-string baseRoot = "https://localhost:7200/api";
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
+
+string? baseRoot = builder.Configuration.GetSection("BaseAddress").Value;
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient(baseRoot, "Users");
