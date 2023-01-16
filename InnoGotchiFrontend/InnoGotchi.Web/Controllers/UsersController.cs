@@ -5,7 +5,6 @@ using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
 using InnoGotchi.Web.Models;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text.Json;
@@ -25,9 +24,9 @@ namespace InnoGotchi.Web.Controllers
             _imageService = imageService;
         }
         
-        public IActionResult Login()
+        public IActionResult Login(string errorMessage)
         {
-            return View();
+            return View(errorMessage);
         }
         
         public IActionResult Register()
@@ -180,7 +179,7 @@ namespace InnoGotchi.Web.Controllers
                     Email = email,
                     UserName = user.FirstName + " " + user.LastName,
                     UserId = user.Id,
-                    ExpireAt = DateTime.UtcNow.AddMinutes(5),
+                    ExpireAt = DateTime.UtcNow.AddHours(1),
                     FarmId = user.Farm == null ? -1 : user.Farm.Id
                 };
                 string jsonToken = JsonSerializer.Serialize(securityToken);
@@ -189,7 +188,7 @@ namespace InnoGotchi.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             else
-                return BadRequest();
+                return View("Login", new LoginErrorModel{ Error = "Invalid email or password" });
         }
         
         private async Task SignIn(SecurityToken securityToken)
@@ -222,6 +221,7 @@ namespace InnoGotchi.Web.Controllers
             {
                 token = (await httpResponseMessage.Content.ReadAsStringAsync()).Replace("\"", String.Empty);
             }
+            
             return token;
         }
         private async Task<UserDTO?> GetUser(string email, string password)

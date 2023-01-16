@@ -1,16 +1,45 @@
-﻿<form  asp-action="Authenticate" asp-controller="Users">
+﻿@model LoginErrorModel;
+<form name="loginForm" asp-action="Authenticate" asp-controller="Users">
     <h3>Login form</h3>
     <div class="form-floating mb-3">
-        <input class="form-control" id="email_input" type="email" name="email" placeholder="name@example.com"/> <br />
+        <input class="form-control" id="email_input" type="email" name="email" placeholder="name@example.com" required />
         <label for="email_input">Email</label>
+        <div id="password_help" class="form-text">Email must look like this: name@example.com</div>
     </div>
     <div class="form-floating mb-3">
-        
-        <input class="form-control" id="password_input" type="password" name="password" aria-describedby="password_help" placeholder="SomePassword1234_"/><br />
+        <input class="form-control" id="password_input" type="password" name="password" aria-describedby="password_help" placeholder="SomePassword1234_" required/>
         <label for="password_input">Password</label>
         <div id="password_help" class="form-text">Password must contain bla bla bla</div>
     </div>
     
     <input type="submit" value="Login" class="btn btn-outline-dark" />
-    
 </form>
+
+<script>
+    var loginForm = document.querySelector('[name="loginForm"]')
+    var password_input = document.getElementById('password_input');
+    var email_input = document.getElementById('email_input');
+    @if(Model != null && Model.Error != null)
+    {
+        @:const div = document.createElement('div');
+        @:div.classList.toggle('text-danger');
+        @:div.classList.toggle('h6');
+        @:div.id = 'errorMessage';
+        @:const errorMessage = document.createTextNode('@Model.Error');
+        @:div.appendChild(errorMessage);
+        @:loginForm.appendChild(div);
+        @:password_input.addEventListener('change', () => {
+            @:deleteErrorMessage();
+        @:});
+        @:email_input.addEventListener('change', () => {
+            @:deleteErrorMessage();
+        @:});
+    }
+
+    function deleteErrorMessage(){
+        var div = document.getElementById('errorMessage');
+        if(div != null){
+            div.remove();
+        }
+    }
+</script>
