@@ -8,5 +8,7 @@ namespace InnoGotchi.Web.Models
         public List<PictureDTO> Eyes { get; set; }
         public List<PictureDTO> Noses { get; set; }
         public List<PictureDTO> Mouths { get; set; }
+        public IEnumerable<string> PetNames { get; set; }
+
     }
 }

@@ -10,16 +10,21 @@ namespace InnoGotchi.Web.Controllers
 {
     public class PicturesController : BaseController
     {
-        private ImageService _service;
+        private ImageService _imageService;
+        private PetService _petService;
         public PicturesController(IHttpClientFactory httpClientFactory,
                                   ImageService imageService,
+                                  PetService petService,
                                   LocalStorage localStorage) : base(httpClientFactory, localStorage)
         {
-            _service = imageService;
+            _imageService = imageService;
+            _petService = petService;
         }
-
-        public async Task<IActionResult> PetConstructor()
+        
+        public async Task<IActionResult> PetConstructor(string? errorMessage)
         {
+            var petsController = new PetsController(_httpClientFactory, _petService, _localStorage);
+            IEnumerable<string> petNames = (await petsController.GetAllPets()).Select(p => p.Name);
             List<PictureDTO> allPictures = (await GetAll()).ToList();
             PetConstructorViewModel vm = new PetConstructorViewModel
             {
@@ -27,6 +32,7 @@ namespace InnoGotchi.Web.Controllers
                 Eyes = allPictures.Where(p => p.Description.ToLower() == "eyes").ToList(),
                 Noses = allPictures.Where(p => p.Description.ToLower() == "nose").ToList(),
                 Mouths = allPictures.Where(p => p.Description.ToLower() == "mouth").ToList(),
+                PetNames = petNames
             };
             return View(vm);
         }
@@ -57,7 +63,7 @@ namespace InnoGotchi.Web.Controllers
                 };
                 IEnumerable<Picture>? pictures = await JsonSerializer.DeserializeAsync<IEnumerable<Picture>>(contentStream, options);
 
-                return _service.GetAll(pictures);
+                return _imageService.GetAll(pictures);
             }
             else
                 return null;

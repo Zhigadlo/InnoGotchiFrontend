@@ -8,7 +8,7 @@ namespace InnoGotchi.Web.Controllers
 {
     public class BaseController : Controller
     {
-        private IHttpClientFactory _httpClientFactory;
+        protected IHttpClientFactory _httpClientFactory;
         protected LocalStorage _localStorage;
         public BaseController(IHttpClientFactory httpClientFactory, LocalStorage localStorage)
         {

@@ -2,9 +2,10 @@
 
 <form id="petCreate" method="post" asp-action="Create" asp-controller="Pets">
     <h1>Pet constructor</h1>
-    <div class="mb-3">
-        <label class="form-label">Name</label><br />
-        <input class="form-control" type="text" name="name" />
+    <div class="form-floating mb-3">
+        <input id="petname_input" class="form-control" type="text" name="name" placeholder="petname" required/>
+        <label for="petname_input" class="form-label">Name</label>
+        <div id="error_message" class="text-danger h6" style="display:none">There is a pet with such name</div>
     </div>
     <div class="container mb-3">
         <div class="row">
@@ -18,14 +19,18 @@
                         cursor: move;
                     }
                 </style>
-                
-                <svg xmlns="http://www.w3.org/2000/svg" id="pet" width="500" height="500" onload="makeDraggable(evt)">
-                    <rect width="100%" height="100%" style="fill:white;stroke-width:1;stroke:black" />
-                    <image class="draggable" name="body" x="-25" y="-20" width="600" height="600" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies[0].Image))" />
-                    <image class="draggable" name="eyes" x="190" y="100" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes[0].Image))" />
-                    <image class="draggable" name="nose" x="190" y="140" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses[0].Image))" />
-                    <image class="draggable" name="mouth" x="190" y="170" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths[0].Image))" />
-                </svg>
+                <div class="mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" id="pet" width="500" height="500" onload="makeDraggable(evt)">
+                        <rect width="100%" height="100%" style="fill:white;stroke-width:1;stroke:black" />
+                        <image class="draggable" name="body" x="-25" y="-20" width="600" height="600" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies[0].Image))" />
+                        <image class="draggable" name="eyes" x="190" y="100" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes[0].Image))" />
+                        <image class="draggable" name="nose" x="190" y="140" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses[0].Image))" />
+                        <image class="draggable" name="mouth" x="190" y="170" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths[0].Image))" />
+                    </svg>
+                </div>
+                <div class="mb-3">
+                    <input type="submit" id="submit" onsubmit="getSvg()" value="Create pet" class="btn btn-outline-dark" />
+                </div>
             </div>
             <div class="col">
                 <div class="row">
@@ -87,12 +92,34 @@
         </div>
     </div>
     <input type="text" name="appearance" onforminput="getSvg()" hidden/>
-    <div class="mb-3">
-        <input type="submit" id="submit" onsubmit="getSvg()" value="Create" class="btn btn-primary"/>
-    </div>
+    
 </form>
 
 <script>
+    var petNames = [];
+    var error_message = document.getElementById('error_message');
+    var petname_input = document.getElementById('petname_input');
+
+    @foreach (var name in Model.PetNames)
+    {
+        @:petNames.push('@name');
+    }
+
+    petname_input.addEventListener('change', () => {
+        let name = petname_input.value;
+        error_message.style.display = 'block';
+        if(!petNames.includes(name)){
+            error_message.classList.remove('text-danger');
+            error_message.classList.toggle('text-success');
+            error_message.innerText = 'This pet name is available :)';
+        }
+        else{
+            error_message.classList.remove('text-success');
+            error_message.classList.toggle('text-danger');
+            error_message.innerText = 'This pet name is already in use:(';
+        }
+    });
+
     var bodyImage = $('image[name="body"]');
     var eyesImage = $('image[name="eyes"]');
     var noseImage = $('image[name="nose"]');

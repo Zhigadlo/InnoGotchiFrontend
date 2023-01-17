@@ -1,4 +1,5 @@
 ﻿using Hanssens.Net;
+using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Identity;
 using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
@@ -45,7 +46,7 @@ namespace InnoGotchi.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IEnumerable<PetDTO>?> GetAllPets()
         {
             var httpClient = GetHttpClient("Pets");
 
@@ -66,10 +67,10 @@ namespace InnoGotchi.Web.Controllers
                 };
                 IEnumerable<Pet>? pets = await JsonSerializer.DeserializeAsync<IEnumerable<Pet>>(contentStream, options);
 
-                return View(_service.GetAll(pets));
+                return _service.GetAll(pets);
             }
             else
-                return BadRequest();
+                return null;
         }
 
         [HttpPost]
