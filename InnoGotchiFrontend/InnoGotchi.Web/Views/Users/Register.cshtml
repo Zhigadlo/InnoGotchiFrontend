@@ -1,20 +1,19 @@
-﻿@using (Html.BeginForm("Create", "Users", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
+﻿<form asp-action="Create" asp-controller="Users" method="post" enctype="multipart/form-data">
     <h3>Registration form</h3>
     <div class="form-floating mb-3">
         <input class="form-control" id="firstname_input" type="text" name="FirstName" placeholder="firstname" required/>
         <label for="firstname_input">First name</label>
     </div>
     <div class="form-floating mb-3">
-        <input id="lastname_input" class="form-control" type="text" name="LastName" placeholder="secondname" required/>
+        <input id="lastname_input" class="form-control" type="text" name="LastName" placeholder="secondname" required />
         <label for="lastname_input">Last name</label>
     </div>
     <div class="form-floating mb-3">
-        <input id="email_input" class="form-control" type="email" name="Email" placeholder="name@example.com" required/>
+        <input id="email_input" class="form-control" type="email" name="Email" placeholder="name@example.com" required />
         <label for="email_input">Email</label>
     </div>
     <div class="form-floating mb-3">
-        <input id="password_input" class="form-control" type="password" name="Password" placeholder="SomePassword1234_" required/>
+        <input id="password_input" class="form-control" type="password" name="Password" placeholder="SomePassword1234_" required />
         <label for="password_input">Password</label>
     </div>
     <div id="imageSelector" class="row mb-3">
@@ -27,71 +26,69 @@
         </div>
     </div>
     
-    <input class="btn btn-outline-dark" type="submit" value="Register" />
-    
+    <input class="btn btn-outline-dark" type="submit" value="Register"/>
+</form>
 
-    <script>
 
-        var input = document.getElementById('formFile');
-        input.addEventListener('change', updateImageDisplay);
+<script>
 
-        function updateImageDisplay() {
+    var input = document.getElementById('formFile');
+    input.addEventListener('change', updateImageDisplay);
 
-            var imageSelector = document.getElementById('imageSelector');
-            var image = document.getElementById('avatar')
+    function updateImageDisplay() {
 
-            while (input.firstChild) {
-                console.log(input.firstChild)
-                input.removeChild(input.firstChild);
-            }
-            var curFiles = input.files;
-            if (curFiles.length === 0) {
-                image.style.opacity = 0;
-            }
-            else {
-                for (var i = 0; i < curFiles.length; i++) {
-                    var para = document.createElement('p');
-                    if (validFileType(curFiles[i])) {
-                        para.textContent = 'File name ' + curFiles[i].name + ', file size ' + returnFileSize(curFiles[i].size) + '.';
-                        image.style.opacity = 1;
-                        
-                        image.src = window.URL.createObjectURL(curFiles[i]);
-                    } else {
-                        para.textContent = 'File name ' + curFiles[i].name + ': Not a valid file type. Update your selection.';
-                        imageSelector.appendChild(para);
-                    }
+        var imageSelector = document.getElementById('imageSelector');
+        var image = document.getElementById('avatar')
+
+        while (input.firstChild) {
+            console.log(input.firstChild)
+            input.removeChild(input.firstChild);
+        }
+        var curFiles = input.files;
+        if (curFiles.length === 0) {
+            image.style.opacity = 0;
+        }
+        else {
+            for (var i = 0; i < curFiles.length; i++) {
+                var para = document.createElement('p');
+                if (validFileType(curFiles[i])) {
+                    para.textContent = 'File name ' + curFiles[i].name + ', file size ' + returnFileSize(curFiles[i].size) + '.';
+                    image.style.opacity = 1;
+
+                    image.src = window.URL.createObjectURL(curFiles[i]);
+                } else {
+                    para.textContent = 'File name ' + curFiles[i].name + ': Not a valid file type. Update your selection.';
+                    imageSelector.appendChild(para);
                 }
             }
-
         }
 
-        var fileTypes = [
-            'image/jpeg',
-            'image/pjpeg',
-            'image/png'
-        ]
+    }
 
-        function validFileType(file) {
-            for (var i = 0; i < fileTypes.length; i++) {
-                if (file.type === fileTypes[i]) {
-                    return true;
-                }
-            }
+    var fileTypes = [
+        'image/jpeg',
+        'image/pjpeg',
+        'image/png'
+    ]
 
-            return false;
-        }
-
-        function returnFileSize(number) {
-            if (number < 1024) {
-                return number + 'bytes';
-            } else if (number > 1024 && number < 1048576) {
-                return (number / 1024).toFixed(1) + 'KB';
-            } else if (number > 1048576) {
-                return (number / 1048576).toFixed(1) + 'MB';
+    function validFileType(file) {
+        for (var i = 0; i < fileTypes.length; i++) {
+            if (file.type === fileTypes[i]) {
+                return true;
             }
         }
 
-    </script>
-}
+        return false;
+    }
 
+    function returnFileSize(number) {
+        if (number < 1024) {
+            return number + 'bytes';
+        } else if (number > 1024 && number < 1048576) {
+            return (number / 1024).toFixed(1) + 'KB';
+        } else if (number > 1048576) {
+            return (number / 1048576).toFixed(1) + 'MB';
+        }
+    }
 
+</script>

@@ -1,6 +1,6 @@
 ﻿namespace InnoGotchi.Web.Models
 {
-    public class LoginErrorModel
+    public class ErrorModel
     {
         public string? Error { get; set; }
     }

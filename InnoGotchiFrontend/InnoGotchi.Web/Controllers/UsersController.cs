@@ -158,7 +158,7 @@ namespace InnoGotchi.Web.Controllers
                 return await Logout();
             }
             else
-                return BadRequest();
+                return View("ChangePasswordView", new ErrorModel { Error="Old password is wrong"});
         }
         public async Task<IActionResult> Logout()
         {
@@ -188,7 +188,7 @@ namespace InnoGotchi.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             else
-                return View("Login", new LoginErrorModel{ Error = "Invalid email or password" });
+                return View("Login", new ErrorModel{ Error = "Invalid email or password" });
         }
         
         private async Task SignIn(SecurityToken securityToken)
