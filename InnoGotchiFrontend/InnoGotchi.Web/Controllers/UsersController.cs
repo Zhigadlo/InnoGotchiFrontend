@@ -39,28 +39,54 @@ namespace InnoGotchi.Web.Controllers
             return View();
         }
 
+        public async Task<IActionResult> Coloborators()
+        {
+            UserDTO? user = await GetCurrentUser();
+            if (user == null)
+                return RedirectToAction("Login");
+
+            List<UserDTO> coloborators = new List<UserDTO>();
+            foreach(var rr in user.ReceivedRequests)
+            {
+                if (rr.IsConfirmed)
+                {
+                    var u = await Get(rr.RequestOwnerId);
+                    coloborators.Add(u);
+                }
+            }
+            foreach(var sr in user.SentRequests)
+            {
+                if (sr.IsConfirmed)
+                {
+                    var u = await Get(sr.RequestReceipientId);
+                    coloborators.Add(u);
+                }
+            }
+            return View(coloborators);
+        }
+
         public async Task<IActionResult> UserRequests()
         {
             UserDTO? user = await GetCurrentUser();
             if(user == null) 
                 return RedirectToAction("Login");
             List<KeyValuePair<int, UserDTO>> usersWhoSentRequest = new List<KeyValuePair<int, UserDTO>>();
-            foreach (var sr in user.ReceivedRequests)
-            {
-                if (sr.IsConfirmed == false)
-                {
-                    var u = await Get(sr.RequestOwnerId);
-                    
-                    usersWhoSentRequest.Add(KeyValuePair.Create(sr.Id, u));
-                }
-            };
-            List<KeyValuePair<int, UserDTO>> usersWhoReceivedRequest = new List<KeyValuePair<int, UserDTO>>();
-            foreach(var rr in user.SentRequests)
+            foreach (var rr in user.ReceivedRequests)
             {
                 if (rr.IsConfirmed == false)
                 {
-                    var u = await Get(rr.RequestReceipientId);
-                    usersWhoReceivedRequest.Add(KeyValuePair.Create(rr.Id, u));
+                    var u = await Get(rr.RequestOwnerId);
+                    
+                    usersWhoSentRequest.Add(KeyValuePair.Create(rr.Id, u));
+                }
+            };
+            List<KeyValuePair<int, UserDTO>> usersWhoReceivedRequest = new List<KeyValuePair<int, UserDTO>>();
+            foreach(var sr in user.SentRequests)
+            {
+                if (sr.IsConfirmed == false)
+                {
+                    var u = await Get(sr.RequestReceipientId);
+                    usersWhoReceivedRequest.Add(KeyValuePair.Create(sr.Id, u));
                 }
             };
             UserRequestsViewModel vm = new UserRequestsViewModel()
