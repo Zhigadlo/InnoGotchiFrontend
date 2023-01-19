@@ -52,6 +52,7 @@ else
                     <th>Thirsty state</th>
                     <th></th>
                     <th></th>
+                    <th></th>
                 </tr>
                 @foreach (var item in Model.Pets)
                 {
@@ -62,18 +63,15 @@ else
                         <td>@item.Name</td>
                         <td>@item.Age</td>
                         <td>@item.State</td>
+                        <td>@item.HungerLavel</td>
+                        <td>@item.ThirstyLavel</td>
                         @if (item.State == PetState.Dead)
                         {
-                            <td>None</td>
-                            <td>None</td>
                             <td></td>
                             <td></td>
                         }
                         else
                         {
-                            <td>@item.HungerLavel</td>
-                            <td>@item.ThirstyLavel</td>
-
                             @if (item.HungerLavel == HungerLavel.Full)
                             {
                                 <td>
@@ -101,6 +99,10 @@ else
                                 </td>
                             }
                         }
+
+                        <td>
+                            <a class="btn btn-outline-dark" asp-action="PetView" asp-controller="Pets" asp-route-id="@item.Id">details</a>
+                        </td>
                     </tr>
                 }
             </table>

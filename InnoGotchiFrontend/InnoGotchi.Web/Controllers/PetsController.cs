@@ -19,7 +19,13 @@ namespace InnoGotchi.Web.Controllers
             _service = service;
         }
 
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> PetView(int id)
+        {
+            var pet = await Get(id);
+            return View(pet);
+        }
+
+        public async Task<PetDTO?> Get(int id)
         {
             var httpClient = GetHttpClient("Pets");
             var httpRequestMessage = new HttpRequestMessage
@@ -39,10 +45,10 @@ namespace InnoGotchi.Web.Controllers
                 };
                 Pet? pet = await JsonSerializer.DeserializeAsync<Pet>(contentStream, options);
 
-                return View(_service.Get(pet));
+                return _service.Get(pet);
             }
             else
-                return BadRequest();
+                return null;
         }
 
         [HttpGet]
