@@ -47,7 +47,7 @@ namespace InnoGotchi.Web.Controllers
                 _localStorage.Remove(nameof(SecurityToken));
                 jsonToken = JsonSerializer.Serialize(securityToken);
                 _localStorage.Store(nameof(SecurityToken), jsonToken);
-                return RedirectToAction("UserFarm", new { id = farmId });
+                return RedirectToAction("GetUserFarm");
             }
             else
                 return BadRequest();

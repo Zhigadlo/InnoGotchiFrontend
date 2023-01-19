@@ -7,7 +7,6 @@
         public DateTime CreateTime { get; set; }
         public List<PetDTO> Pets { get; set; }
         public int OwnerId { get; set; }
-        public FarmDTO? Farm { get; set; }
 
 
         public double GetAverageHappinessDays => Pets.Count() == 0 ? 0 : Pets.Average(p => p.HappinessDaysCount);

@@ -92,5 +92,43 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
+
+        public async Task<IActionResult> Feed(int id)
+        {
+            var httpClient = GetHttpClient("Pets");
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Put,
+                httpClient.BaseAddress + $"/feed/{id}"
+            );
+
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                return RedirectToAction("GetUserFarm", "Farms");
+            }
+            else
+                return BadRequest();
+        }
+
+        public async Task<IActionResult> Drink(int id)
+        {
+            var httpClient = GetHttpClient("Pets");
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Put,
+                httpClient.BaseAddress + $"/drink/{id}"
+            );
+
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                return RedirectToAction("GetUserFarm", "Farms");
+            }
+            else
+                return BadRequest();
+        }
     }
 }

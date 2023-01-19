@@ -9,8 +9,8 @@
             <input id="name_input" name="name" type="text" class="form-control" placeholder="farm_name" required />
             <label for="name_input">Enter farm name</label>
         </div>
-        
-        <input class="btn btn-outline-dark" type="submit" value="Create farm"/>
+
+        <input class="btn btn-outline-dark" type="submit" value="Create farm" />
     </form>
 }
 else
@@ -22,11 +22,26 @@ else
     }
     else
     {
+        <div>
+            <h1>Farm statistic</h1>
+            <h6>Farm name: @Model.Name</h6>
+            <h6>Pets count: @Model.Pets.Count</h6>
+            <h6>Creation date: @Model.CreateTime.ToShortDateString()</h6>
+            <h6>Creation time: @Model.CreateTime.ToShortTimeString()</h6>
+            <h6>Alive pets count: @Model.GetAlivePetsCount</h6>
+            <h6>Dead pets count: @Model.GetDeadPetsCount</h6>
+            <h6>Average pet age: @Model.GetAveragePetsAge</h6>
+            <h6>Average period between feedings: @Model.GetAverageFeedingPeriod</h6>
+            <h6>Average period between drinkings: @Model.GetAverageDrinkingPeriod</h6>
+            <h6>Average happiness days count: @Model.GetAverageHappinessDays</h6>
+        </div>
+
+        <h1 class="text-center">Pets list</h1>
+        <div>
+            <a class="btn btn-outline-dark" asp-action="PetConstructor" asp-controller="Pictures">Create new pet</a>
+        </div>
         <div class="text-center">
-            <h1 class="display-4">Your pets</h1>
-            <div>
-                <a class="btn btn-outline-dark" asp-action="PetConstructor" asp-controller="Pictures">Create new pet</a>
-            </div>
+
             <table class="table">
                 <tr>
                     <th>Appearance</th>
@@ -35,6 +50,8 @@ else
                     <th>Pet state</th>
                     <th>Hungry state</th>
                     <th>Thirsty state</th>
+                    <th></th>
+                    <th></th>
                 </tr>
                 @foreach (var item in Model.Pets)
                 {
@@ -45,21 +62,48 @@ else
                         <td>@item.Name</td>
                         <td>@item.Age</td>
                         <td>@item.State</td>
-                        @if(item.State == PetState.Dead)
+                        @if (item.State == PetState.Dead)
                         {
                             <td>None</td>
                             <td>None</td>
+                            <td></td>
+                            <td></td>
                         }
                         else
                         {
                             <td>@item.HungerLavel</td>
                             <td>@item.ThirstyLavel</td>
+
+                            @if (item.HungerLavel == HungerLavel.Full)
+                            {
+                                <td>
+                                    <a class="btn btn-outline-success disabled">feed</a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <a class="btn btn-outline-success" asp-action="Feed" asp-controller="Pets" asp-route-id="@item.Id">feed</a>
+                                </td>
+                            }
+
+
+                            @if (item.ThirstyLavel == ThirstyLavel.Full)
+                            {
+                                <td>
+                                    <a class="btn btn-outline-info disabled">drink</a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <a class="btn btn-outline-info" asp-action="Drink" asp-controller="Pets" asp-route-id="@item.Id">drink</a>
+                                </td>
+                            }
                         }
                     </tr>
                 }
             </table>
         </div>
-        
     }
-
 }

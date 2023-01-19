@@ -73,11 +73,11 @@ namespace InnoGotchi.BLL.Services
         }
         private ThirstyLavel GetThirstyLavel(PetDTO pet)
         {
-            if ((DateTime.UtcNow - pet.LastFeedingTime).Ticks > _drinkingPeriodHours.Ticks * 3)
+            if ((DateTime.UtcNow - pet.LastDrinkingTime).Ticks > _drinkingPeriodHours.Ticks * 3)
                 return ThirstyLavel.Dead;
-            else if ((DateTime.UtcNow - pet.LastFeedingTime).Ticks > _drinkingPeriodHours.Ticks * 2)
+            else if ((DateTime.UtcNow - pet.LastDrinkingTime).Ticks > _drinkingPeriodHours.Ticks * 2)
                 return ThirstyLavel.Thirsty;
-            else if ((DateTime.UtcNow - pet.LastFeedingTime).Ticks > _drinkingPeriodHours.Ticks)
+            else if ((DateTime.UtcNow - pet.LastDrinkingTime).Ticks > _drinkingPeriodHours.Ticks)
                 return ThirstyLavel.Normal;
             else
                 return ThirstyLavel.Full;
@@ -95,7 +95,7 @@ namespace InnoGotchi.BLL.Services
 
         private double GetAverageDrinkingPeriod(PetDTO pet)
         {
-            return (DateTime.Now - pet.CreateTime).Ticks / pet.DrinkingCount / _dayHours.Ticks;
+            return (DateTime.UtcNow - pet.CreateTime).Ticks / pet.DrinkingCount / _dayHours.Ticks;
         }
     }
 }
