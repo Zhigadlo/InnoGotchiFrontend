@@ -6,5 +6,6 @@ namespace InnoGotchi.Web.Models
     {
         public FarmDTO Farm { get; set; }
         public int AuthorizedUserId { get; set; }
+        public IEnumerable<string> FarmNames { get; set; }
     }
 }

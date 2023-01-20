@@ -27,11 +27,11 @@ namespace InnoGotchi.Web.Controllers
                 return RedirectToAction("Login", "Users");
             
             if (id == -1)
-                return View("UserFarm", new UserFarmModel { Farm = new FarmDTO { Id = id }, AuthorizedUserId = int.Parse(authorizedUserId) } );
+                return View("UserFarm", new UserFarmModel { FarmNames = await GetAllFarmNames(), Farm = new FarmDTO { Id = id }, AuthorizedUserId = int.Parse(authorizedUserId) } );
             FarmDTO? farm = await Get(id);
             if (farm == null)
                 return RedirectToAction("Login", "Users");
-            return View("UserFarm", new UserFarmModel { Farm = farm, AuthorizedUserId = int.Parse(authorizedUserId) });
+            return View("UserFarm", new UserFarmModel { FarmNames = await GetAllFarmNames(), Farm = farm, AuthorizedUserId = int.Parse(authorizedUserId) });
         }
 
         public async Task<IActionResult> CreateFarm(string name)
@@ -52,7 +52,7 @@ namespace InnoGotchi.Web.Controllers
                 _localStorage.Remove(nameof(SecurityToken));
                 jsonToken = JsonSerializer.Serialize(securityToken);
                 _localStorage.Store(nameof(SecurityToken), jsonToken);
-                return RedirectToAction("GetUserFarm");
+                return RedirectToAction("GetCurrentUserFarm");
             }
             else
                 return BadRequest();
@@ -90,6 +90,34 @@ namespace InnoGotchi.Web.Controllers
                 Farm? farm = await JsonSerializer.DeserializeAsync<Farm>(contentStream, options);
                 
                 return _farmService.GetFarmDTO(farm);
+            }
+            else
+                return null;
+        }
+
+        public async Task<IEnumerable<string>> GetAllFarmNames()
+        {
+            var httpClient = GetHttpClient("Farms");
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Get,
+                httpClient.BaseAddress
+            );
+
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                if (contentStream.Length == 0)
+                    return null;
+                IEnumerable<Farm>? farm = await JsonSerializer.DeserializeAsync<IEnumerable<Farm>>(contentStream, options);
+
+                return _farmService.GetAllFarmsNames(farm);
             }
             else
                 return null;

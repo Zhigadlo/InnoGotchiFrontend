@@ -9,9 +9,40 @@
             <input id="name_input" name="name" type="text" class="form-control" placeholder="farm_name" required />
             <label for="name_input">Enter farm name</label>
         </div>
-
-        <input class="btn btn-outline-dark" type="submit" value="Create farm" />
+        <div id="error_message" class="text-danger h6" style="display:none">There is a farm with such name</div>
+        <input id="create_input" class="btn btn-outline-dark disabled" type="submit" value="Create farm" />
     </form>
+    <script>
+        var farmNames = [];
+        var error_message = document.getElementById('error_message');
+        var name_input = document.getElementById('name_input');
+        var create_input = document.getElementById('create_input');
+        console.log(create_input);
+        @foreach (var name in Model.FarmNames)
+        {
+            @:farmNames.push('@name');
+        }
+
+        console.log(farmNames);
+
+        name_input.addEventListener('change', () => {
+            let name = name_input.value;
+            error_message.style.display = 'block';
+            create_input.classList.remove('disabled');
+            if (!farmNames.includes(name)) {
+                error_message.classList.remove("text-danger");
+                create_input.classList.remove("disabled");
+                error_message.classList.add("text-success");
+                error_message.innerText = "This farm name is available :)";
+            }
+            else {
+                error_message.classList.remove("text-success");
+                error_message.classList.add("text-danger");
+                create_input.classList.toggle("disabled");
+                error_message.innerText = "This farm name is already in use:(";
+            }
+        });
+    </script>
 }
 else
 {

@@ -29,7 +29,7 @@
                     </svg>
                 </div>
                 <div class="mb-3">
-                    <input type="submit" id="submit" onsubmit="getSvg()" value="Create pet" class="btn btn-outline-dark" />
+                    <input type="submit" id="submit" onsubmit="getSvg()" value="Create pet" class="btn btn-outline-dark disabled" />
                 </div>
             </div>
             <div class="col">
@@ -99,7 +99,7 @@
     var petNames = [];
     var error_message = document.getElementById('error_message');
     var petname_input = document.getElementById('petname_input');
-
+    var create_input = document.getElementById('submit');
     @foreach (var name in Model.PetNames)
     {
         @:petNames.push('@name');
@@ -108,14 +108,17 @@
     petname_input.addEventListener('change', () => {
         let name = petname_input.value;
         error_message.style.display = 'block';
+        create_input.classList.remove('disabled');
         if(!petNames.includes(name)){
             error_message.classList.remove('text-danger');
-            error_message.classList.toggle('text-success');
+            create_input.classList.remove('disabled');
+            error_message.classList.add('text-success');
             error_message.innerText = 'This pet name is available :)';
         }
         else{
             error_message.classList.remove('text-success');
-            error_message.classList.toggle('text-danger');
+            error_message.classList.add('text-danger');
+            create_input.classList.toggle('disabled');
             error_message.innerText = 'This pet name is already in use:(';
         }
     });

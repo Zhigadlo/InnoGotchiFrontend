@@ -19,5 +19,10 @@ namespace InnoGotchi.BLL.Services
             farmDTO.Pets.ForEach(p => p = _petInfoService.FillPetDTO(p));
             return farmDTO;
         }
+
+        public IEnumerable<string>? GetAllFarmsNames(IEnumerable<Farm> farms)
+        {
+            return farms.Select(f => f.Name);
+        }
     }
 }
