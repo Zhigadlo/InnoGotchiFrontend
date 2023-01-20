@@ -51,6 +51,12 @@ namespace InnoGotchi.Web.Controllers
                 return null;
         }
 
+        public async Task<IActionResult> AllPetsView()
+        {
+            var pets = await GetAllPets();
+            return View(pets);
+        }
+
         [HttpGet]
         public async Task<IEnumerable<PetDTO>?> GetAllPets()
         {
