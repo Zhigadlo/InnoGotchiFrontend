@@ -3,6 +3,7 @@ using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Identity;
 using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
+using InnoGotchi.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text.Json;
@@ -21,12 +22,16 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<IActionResult> UserFarm(int id)
         {
+            string authorizedUserId = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
+            if(authorizedUserId == null)
+                return RedirectToAction("Login", "Users");
+            
             if (id == -1)
-                return View(new FarmDTO { Id = id } );
+                return View("UserFarm", new UserFarmModel { Farm = new FarmDTO { Id = id }, AuthorizedUserId = int.Parse(authorizedUserId) } );
             FarmDTO? farm = await Get(id);
             if (farm == null)
                 return RedirectToAction("Login", "Users");
-            return View(farm);
+            return View("UserFarm", new UserFarmModel { Farm = farm, AuthorizedUserId = int.Parse(authorizedUserId) });
         }
 
         public async Task<IActionResult> CreateFarm(string name)
@@ -53,12 +58,13 @@ namespace InnoGotchi.Web.Controllers
                 return BadRequest();
         }
 
-        public IActionResult GetUserFarm()
+        public async Task<IActionResult> GetCurrentUserFarm()
         {
             string farmId = HttpContext.User.FindFirstValue(nameof(SecurityToken.FarmId));
             if (farmId == null)
                 return RedirectToAction("Login", "Users");
-            return RedirectToAction("UserFarm", new { id = int.Parse(farmId) });
+            //return RedirectToAction("UserFarm", new { id = int.Parse(farmId) });
+            return await UserFarm(int.Parse(farmId));
         }
 
         public async Task<FarmDTO?> Get(int id)

@@ -14,13 +14,22 @@
         {
             <tr>
                 <td align="left">
-                    <img src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="60" height="60" />
+                    <img class="img-thumbnail" src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="80" height="80" />
                 </td>
                 <td>@item.FirstName</td>
                 <td>@item.LastName</td>
-                <td>
-                    <a class="btn btn-outline-dark">go to farm</a>
-                </td>
+                @if(item.Farm == null)
+                {
+                    <td>
+                        This user hasn't farm yet
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a class="btn btn-outline-dark" asp-controller="Farms" asp-action="UserFarm" asp-route-id="@item.Farm.Id">go to farm</a>
+                    </td>
+                }
             </tr>
         }
     </table>

@@ -1,7 +1,7 @@
 ﻿@using InnoGotchi.BLL.DTO;
-@model FarmDTO
+@model UserFarmModel
 
-@if (Model.Id == -1)
+@if (Model.Farm.Id == -1)
 {
     <h1>You have no farm yet</h1>
     <form method="post" asp-controller="Farms" asp-action="CreateFarm">
@@ -15,7 +15,7 @@
 }
 else
 {
-    if (Model.Pets == null || Model.Pets.Count() == 0)
+    if (Model.Farm.Pets == null || Model.Farm.Pets.Count() == 0)
     {
         <h1>You have no pets yet</h1>
         <a class="btn btn-outline-dark" asp-action="PetConstructor" asp-controller="Pictures">Create new pet</a>
@@ -24,22 +24,25 @@ else
     {
         <div>
             <h1>Farm statistic</h1>
-            <h6>Farm name: @Model.Name</h6>
-            <h6>Pets count: @Model.Pets.Count</h6>
-            <h6>Creation date: @Model.CreateTime.ToShortDateString()</h6>
-            <h6>Creation time: @Model.CreateTime.ToShortTimeString()</h6>
-            <h6>Alive pets count: @Model.GetAlivePetsCount</h6>
-            <h6>Dead pets count: @Model.GetDeadPetsCount</h6>
-            <h6>Average pet age: @Model.GetAveragePetsAge</h6>
-            <h6>Average period between feedings: @Model.GetAverageFeedingPeriod</h6>
-            <h6>Average period between drinkings: @Model.GetAverageDrinkingPeriod</h6>
-            <h6>Average happiness days count: @Model.GetAverageHappinessDays</h6>
+            <h6>Farm name: @Model.Farm.Name</h6>
+            <h6>Pets count: @Model.Farm.Pets.Count</h6>
+            <h6>Creation date: @Model.Farm.CreateTime.ToShortDateString()</h6>
+            <h6>Creation time: @Model.Farm.CreateTime.ToShortTimeString()</h6>
+            <h6>Alive pets count: @Model.Farm.GetAlivePetsCount</h6>
+            <h6>Dead pets count: @Model.Farm.GetDeadPetsCount</h6>
+            <h6>Average pet age: @Model.Farm.GetAveragePetsAge</h6>
+            <h6>Average period between feedings: @Model.Farm.GetAverageFeedingPeriod</h6>
+            <h6>Average period between drinkings: @Model.Farm.GetAverageDrinkingPeriod</h6>
+            <h6>Average happiness days count: @Model.Farm.GetAverageHappinessDays</h6>
         </div>
 
         <h1 class="text-center">Pets list</h1>
-        <div>
-            <a class="btn btn-outline-dark" asp-action="PetConstructor" asp-controller="Pictures">Create new pet</a>
-        </div>
+        @if (Model.AuthorizedUserId == Model.Farm.OwnerId)
+        {
+            <div>
+                <a class="btn btn-outline-dark" asp-action="PetConstructor" asp-controller="Pictures">Create new pet</a>
+            </div>
+        }
         <div class="text-center">
 
             <table class="table">
@@ -54,7 +57,7 @@ else
                     <th></th>
                     <th></th>
                 </tr>
-                @foreach (var item in Model.Pets)
+                @foreach (var item in Model.Farm.Pets)
                 {
                     <tr>
                         <td>
