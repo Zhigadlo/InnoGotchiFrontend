@@ -2,7 +2,13 @@
     ViewData["Title"] = "All users";
 }
 @model IEnumerable<UserViewModel>;
-<div class="text-center">
+@if(Model.Count() == 0 || Model == null)
+{
+    <h1 class="text-center">There are no users yet</h1>    
+}
+else
+{
+    <div class="text-center">
     <h1 class="display-4">Users</h1>
     <table class="table">
         <tr>
@@ -36,5 +42,7 @@
                 </td>
             </tr>
         }
-    </table>
-</div>
+        </table>
+    </div>
+}
+

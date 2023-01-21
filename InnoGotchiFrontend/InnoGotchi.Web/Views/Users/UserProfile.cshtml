@@ -5,40 +5,48 @@
 <h1>@Model.FirstName @Model.LastName</h1>
 <h2>Email: @Model.Email</h2>
 
-<a id="avatarChangeButton" class="btn btn-sm btn-primary" onclick=createFileInput>Change avatar</a>
-<a asp-action="ChangePasswordView" asp-controller="Users"  class="btn btn-sm btn-primary" >Change password</a>
+<a id="avatarChangeButton" class="btn btn-sm btn-outline-dark" onclick=createFileInput>Change avatar</a>
+<a asp-action="ChangePasswordView" asp-controller="Users"  class="btn btn-sm btn-outline-dark" >Change password</a>
 
 <form method="post" asp-action="ChangeAvatar" asp-controller="Users" id="formForFileInput" style="visibility:hidden;" enctype="multipart/form-data">
     <div>
         <label for="formFile" class="form-label">Choose image for avatar (jpg, png)</label>
-        <input type="file" name="FormFile" accept=".jpg, .png, .jpeg" class="form-control mb-1" id="formFile">
-        <input type="submit" value="Save" class="btn btn-sm btn-success"/>
+        <input type="file" name="FormFile" accept=".jpg, .png, .jpeg" class="form-control mb-1" id="formFile" required>
+        <input type="submit" value="Save" class="btn btn-sm btn-outline-success"/>
+        <a id="hideAvatarChange" class="btn btn-sm btn-outline-danger">Cancel</a>
     </div>
 </form>
 
 <script>
     window.onload = function () {
-        document.getElementById("avatarChangeButton").onclick = createFileInput
+        document.getElementById("avatarChangeButton").onclick = createFileInput;
+        document.getElementById("hideAvatarChange").onclick = hideFileInput;
     }
 
-    function createFileInput(){
-        var div = document.getElementById('formForFileInput');
-        div.style.visibility = 'visible';
-    }
-
+    var div = document.getElementById('formForFileInput');
+    var image = document.getElementById('avatar');
+    const firstImage = image.src;
     var input = document.getElementById('formFile');
     input.addEventListener('change', updateImageDisplay);
 
-    function updateImageDisplay() {
+    function createFileInput(){
+        div.style.visibility = 'visible';
+    }
 
-        var image = document.getElementById('avatar');
+    function hideFileInput(){
+        div.style.visibility = 'hidden';
+        image.src = firstImage;
+        input.value = '';
+    }
+
+    function updateImageDisplay() {
         console.log(image.src)
         while (input.firstChild) {
             input.removeChild(input.firstChild);
         }
         var curFiles = input.files;
         if (curFiles.length === 0) {
-            image.src = 'data:image/png;base64,@(Convert.ToBase64String(@Model.Avatar))';
+            image.src = firstImage;
         }
         else {
             for (var i = 0; i < curFiles.length; i++) {
