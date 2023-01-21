@@ -105,7 +105,10 @@
         @:petNames.push('@name');
     }
 
-    petname_input.addEventListener('change', () => {
+    petname_input.addEventListener('keyup', validateName);
+    petname_input.addEventListener('change', validateName);
+
+    function validateName(){
         let name = petname_input.value;
         error_message.style.display = 'block';
         create_input.classList.remove('disabled');
@@ -121,7 +124,7 @@
             create_input.classList.toggle('disabled');
             error_message.innerText = 'This pet name is already in use:(';
         }
-    });
+    }
 
     var bodyImage = $('image[name="body"]');
     var eyesImage = $('image[name="eyes"]');

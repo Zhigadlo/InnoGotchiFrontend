@@ -28,10 +28,10 @@
         @:const errorMessage = document.createTextNode('@Model.Error');
         @:div.appendChild(errorMessage);
         @:loginForm.appendChild(div);
-        @:password_input.addEventListener('change', () => {
+        @:password_input.addEventListener('keyup', () => {
             @:deleteErrorMessage();
         @:});
-        @:email_input.addEventListener('change', () => {
+        @:email_input.addEventListener('keyup', () => {
             @:deleteErrorMessage();
         @:});
     }

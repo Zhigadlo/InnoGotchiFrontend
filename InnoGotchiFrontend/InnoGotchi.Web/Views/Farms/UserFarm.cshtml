@@ -25,7 +25,10 @@
 
         console.log(farmNames);
 
-        name_input.addEventListener('change', () => {
+        name_input.addEventListener('keyup', nameValidate);
+        name_input.addEventListener('change', nameValidate);
+
+        function nameValidate(){
             let name = name_input.value;
             error_message.style.display = 'block';
             create_input.classList.remove('disabled');
@@ -41,7 +44,8 @@
                 create_input.classList.toggle("disabled");
                 error_message.innerText = "This farm name is already in use:(";
             }
-        });
+        }
+
     </script>
 }
 else

@@ -99,7 +99,7 @@ namespace InnoGotchi.Web.Controllers
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                return RedirectToAction("UserFarm", "Farms", new { id = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId)) });
+                return RedirectToAction("UserFarm", "Farms", new { id = HttpContext.User.FindFirstValue(nameof(SecurityToken.FarmId)) });
             }
             else
                 return BadRequest();
@@ -118,7 +118,7 @@ namespace InnoGotchi.Web.Controllers
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                return RedirectToAction("GetUserFarm", "Farms");
+                return RedirectToAction("GetCurrentUserFarm", "Farms");
             }
             else
                 return BadRequest();
@@ -137,7 +137,7 @@ namespace InnoGotchi.Web.Controllers
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                return RedirectToAction("GetUserFarm", "Farms");
+                return RedirectToAction("GetCurrentUserFarm", "Farms");
             }
             else
                 return BadRequest();
