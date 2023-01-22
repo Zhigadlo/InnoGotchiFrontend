@@ -1,6 +1,6 @@
 ﻿@model PetConstructorViewModel;
 
-<form id="petCreate" method="post" asp-action="Create" asp-controller="Pets">
+<form id="petCreate" method="post" asp-action="Create" asp-controller="Pets" onsubmit="return isValidForm()">
     <h1>Pet constructor</h1>
     <div class="form-floating mb-3">
         <input id="petname_input" class="form-control" type="text" name="name" placeholder="petname" required/>
@@ -29,7 +29,7 @@
                     </svg>
                 </div>
                 <div class="mb-3">
-                    <input type="submit" id="submit" onsubmit="getSvg()" value="Create pet" class="btn btn-outline-dark disabled" />
+                    <input type="submit" id="submit" onsubmit="getSvg()" value="Create pet" class="btn btn-outline-dark" />
                 </div>
             </div>
             <div class="col">
@@ -100,10 +100,15 @@
     var error_message = document.getElementById('error_message');
     var petname_input = document.getElementById('petname_input');
     var create_input = document.getElementById('submit');
+
+    var isValid = false; 
+
     @foreach (var name in Model.PetNames)
     {
         @:petNames.push('@name');
     }
+
+    console.log(petNames);
 
     petname_input.addEventListener('keyup', validateName);
     petname_input.addEventListener('change', validateName);
@@ -111,19 +116,30 @@
     function validateName(){
         let name = petname_input.value;
         error_message.style.display = 'block';
-        create_input.classList.remove('disabled');
         if(!petNames.includes(name)){
-            error_message.classList.remove('text-danger');
-            create_input.classList.remove('disabled');
-            error_message.classList.add('text-success');
+            if(error_message.classList.contains('text-danger')){
+                error_message.classList.remove('text-danger');
+            }
+            if(!error_message.classList.contains('text-success')){
+                error_message.classList.add('text-success');
+            }
             error_message.innerText = 'This pet name is available :)';
+            isValid = true;
         }
         else{
-            error_message.classList.remove('text-success');
-            error_message.classList.add('text-danger');
-            create_input.classList.toggle('disabled');
+            if(!error_message.classList.contains('text-danger')){
+                error_message.classList.add('text-danger');
+            }
+            if(error_message.classList.contains('text-success')){
+                error_message.classList.remove('text-success');
+            }
             error_message.innerText = 'This pet name is already in use:(';
+            isValid = false;
         }
+    }
+
+    function isValidForm(){
+        return isValid;
     }
 
     var bodyImage = $('image[name="body"]');

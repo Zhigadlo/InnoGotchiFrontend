@@ -63,7 +63,7 @@ namespace InnoGotchi.Web.Controllers
             string farmId = HttpContext.User.FindFirstValue(nameof(SecurityToken.FarmId));
             if (farmId == null)
                 return RedirectToAction("Login", "Users");
-            //return RedirectToAction("UserFarm", new { id = int.Parse(farmId) });
+            
             return await UserFarm(int.Parse(farmId));
         }
 

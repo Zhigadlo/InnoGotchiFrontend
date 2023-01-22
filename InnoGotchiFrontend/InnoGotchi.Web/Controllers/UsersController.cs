@@ -29,9 +29,10 @@ namespace InnoGotchi.Web.Controllers
             return View(errorMessage);
         }
         
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
-            return View();
+            IEnumerable<string> userEmails = (await GetAll()).Select(u => u.Email);
+            return View(userEmails);
         }
 
         public IActionResult ChangePasswordView()

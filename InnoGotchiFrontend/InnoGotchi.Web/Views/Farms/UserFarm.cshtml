@@ -4,20 +4,22 @@
 @if (Model.Farm.Id == -1)
 {
     <h1>You have no farm yet</h1>
-    <form method="post" asp-controller="Farms" asp-action="CreateFarm">
+    <form method="post" asp-controller="Farms" asp-action="CreateFarm" onsubmit="return isValidForm()">
         <div class="form-floating mb-3">
             <input id="name_input" name="name" type="text" class="form-control" placeholder="farm_name" required />
             <label for="name_input">Enter farm name</label>
         </div>
         <div id="error_message" class="text-danger h6" style="display:none">There is a farm with such name</div>
-        <input id="create_input" class="btn btn-outline-dark disabled" type="submit" value="Create farm" />
+        <input id="create_input" class="btn btn-outline-dark" type="submit" value="Create farm" />
     </form>
     <script>
         var farmNames = [];
         var error_message = document.getElementById('error_message');
         var name_input = document.getElementById('name_input');
         var create_input = document.getElementById('create_input');
-        console.log(create_input);
+
+        var isValid = false;
+
         @foreach (var name in Model.FarmNames)
         {
             @:farmNames.push('@name');
@@ -31,19 +33,30 @@
         function nameValidate(){
             let name = name_input.value;
             error_message.style.display = 'block';
-            create_input.classList.remove('disabled');
             if (!farmNames.includes(name)) {
-                error_message.classList.remove("text-danger");
-                create_input.classList.remove("disabled");
-                error_message.classList.add("text-success");
-                error_message.innerText = "This farm name is available :)";
+                if (error_message.classList.contains('text-danger')) {
+                    error_message.classList.remove('text-danger');
+                }
+                if (!error_message.classList.contains('text-success')) {
+                    error_message.classList.add('text-success');
+                }
+                error_message.innerText = 'This pet name is available :)';
+                isValid = true;
             }
             else {
-                error_message.classList.remove("text-success");
-                error_message.classList.add("text-danger");
-                create_input.classList.toggle("disabled");
-                error_message.innerText = "This farm name is already in use:(";
+                if (!error_message.classList.contains('text-danger')) {
+                    error_message.classList.add('text-danger');
+                }
+                if (error_message.classList.contains('text-success')) {
+                    error_message.classList.remove('text-success');
+                }
+                error_message.innerText = 'This pet name is already in use:(';
+                isValid = false;
             }
+        }
+
+        function isValidForm(){
+            return isValid;
         }
 
     </script>
