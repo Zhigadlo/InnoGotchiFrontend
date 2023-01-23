@@ -16,7 +16,7 @@
         public DateTime LastFeedingTime { get; set; }
         public DateTime LastDrinkingTime { get; set; }
         public DateTime FirstHappinessDate { get; set; }
-        
+
 
         public int Age { get; set; }
         public HungerLavel HungerLavel { get; set; }

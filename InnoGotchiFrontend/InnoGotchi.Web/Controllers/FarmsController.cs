@@ -23,11 +23,11 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> UserFarm(int id)
         {
             string authorizedUserId = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
-            if(authorizedUserId == null)
+            if (authorizedUserId == null)
                 return RedirectToAction("Login", "Users");
-            
+
             if (id == -1)
-                return View("UserFarm", new UserFarmModel { FarmNames = await GetAllFarmNames(), Farm = new FarmDTO { Id = id }, AuthorizedUserId = int.Parse(authorizedUserId) } );
+                return View("UserFarm", new UserFarmModel { FarmNames = await GetAllFarmNames(), Farm = new FarmDTO { Id = id }, AuthorizedUserId = int.Parse(authorizedUserId) });
             FarmDTO? farm = await Get(id);
             if (farm == null)
                 return RedirectToAction("Login", "Users");
@@ -63,7 +63,7 @@ namespace InnoGotchi.Web.Controllers
             string farmId = HttpContext.User.FindFirstValue(nameof(SecurityToken.FarmId));
             if (farmId == null)
                 return RedirectToAction("Login", "Users");
-            
+
             return await UserFarm(int.Parse(farmId));
         }
 
@@ -88,7 +88,7 @@ namespace InnoGotchi.Web.Controllers
                 if (contentStream.Length == 0)
                     return null;
                 Farm? farm = await JsonSerializer.DeserializeAsync<Farm>(contentStream, options);
-                
+
                 return _farmService.GetFarmDTO(farm);
             }
             else

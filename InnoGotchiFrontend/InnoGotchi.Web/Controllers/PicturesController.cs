@@ -20,7 +20,7 @@ namespace InnoGotchi.Web.Controllers
             _imageService = imageService;
             _petService = petService;
         }
-        
+
         public async Task<IActionResult> PetConstructor(string? errorMessage)
         {
             var petsController = new PetsController(_httpClientFactory, _petService, _localStorage);

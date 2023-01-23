@@ -5,8 +5,6 @@ using InnoGotchi.BLL.Services;
 using InnoGotchi.Web.Extensions;
 using InnoGotchi.Web.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 

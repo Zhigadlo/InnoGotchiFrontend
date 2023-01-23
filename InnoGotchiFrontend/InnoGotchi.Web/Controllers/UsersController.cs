@@ -23,12 +23,12 @@ namespace InnoGotchi.Web.Controllers
             _userService = userService;
             _imageService = imageService;
         }
-        
+
         public IActionResult Login(string errorMessage)
         {
             return View(errorMessage);
         }
-        
+
         public async Task<IActionResult> Register()
         {
             IEnumerable<string> userEmails = (await GetAll()).Select(u => u.Email);
@@ -47,7 +47,7 @@ namespace InnoGotchi.Web.Controllers
                 return RedirectToAction("Login");
 
             List<UserDTO> coloborators = new List<UserDTO>();
-            foreach(var rr in user.ReceivedRequests)
+            foreach (var rr in user.ReceivedRequests)
             {
                 if (rr.IsConfirmed)
                 {
@@ -55,7 +55,7 @@ namespace InnoGotchi.Web.Controllers
                     coloborators.Add(u);
                 }
             }
-            foreach(var sr in user.SentRequests)
+            foreach (var sr in user.SentRequests)
             {
                 if (sr.IsConfirmed)
                 {
@@ -69,7 +69,7 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> UserRequests()
         {
             UserDTO? user = await GetCurrentUser();
-            if(user == null) 
+            if (user == null)
                 return RedirectToAction("Login");
             List<KeyValuePair<int, UserDTO>> usersWhoSentRequest = new List<KeyValuePair<int, UserDTO>>();
             foreach (var rr in user.ReceivedRequests)
@@ -77,12 +77,12 @@ namespace InnoGotchi.Web.Controllers
                 if (rr.IsConfirmed == false)
                 {
                     var u = await Get(rr.RequestOwnerId);
-                    
+
                     usersWhoSentRequest.Add(KeyValuePair.Create(rr.Id, u));
                 }
             };
             List<KeyValuePair<int, UserDTO>> usersWhoReceivedRequest = new List<KeyValuePair<int, UserDTO>>();
-            foreach(var sr in user.SentRequests)
+            foreach (var sr in user.SentRequests)
             {
                 if (sr.IsConfirmed == false)
                 {
@@ -108,7 +108,7 @@ namespace InnoGotchi.Web.Controllers
             UserDTO authorizedUser = users.ToList().Find(u => u.Id == authorized_id);
             users.Remove(authorizedUser);
             List<UserViewModel> usersVM = new List<UserViewModel>();
-            foreach(UserDTO user in users)
+            foreach (UserDTO user in users)
             {
                 UserViewModel userVM = new UserViewModel
                 {
@@ -117,7 +117,7 @@ namespace InnoGotchi.Web.Controllers
 
                 var sentRequest = authorizedUser.SentRequests.FirstOrDefault(sr => sr.RequestReceipientId == user.Id);
                 var receivedRequest = authorizedUser.ReceivedRequests.FirstOrDefault(sr => sr.RequestOwnerId == user.Id);
-                
+
                 if (sentRequest != null)
                 {
                     if (sentRequest.IsConfirmed)
@@ -155,7 +155,7 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> UserProfile()
         {
             UserDTO? user = await GetCurrentUser();
-            if(user == null) 
+            if (user == null)
                 return RedirectToAction("Login");
             return View(user);
         }
@@ -185,7 +185,7 @@ namespace InnoGotchi.Web.Controllers
                 return await Logout();
             }
             else
-                return View("ChangePasswordView", new ErrorModel { Error="Old password is wrong"});
+                return View("ChangePasswordView", new ErrorModel { Error = "Old password is wrong" });
         }
         public async Task<IActionResult> Logout()
         {
@@ -193,7 +193,7 @@ namespace InnoGotchi.Web.Controllers
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
-        
+
         public async Task<IActionResult> Authenticate(string email, string password)
         {
             string? token = await Token(email, password);
@@ -215,9 +215,9 @@ namespace InnoGotchi.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             else
-                return View("Login", new ErrorModel{ Error = "Invalid email or password" });
+                return View("Login", new ErrorModel { Error = "Invalid email or password" });
         }
-        
+
         private async Task SignIn(SecurityToken securityToken)
         {
             var claims = new List<Claim>
@@ -233,7 +233,7 @@ namespace InnoGotchi.Web.Controllers
             var claimsPrincipal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(claimsPrincipal);
         }
-        
+
         private async Task<string?> Token(string email, string password)
         {
             var httpClient = GetHttpClient("Users");
@@ -248,7 +248,7 @@ namespace InnoGotchi.Web.Controllers
             {
                 token = (await httpResponseMessage.Content.ReadAsStringAsync()).Replace("\"", String.Empty);
             }
-            
+
             return token;
         }
         private async Task<UserDTO?> GetUser(string email, string password)
