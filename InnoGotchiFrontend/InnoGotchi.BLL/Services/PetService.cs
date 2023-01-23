@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using InnoGotchi.BLL.DTO;
+using InnoGotchi.BLL.Models;
 using InnoGotchi.DAL.Models;
 using Microsoft.Extensions.Configuration;
-using System.Linq;
 
 namespace InnoGotchi.BLL.Services
 {
@@ -34,9 +34,30 @@ namespace InnoGotchi.BLL.Services
             {
                 var petDTO = _mapper.Map<PetDTO>(pet);
                 result.Add(_petInfoService.FillPetDTO(petDTO));
-                
+
             }
             return result.AsEnumerable();
+        }
+
+        public PaginatedList<PetDTO> GetPage(PaginatedList<Pet>? pets)
+        {
+            if (pets == null)
+                return null;
+
+            PaginatedList<PetDTO>? result = new PaginatedList<PetDTO>
+            {
+                TotalPages = pets.TotalPages,
+                PageIndex = pets.PageIndex,
+                Items = new List<PetDTO>()
+            };
+
+            foreach (var pet in pets.Items)
+            {
+                var petDTO = _mapper.Map<PetDTO>(pet);
+                result.Items.Add(_petInfoService.FillPetDTO(petDTO));
+            }
+
+            return result;
         }
     }
 }

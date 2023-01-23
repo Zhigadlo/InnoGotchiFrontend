@@ -1,8 +1,10 @@
 ﻿using Hanssens.Net;
 using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Identity;
+using InnoGotchi.BLL.Models;
 using InnoGotchi.BLL.Services;
 using InnoGotchi.DAL.Models;
+using InnoGotchi.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text.Json;
@@ -51,10 +53,44 @@ namespace InnoGotchi.Web.Controllers
                 return null;
         }
 
-        public async Task<IActionResult> AllPetsView()
+        public async Task<PaginatedList<PetDTO>> GetPage(int page, string sortType)
         {
-            var pets = await GetAllPets();
-            return View(pets);
+            var httpClient = GetHttpClient("Pets");
+
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Get,
+                httpClient.BaseAddress + $"/{page}&{sortType}"
+            );
+
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                PaginatedList<Pet>? pets = await JsonSerializer.DeserializeAsync<PaginatedList<Pet>>(contentStream, options);
+
+                return _service.GetPage(pets);
+            }
+            else
+                return null;
+        }
+
+        public async Task<IActionResult> AllPetsView(int page = 1, string sortType = "happiness_asc")
+        {
+            var pets = await GetPage(page, sortType);
+            if (pets == null)
+                return RedirectToAction("Login", "Users");
+            var vm = new AllPetsViewModel
+            {
+                PaginatedList = pets,
+                SortModel = new PetSortModel(sortType)
+            };
+            return View(vm);
         }
 
         [HttpGet]

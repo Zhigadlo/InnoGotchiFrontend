@@ -1,8 +1,8 @@
-﻿@using InnoGotchi.BLL.DTO;
+﻿@using InnoGotchi.BLL.Models;
 @{
     ViewData["Title"] = "All pets";
 }
-@model IEnumerable<PetDTO>;
+@model AllPetsViewModel;
 @if(Model == null)
 {
     <div class="text-center">There are no pets in game yet</div>
@@ -12,16 +12,28 @@ else
     <div class="text-center">
         <table class="table">
             <tr>
-                <th>Appearance</th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Pet state</th>
-                <th>Hungry state</th>
-                <th>Thirsty state</th>
-                <th>Happiness days</th>
+                <th></th>
+                <th>
+                    <a class="text-black btn-link" asp-controller="Pets" asp-action="AllPetsView" asp-route-page="@Model.PaginatedList.PageIndex" asp-route-sortType="@Model.SortModel.NameState">Name</a>
+                </th>
+                <th>
+                    <a class="text-black btn-link" asp-controller="Pets" asp-action="AllPetsView" asp-route-page="@Model.PaginatedList.PageIndex" asp-route-sortType="@Model.SortModel.AgeState">Age</a>
+                </th>
+                <th>
+                    <a class="text-black btn-link" asp-controller="Pets" asp-action="AllPetsView" asp-route-page="@Model.PaginatedList.PageIndex" asp-route-sortType="@Model.SortModel.PetState">Pet state</a>
+                </th>
+                <th>
+                    <a class="text-black btn-link" asp-controller="Pets" asp-action="AllPetsView" asp-route-page="@Model.PaginatedList.PageIndex" asp-route-sortType="@Model.SortModel.HungryState">Hungry state</a>
+                </th>
+                <th>
+                    <a class="text-black btn-link" asp-controller="Pets" asp-action="AllPetsView" asp-route-page="@Model.PaginatedList.PageIndex" asp-route-sortType="@Model.SortModel.ThirstyState">Thirsty state</a>
+                </th>
+                <th>
+                    <a class="text-black btn-link" asp-controller="Pets" asp-action="AllPetsView" asp-route-page="@Model.PaginatedList.PageIndex" asp-route-sortType="@Model.SortModel.HappinessState">Happiness days</a>
+                </th>
                 <th></th>
             </tr>
-            @foreach (var item in Model)
+            @foreach (var item in Model.PaginatedList.Items)
             {
                 <tr>
                     <td>
@@ -40,5 +52,23 @@ else
             }
         </table>
     </div>
-}
 
+    @if(Model.PaginatedList.HasPreviousPage)
+    {
+        <a asp-action="AllPetsView"
+            asp-route-sortType="@Model.SortModel.Current"
+            asp-route-page="@(Model.PaginatedList.PageIndex - 1)"
+            class="btn btn-outline-dark">
+            Previous
+        </a>
+    }
+    @if(Model.PaginatedList.HasNextPage)
+    {
+        <a asp-action="AllPetsView"
+            asp-route-sortType="@Model.SortModel.Current"
+            asp-route-page="@(Model.PaginatedList.PageIndex + 1)"
+            class="btn btn-outline-dark">
+            Next
+        </a>
+    }
+}
