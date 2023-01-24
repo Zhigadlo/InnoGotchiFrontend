@@ -5,15 +5,15 @@ namespace InnoGotchi.BLL.Services
 {
     public class PetInfoService
     {
-        private DateTime _feedingPeriodHours;
-        private DateTime _drinkingPeriodHours;
-        private DateTime _dayHours;
+        public DateTime FeedingPeriodHours { get; private set; }
+        public DateTime DrinkingPeriodHours { get; private set; }
+        public DateTime DayHours { get; private set; }
 
         public PetInfoService(IConfiguration configuration)
         {
-            _dayHours = DateTime.MinValue.AddHours(int.Parse(configuration.GetSection("DayHours").Value));
-            _feedingPeriodHours = DateTime.MinValue.AddHours(int.Parse(configuration.GetSection("FeedingPeriodHours").Value));
-            _drinkingPeriodHours = DateTime.MinValue.AddHours(int.Parse(configuration.GetSection("DrinkingPeriodHours").Value));
+            DayHours = DateTime.MinValue.AddHours(int.Parse(configuration.GetSection("DayHours").Value));
+            FeedingPeriodHours = DateTime.MinValue.AddHours(int.Parse(configuration.GetSection("FeedingPeriodHours").Value));
+            DrinkingPeriodHours = DateTime.MinValue.AddHours(int.Parse(configuration.GetSection("DrinkingPeriodHours").Value));
         }
 
         public PetDTO FillPetDTO(PetDTO petDTO)
@@ -30,18 +30,18 @@ namespace InnoGotchi.BLL.Services
         private int GetAge(PetDTO pet)
         {
             if (GetPetState(pet) != PetState.Dead)
-                return (int)((DateTime.UtcNow - pet.CreateTime).Ticks / _dayHours.Ticks / 365);
+                return (int)((DateTime.UtcNow - pet.CreateTime).Ticks / DayHours.Ticks / 365);
             else
             {
                 if (pet.LastDrinkingTime > pet.LastFeedingTime)
                 {
-                    pet.DeadTime = pet.LastFeedingTime.AddTicks(_feedingPeriodHours.Ticks * 3);
+                    pet.DeadTime = pet.LastFeedingTime.AddTicks(FeedingPeriodHours.Ticks * 3);
                 }
                 else
                 {
-                    pet.DeadTime = pet.LastDrinkingTime.AddTicks(_drinkingPeriodHours.Ticks * 3);
+                    pet.DeadTime = pet.LastDrinkingTime.AddTicks(DrinkingPeriodHours.Ticks * 3);
                 }
-                return (int)((pet.DeadTime - pet.CreateTime).Ticks / _dayHours.Ticks / 365);
+                return (int)((pet.DeadTime - pet.CreateTime).Ticks / DayHours.Ticks / 365);
             }
         }
 
@@ -56,22 +56,22 @@ namespace InnoGotchi.BLL.Services
 
         private HungerLavel GetHungryLavel(PetDTO pet)
         {
-            if ((DateTime.UtcNow - pet.LastFeedingTime).Ticks > _feedingPeriodHours.Ticks * 3)
+            if ((DateTime.UtcNow - pet.LastFeedingTime).Ticks > FeedingPeriodHours.Ticks * 3)
                 return HungerLavel.Dead;
-            else if ((DateTime.UtcNow - pet.LastFeedingTime).Ticks > _feedingPeriodHours.Ticks * 2)
+            else if ((DateTime.UtcNow - pet.LastFeedingTime).Ticks > FeedingPeriodHours.Ticks * 2)
                 return HungerLavel.Hungry;
-            else if ((DateTime.UtcNow - pet.LastFeedingTime).Ticks > _feedingPeriodHours.Ticks)
+            else if ((DateTime.UtcNow - pet.LastFeedingTime).Ticks > FeedingPeriodHours.Ticks)
                 return HungerLavel.Normal;
             else
                 return HungerLavel.Full;
         }
         private ThirstyLavel GetThirstyLavel(PetDTO pet)
         {
-            if ((DateTime.UtcNow - pet.LastDrinkingTime).Ticks > _drinkingPeriodHours.Ticks * 3)
+            if ((DateTime.UtcNow - pet.LastDrinkingTime).Ticks > DrinkingPeriodHours.Ticks * 3)
                 return ThirstyLavel.Dead;
-            else if ((DateTime.UtcNow - pet.LastDrinkingTime).Ticks > _drinkingPeriodHours.Ticks * 2)
+            else if ((DateTime.UtcNow - pet.LastDrinkingTime).Ticks > DrinkingPeriodHours.Ticks * 2)
                 return ThirstyLavel.Thirsty;
-            else if ((DateTime.UtcNow - pet.LastDrinkingTime).Ticks > _drinkingPeriodHours.Ticks)
+            else if ((DateTime.UtcNow - pet.LastDrinkingTime).Ticks > DrinkingPeriodHours.Ticks)
                 return ThirstyLavel.Normal;
             else
                 return ThirstyLavel.Full;
@@ -79,17 +79,17 @@ namespace InnoGotchi.BLL.Services
 
         private int GetHappinessDaysCount(PetDTO pet)
         {
-            return (int)((DateTime.UtcNow - pet.FirstHappinessDate).Ticks / _dayHours.Ticks);
+            return (int)((DateTime.UtcNow - pet.FirstHappinessDate).Ticks / DayHours.Ticks);
         }
 
         private double GetAverageFeedingPeriod(PetDTO pet)
         {
-            return (DateTime.UtcNow - pet.CreateTime).Ticks / pet.FeedingCount / _dayHours.Ticks;
+            return (DateTime.UtcNow - pet.CreateTime).Ticks / pet.FeedingCount / DayHours.Ticks;
         }
 
         private double GetAverageDrinkingPeriod(PetDTO pet)
         {
-            return (DateTime.UtcNow - pet.CreateTime).Ticks / pet.DrinkingCount / _dayHours.Ticks;
+            return (DateTime.UtcNow - pet.CreateTime).Ticks / pet.DrinkingCount / DayHours.Ticks;
         }
     }
 }

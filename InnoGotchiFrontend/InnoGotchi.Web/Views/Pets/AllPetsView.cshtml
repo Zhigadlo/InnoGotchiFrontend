@@ -1,4 +1,5 @@
-﻿@using InnoGotchi.BLL.Models;
+﻿@using InnoGotchi.BLL.DTO;
+@using InnoGotchi.BLL.Models;
 @{
     ViewData["Title"] = "All pets";
 }
@@ -10,6 +11,28 @@
 else
 {
     <div class="text-center">
+        <form method="get" asp-controller="Pets" asp-action="AllPetsView" asp-route-sortType="@Model.SortModel.Current" asp-route-page="@Model.PaginatedList.PageIndex">
+            <div class="input-group">
+                <span class="input-group-text" id="basic-addon3">Filtration fields</span>
+                <input class="form-control" type="number" name="age" id="age_input" value="@Model.FilterModel.SelectedAge" placeholder="Age" />
+                <select class="form-select" name="hungerLavel" id="hunger_select">
+                    <option value="-1">Select hunger lavel</option>
+                    <option value="@((int)HungerLavel.Full)">@nameof(HungerLavel.Full)</option>
+                    <option value="@((int)HungerLavel.Normal)">@nameof(HungerLavel.Normal)</option>
+                    <option value="@((int)HungerLavel.Hungry)">@nameof(HungerLavel.Hungry)</option>
+                    <option value="@((int)HungerLavel.Dead)">@nameof(HungerLavel.Dead)</option>
+                </select>
+                <select class="form-select" name="thirstyLavel" id="thirsty_select">
+                    <option value="-1">Select thirsty lavel</option>
+                    <option value="@((int)ThirstyLavel.Full)">@nameof(ThirstyLavel.Full)</option>
+                    <option value="@((int)ThirstyLavel.Normal)">@nameof(ThirstyLavel.Normal)</option>
+                    <option value="@((int)ThirstyLavel.Thirsty)">@nameof(ThirstyLavel.Thirsty)</option>
+                    <option value="@((int)ThirstyLavel.Dead)">@nameof(ThirstyLavel.Dead)</option>
+                </select>
+                <input type="submit" value="Filter" class="btn btn-outline-dark" />
+            </div>
+                
+        </form>
         <table class="table">
             <tr>
                 <th></th>
@@ -33,21 +56,32 @@ else
                 </th>
                 <th></th>
             </tr>
-            @foreach (var item in Model.PaginatedList.Items)
+            @if (Model.PaginatedList.Items.Count > 0)
+            {
+                @foreach (var item in Model.PaginatedList.Items)
+                {
+
+                    <tr>
+                        <td>
+                            <img src="data:image/svg+xml;base64,@(item.Appearance)" width="100" height="100" />
+                        </td>
+                        <td>@item.Name</td>
+                        <td>@item.Age</td>
+                        <td>@item.State</td>
+                        <td>@item.HungerLavel</td>
+                        <td>@item.ThirstyLavel</td>
+                        <td>@item.HappinessDaysCount</td>
+                        <td>
+                            <a class="btn btn-outline-dark" asp-action="PetView" asp-controller="Pets" asp-route-id="@item.Id">details</a>
+                        </td>
+                    </tr>
+                }
+
+            }
+            else
             {
                 <tr>
-                    <td>
-                        <img src="data:image/svg+xml;base64,@(item.Appearance)" width="100" height="100" />
-                    </td>
-                    <td>@item.Name</td>
-                    <td>@item.Age</td>
-                    <td>@item.State</td>
-                    <td>@item.HungerLavel</td>
-                    <td>@item.ThirstyLavel</td>
-                    <td>@item.HappinessDaysCount</td>
-                    <td>
-                        <a class="btn btn-outline-dark" asp-action="PetView" asp-controller="Pets" asp-route-id="@item.Id">details</a>
-                    </td>
+                    <td class ="text-center h1" colspan="8">There is no such pets</td>
                 </tr>
             }
         </table>
@@ -72,3 +106,14 @@ else
         </a>
     }
 }
+
+<script>
+    window.onload = () => {
+    var hungerLavel = @Model.FilterModel.HungerLavel;
+    var thirstyLavel = @Model.FilterModel.ThirstyLavel;
+    console.log(hungerLavel);
+    console.log(thirstyLavel);
+    document.getElementById('hunger_select').value = hungerLavel;
+    document.getElementById('thirsty_select').value = thirstyLavel;
+    }
+</script>

@@ -12,18 +12,21 @@ namespace InnoGotchi.Web.Controllers
     {
         private ImageService _imageService;
         private PetService _petService;
+        private PetInfoService _petInfoService;
         public PicturesController(IHttpClientFactory httpClientFactory,
                                   ImageService imageService,
                                   PetService petService,
+                                  PetInfoService petInfoService,
                                   LocalStorage localStorage) : base(httpClientFactory, localStorage)
         {
+            _petInfoService = petInfoService;
             _imageService = imageService;
             _petService = petService;
         }
 
         public async Task<IActionResult> PetConstructor(string? errorMessage)
         {
-            var petsController = new PetsController(_httpClientFactory, _petService, _localStorage);
+            var petsController = new PetsController(_httpClientFactory, _petService, _petInfoService, _localStorage);
             IEnumerable<string> petNames = (await petsController.GetAllPets()).Select(p => p.Name);
             List<PictureDTO> allPictures = (await GetAll()).ToList();
             PetConstructorViewModel vm = new PetConstructorViewModel

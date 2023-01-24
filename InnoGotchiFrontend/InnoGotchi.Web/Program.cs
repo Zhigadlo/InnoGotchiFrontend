@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 string? baseRoot = builder.Configuration.GetSection("BaseAddress").Value;
 
+builder.Services.AddSession();
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient(baseRoot, "Users");
 builder.Services.AddHttpClient(baseRoot, "Pets");
@@ -29,9 +31,10 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<RequestService>();
 builder.Services.AddScoped<LocalStorage>();
+builder.Services.AddTransient<PetInfoService>();
 
 var app = builder.Build();
-
+app.UseSession();
 app.UseMiddleware<JwtTokenCheckMiddleware>();
 
 if (!app.Environment.IsDevelopment())
