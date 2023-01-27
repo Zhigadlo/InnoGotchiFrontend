@@ -11,9 +11,9 @@
                 <h6>Age: @Model.Age</h6>
                 <h6>Born date: @Model.CreateTime.ToShortDateString()</h6>
                 <h6>Born time: @Model.CreateTime.ToShortTimeString()</h6>
-                <h6>Average drinking period: @Model.AverageDrinkingPeriod</h6>
-                <h6>Average feeding period: @Model.AverageFeedingPeriod</h6>
-                <h6>Happiness days count: @Model.HappinessDaysCount</h6>
+                <h6>Average drinking period: @Model.AverageDrinkingPeriod per pet day</h6>
+                <h6>Average feeding period: @Model.AverageFeedingPeriod per pet day</h6>
+                <h6>Happiness pet days count: @Model.HappinessDaysCount</h6>
                 @if (Model.State == PetState.Dead)
                 {
                     <h6>Dead date: @Model.DeadTime.ToShortDateString()</h6>

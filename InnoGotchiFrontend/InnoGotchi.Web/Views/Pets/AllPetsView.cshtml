@@ -16,14 +16,14 @@ else
                 <span class="input-group-text" id="basic-addon3">Filtration fields</span>
                 <input class="form-control" type="number" name="age" id="age_input" value="@Model.FilterModel.SelectedAge" placeholder="Age" />
                 <select class="form-select" name="hungerLavel" id="hunger_select">
-                    <option value="-1">Select hunger lavel</option>
+                    <option value="-1">All hunger lavels</option>
                     <option value="@((int)HungerLavel.Full)">@nameof(HungerLavel.Full)</option>
                     <option value="@((int)HungerLavel.Normal)">@nameof(HungerLavel.Normal)</option>
                     <option value="@((int)HungerLavel.Hungry)">@nameof(HungerLavel.Hungry)</option>
                     <option value="@((int)HungerLavel.Dead)">@nameof(HungerLavel.Dead)</option>
                 </select>
                 <select class="form-select" name="thirstyLavel" id="thirsty_select">
-                    <option value="-1">Select thirsty lavel</option>
+                    <option value="-1">All thirsty lavels</option>
                     <option value="@((int)ThirstyLavel.Full)">@nameof(ThirstyLavel.Full)</option>
                     <option value="@((int)ThirstyLavel.Normal)">@nameof(ThirstyLavel.Normal)</option>
                     <option value="@((int)ThirstyLavel.Thirsty)">@nameof(ThirstyLavel.Thirsty)</option>

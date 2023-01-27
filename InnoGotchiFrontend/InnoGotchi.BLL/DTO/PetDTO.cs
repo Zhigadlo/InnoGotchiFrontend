@@ -25,5 +25,7 @@
         public int HappinessDaysCount { get; set; }
         public double AverageFeedingPeriod { get; set; }
         public double AverageDrinkingPeriod { get; set; }
+
+        public bool IsAlive => DeadTime == DateTime.MinValue;
     }
 }

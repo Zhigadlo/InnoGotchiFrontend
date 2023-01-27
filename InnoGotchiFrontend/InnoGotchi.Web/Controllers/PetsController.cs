@@ -51,17 +51,18 @@ namespace InnoGotchi.Web.Controllers
                 };
                 Pet? pet = await JsonSerializer.DeserializeAsync<Pet>(contentStream, options);
 
+                await IsDeath(pet);
                 return _petService.Get(pet);
             }
             else
                 return null;
         }
 
-        public async Task<PaginatedList<PetDTO>> GetPage(int page, string sortType, long age, long year, 
-                                    long hungerLavel, long feedingPeriod, long thirstyLavel, long drinkingPeriod)
+        public async Task<PaginatedList<PetDTO>> GetPage(int page, string sortType, long age, long year,
+                                    int hungerLavel, long feedingPeriod, bool isLastFeedingStage, int thirstyLavel, long drinkingPeriod, bool isLastDrinkingStage)
         {
             var httpClient = GetHttpClient("Pets");
-            var path = $"/{page}&{sortType}&{age}&{year}&{hungerLavel}&{feedingPeriod}&{thirstyLavel}&{drinkingPeriod}";
+            var path = $"/{page}&{sortType}&{age}&{year}&{hungerLavel}&{feedingPeriod}&{isLastFeedingStage}&{thirstyLavel}&{drinkingPeriod}&{isLastDrinkingStage}";
 
             var httpRequestMessage = new HttpRequestMessage
             (
@@ -79,6 +80,8 @@ namespace InnoGotchi.Web.Controllers
                     PropertyNameCaseInsensitive = true
                 };
                 PaginatedList<Pet>? pets = await JsonSerializer.DeserializeAsync<PaginatedList<Pet>>(contentStream, options);
+
+                pets.Items.ForEach(async p => await IsDeath(p));
 
                 return _petService.GetPage(pets);
             }
@@ -109,33 +112,38 @@ namespace InnoGotchi.Web.Controllers
 
             string hungerLavel = GeStringFromSession("filterhunger", "hungerLavel");
             HttpContext.Session.SetString("filterhunger", hungerLavel);
-            hungerLavel = String.IsNullOrEmpty(hungerLavel) ? "-1" : hungerLavel;  
+            hungerLavel = String.IsNullOrEmpty(hungerLavel) ? "-1" : hungerLavel;
 
             string thirstyLavel = GeStringFromSession("filterthirsty", "thirstyLavel");
             HttpContext.Session.SetString("filterthirsty", thirstyLavel);
             thirstyLavel = String.IsNullOrEmpty(thirstyLavel) ? "-1" : thirstyLavel;
 
-            long year = 0, ageDateTime = 0, hunger = -1, thirsty = -1, feedingPeriod = 0, drinkingPeriod = 0;
-            
+            int hunger = int.Parse(hungerLavel);
+            int thirsty = int.Parse(thirstyLavel);
+            long year = 0, ageDateTime = 0, feedingPeriod = 0, drinkingPeriod = 0;
+            bool isLastFeedingStage = false, isLastDrinkingStage = false;
+
             if (age != null && !String.IsNullOrEmpty(age))
             {
                 year = _petInfoService.DayHours.Ticks * 365;
                 ageDateTime = year * int.Parse(age);
             }
 
-            if(hungerLavel != null && !String.IsNullOrEmpty(hungerLavel) && int.Parse(hungerLavel) != -1)
+            if (hungerLavel != null && !String.IsNullOrEmpty(hungerLavel) && int.Parse(hungerLavel) != -1)
             {
                 feedingPeriod = _petInfoService.FeedingPeriodHours.Ticks;
-                hunger = _petInfoService.FeedingPeriodHours.Ticks * int.Parse(hungerLavel);
+                if ((int)HungerLavel.Dead == int.Parse(hungerLavel))
+                    isLastFeedingStage = true;
             }
 
             if (thirstyLavel != null && !String.IsNullOrEmpty(thirstyLavel) && int.Parse(thirstyLavel) != -1)
             {
                 drinkingPeriod = _petInfoService.DrinkingPeriodHours.Ticks;
-                thirsty = _petInfoService.DrinkingPeriodHours.Ticks * int.Parse(thirstyLavel);
+                if ((int)ThirstyLavel.Dead == int.Parse(thirstyLavel))
+                    isLastDrinkingStage = true;
             }
 
-            PaginatedList<PetDTO> pets = await GetPage(page, sortType, ageDateTime, year, hunger, feedingPeriod, thirsty, drinkingPeriod);
+            PaginatedList<PetDTO> pets = await GetPage(page, sortType, ageDateTime, year, hunger, feedingPeriod, isLastFeedingStage, thirsty, drinkingPeriod, isLastDrinkingStage);
             if (pets == null)
                 return RedirectToAction("Login", "Users");
             var vm = new AllPetsViewModel
@@ -168,8 +176,11 @@ namespace InnoGotchi.Web.Controllers
                     PropertyNameCaseInsensitive = true
                 };
                 IEnumerable<Pet>? pets = await JsonSerializer.DeserializeAsync<IEnumerable<Pet>>(contentStream, options);
-
-                return _petService.GetAll(pets);
+                foreach (var p in pets)
+                {
+                    await IsDeath(p);
+                }
+                return _petService.GetAll(pets.AsEnumerable());
             }
             else
                 return null;
@@ -212,6 +223,37 @@ namespace InnoGotchi.Web.Controllers
             }
             else
                 return BadRequest();
+        }
+
+        private async Task<bool> IsDeath(Pet pet)
+        {
+            long deathTime = pet.LastDrinkingTime.Ticks + _petInfoService.DrinkingPeriodHours.Ticks * (int)ThirstyLavel.Dead;
+            if (DateTime.UtcNow.Ticks <= deathTime)
+                return await Death(pet.Id, deathTime);
+            deathTime = pet.LastFeedingTime.Ticks + _petInfoService.FeedingPeriodHours.Ticks * (int)HungerLavel.Dead;
+            if (DateTime.UtcNow.Ticks <= deathTime)
+                return await Death(pet.Id, deathTime);
+
+            return false;
+        }
+
+        public async Task<bool> Death(int id, long deathTime)
+        {   
+            var httpClient = GetHttpClient("Pets");
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Put,
+                httpClient.BaseAddress + $"/death/{id}&{deathTime}"
+            );
+
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+                return false;
         }
 
         public async Task<IActionResult> Drink(int id)

@@ -1,6 +1,4 @@
-﻿using InnoGotchi.BLL.DTO;
-
-namespace InnoGotchi.Web.Models
+﻿namespace InnoGotchi.Web.Models
 {
     public class FilterPetModel
     {

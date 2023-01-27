@@ -8,6 +8,7 @@
         <div class="form-floating mb-3">
             <input id="name_input" name="name" type="text" class="form-control" placeholder="farm_name" required />
             <label for="name_input">Enter farm name</label>
+            <div id="password_help" class="form-text">Farm name must contain english letters or numbers</div>
         </div>
         <div id="error_message" class="text-danger h6" style="display:none">There is a farm with such name</div>
         <input id="create_input" class="btn btn-outline-dark" type="submit" value="Create farm" />
@@ -73,9 +74,9 @@ else
         <h6>Alive pets count: @Model.Farm.GetAlivePetsCount</h6>
         <h6>Dead pets count: @Model.Farm.GetDeadPetsCount</h6>
         <h6>Average pet age: @Model.Farm.GetAveragePetsAge</h6>
-        <h6>Average period between feedings: @Model.Farm.GetAverageFeedingPeriod</h6>
-        <h6>Average period between drinkings: @Model.Farm.GetAverageDrinkingPeriod</h6>
-        <h6>Average happiness days count: @Model.Farm.GetAverageHappinessDays</h6>
+        <h6>Average period between feedings: @Model.Farm.GetAverageFeedingPeriod per pet day</h6>
+        <h6>Average period between drinkings: @Model.Farm.GetAverageDrinkingPeriod per pet day</h6>
+        <h6>Average happiness pet days count: @Model.Farm.GetAverageHappinessDays</h6>
     </div>
 
     @if (Model.Farm.Pets == null || Model.Farm.Pets.Count() == 0)

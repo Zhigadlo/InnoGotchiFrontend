@@ -79,17 +79,36 @@ namespace InnoGotchi.BLL.Services
 
         private int GetHappinessDaysCount(PetDTO pet)
         {
-            return (int)((DateTime.UtcNow - pet.FirstHappinessDate).Ticks / DayHours.Ticks);
+            if(!pet.IsAlive)
+                return 0;
+            else
+                return (int)((pet.DeadTime - pet.FirstHappinessDate).Ticks / DayHours.Ticks * 1.0);
         }
 
         private double GetAverageFeedingPeriod(PetDTO pet)
         {
-            return (DateTime.UtcNow - pet.CreateTime).Ticks / pet.FeedingCount / DayHours.Ticks;
+            TimeSpan lifeTime;
+
+            if (pet.IsAlive)
+                lifeTime = (DateTime.UtcNow - pet.CreateTime);
+            else
+                lifeTime = (pet.DeadTime - pet.CreateTime);
+
+            int petDays = (int)(lifeTime.Ticks / DayHours.Ticks);
+            return petDays != 0? pet.FeedingCount / petDays: pet.FeedingCount;
         }
 
         private double GetAverageDrinkingPeriod(PetDTO pet)
         {
-            return (DateTime.UtcNow - pet.CreateTime).Ticks / pet.DrinkingCount / DayHours.Ticks;
+            TimeSpan lifeTime;
+            
+            if (pet.IsAlive)
+                lifeTime = (DateTime.UtcNow - pet.CreateTime);
+            else
+                lifeTime = (pet.DeadTime - pet.CreateTime);
+
+            int petDays = (int)(lifeTime.Ticks / DayHours.Ticks);
+            return  lifeTime.Days != 0 ? pet.DrinkingCount / petDays : pet.DrinkingCount;
         }
     }
 }
