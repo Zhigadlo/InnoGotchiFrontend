@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string? baseRoot = builder.Configuration.GetSection("BaseAddress").Value;
+string baseRoot = builder?.Configuration.GetSection("BaseAddress")?.Value;
 
 builder.Services.AddSession();
 

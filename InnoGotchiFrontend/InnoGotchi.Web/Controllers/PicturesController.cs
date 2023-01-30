@@ -1,10 +1,7 @@
-﻿using Hanssens.Net;
-using InnoGotchi.BLL.DTO;
+﻿using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Services;
-using InnoGotchi.DAL.Models;
 using InnoGotchi.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace InnoGotchi.Web.Controllers
 {
@@ -13,22 +10,20 @@ namespace InnoGotchi.Web.Controllers
         private ImageService _imageService;
         private PetService _petService;
         private PetInfoService _petInfoService;
-        public PicturesController(IHttpClientFactory httpClientFactory,
-                                  ImageService imageService,
+        public PicturesController(ImageService imageService,
                                   PetService petService,
-                                  PetInfoService petInfoService,
-                                  LocalStorage localStorage) : base(httpClientFactory, localStorage)
+                                  PetInfoService petInfoService)
         {
             _petInfoService = petInfoService;
             _imageService = imageService;
             _petService = petService;
         }
 
-        public async Task<IActionResult> PetConstructor(string? errorMessage)
+        public async Task<IActionResult> PetConstructor()
         {
-            var petsController = new PetsController(_httpClientFactory, _petService, _petInfoService, _localStorage);
-            IEnumerable<string> petNames = (await petsController.GetAllPets()).Select(p => p.Name);
-            List<PictureDTO> allPictures = (await GetAll()).ToList();
+            var petsController = new PetsController(_petService, _petInfoService);
+            IEnumerable<string> petNames = await _petService.GetAllNames();
+            IEnumerable<PictureDTO>? allPictures = await GetAll();
             PetConstructorViewModel vm = new PetConstructorViewModel
             {
                 Bodies = allPictures.Where(p => p.Description.ToLower() == "body").ToList(),
@@ -39,37 +34,15 @@ namespace InnoGotchi.Web.Controllers
             };
             return View(vm);
         }
-        public async Task<IActionResult> AllBodyParts()
+        public IActionResult AllBodyParts()
         {
-            return View(await GetAll());
+            return View(GetAll());
         }
 
         [HttpGet]
         public async Task<IEnumerable<PictureDTO>?> GetAll()
         {
-            var httpClient = GetHttpClient("Pictures");
-
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Get,
-                httpClient.BaseAddress
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<Picture>? pictures = await JsonSerializer.DeserializeAsync<IEnumerable<Picture>>(contentStream, options);
-
-                return _imageService.GetAll(pictures);
-            }
-            else
-                return null;
+            return await _imageService.GetAll();
         }
     }
 }

@@ -17,13 +17,14 @@ namespace InnoGotchi.Web.Middleware
 
         public async Task InvokeAsync(HttpContext context, LocalStorage localStorage, IConfiguration configuration)
         {
-            SecurityToken? securityToken = GetSecurityToken(localStorage);
+            string tokenName = configuration.GetSection("TokenLocalStoragename").Value;
+            SecurityToken? securityToken = GetSecurityToken(localStorage, tokenName);
 
             if (securityToken != null)
             {
                 if (securityToken.ExpireAt < DateTime.UtcNow)
                 {
-                    localStorage.Remove(nameof(SecurityToken));
+                    localStorage.Remove(tokenName);
                     await context.SignOutAsync();
                 }
 
@@ -39,11 +40,11 @@ namespace InnoGotchi.Web.Middleware
             await _next.Invoke(context);
         }
 
-        private SecurityToken? GetSecurityToken(LocalStorage localStorage)
+        private SecurityToken? GetSecurityToken(LocalStorage localStorage, string tokenName)
         {
-            if (localStorage.Exists(nameof(SecurityToken)))
+            if (localStorage.Exists(tokenName))
             {
-                string? jsonToken = localStorage.Get<string>(nameof(SecurityToken));
+                string? jsonToken = localStorage.Get<string>(tokenName);
                 SecurityToken? securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
                 return securityToken;
             }

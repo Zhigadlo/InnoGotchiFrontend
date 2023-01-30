@@ -1,14 +1,9 @@
-﻿using Hanssens.Net;
-using InnoGotchi.BLL.DTO;
-using InnoGotchi.BLL.Identity;
+﻿using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Models;
 using InnoGotchi.BLL.Services;
-using InnoGotchi.DAL.Models;
 using InnoGotchi.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
 
 namespace InnoGotchi.Web.Controllers
 {
@@ -16,10 +11,8 @@ namespace InnoGotchi.Web.Controllers
     {
         private PetService _petService;
         private PetInfoService _petInfoService;
-        public PetsController(IHttpClientFactory httpClientFactory,
-                              PetService petService,
-                              PetInfoService petInfoService,
-                              LocalStorage localStorage) : base(httpClientFactory, localStorage)
+        public PetsController(PetService petService,
+                              PetInfoService petInfoService)
         {
             _petService = petService;
             _petInfoService = petInfoService;
@@ -33,63 +26,27 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<PetDTO?> Get(int id)
         {
-            var httpClient = GetHttpClient("Pets");
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Get,
-                httpClient.BaseAddress + $"/{id}"
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                Pet? pet = await JsonSerializer.DeserializeAsync<Pet>(contentStream, options);
-
-                await IsDeath(pet);
-                return _petService.Get(pet);
-            }
-            else
-                return null;
+            return await _petService.Get(id);
         }
 
-        public async Task<PaginatedList<PetDTO>> GetPage(int page, string sortType, long age, long year,
-                                    int hungerLavel, long feedingPeriod, bool isLastFeedingStage, int thirstyLavel, long drinkingPeriod, bool isLastDrinkingStage)
+        public async Task<PaginatedListDTO<PetDTO>?> GetPage(int page, string sortType, PetFilterModelDTO filterModel)
         {
-            var httpClient = GetHttpClient("Pets");
-            var path = $"/{page}&{sortType}&{age}&{year}&{hungerLavel}&{feedingPeriod}&{isLastFeedingStage}&{thirstyLavel}&{drinkingPeriod}&{isLastDrinkingStage}";
-
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Get,
-                httpClient.BaseAddress + path
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                PaginatedList<Pet>? pets = await JsonSerializer.DeserializeAsync<PaginatedList<Pet>>(contentStream, options);
-
-                pets.Items.ForEach(async p => await IsDeath(p));
-
-                return _petService.GetPage(pets);
-            }
+            var pets = await _petService.GetPage(page, sortType, filterModel);
+            if (pets == null)
+                pets = new PaginatedListDTO<PetDTO>();
             else
-                return null;
+                pets.Items?.ForEach(async p =>
+                {
+                    if (_petInfoService.IsDeath(p))
+                        await _petService.Death(p.Id, p.DeadTime.Ticks);
+                    //await IsDeath(p);
+                    _petInfoService.FillPetDTO(p);
+                });
+
+            return pets;
         }
 
-        private string GeStringFromSession(string key, string queryName, string defaultValue = "")
+        private string GetStringFromSession(string key, string queryName, string defaultValue = "")
         {
             if (HttpContext.Request.Query[queryName].Count() > 0)
             {
@@ -107,100 +64,73 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<IActionResult> AllPetsView(int page = 1, string sortType = "happiness_asc")
         {
-            string age = GeStringFromSession("filterage", "age");
+            string age = GetStringFromSession("filterage", "age");
             HttpContext.Session.SetString("filterage", age);
 
-            string hungerLavel = GeStringFromSession("filterhunger", "hungerLavel");
+            string hungerLavel = GetStringFromSession("filterhunger", "hungerLavel");
             HttpContext.Session.SetString("filterhunger", hungerLavel);
             hungerLavel = String.IsNullOrEmpty(hungerLavel) ? "-1" : hungerLavel;
 
-            string thirstyLavel = GeStringFromSession("filterthirsty", "thirstyLavel");
+            string thirstyLavel = GetStringFromSession("filterthirsty", "thirstyLavel");
             HttpContext.Session.SetString("filterthirsty", thirstyLavel);
             thirstyLavel = String.IsNullOrEmpty(thirstyLavel) ? "-1" : thirstyLavel;
 
-            int hunger = int.Parse(hungerLavel);
-            int thirsty = int.Parse(thirstyLavel);
-            long year = 0, ageDateTime = 0, feedingPeriod = 0, drinkingPeriod = 0;
-            bool isLastFeedingStage = false, isLastDrinkingStage = false;
-
-            if (age != null && !String.IsNullOrEmpty(age))
+            var filterModel = new PetFilterModelDTO()
             {
-                year = _petInfoService.DayHours.Ticks * 365;
-                ageDateTime = year * int.Parse(age);
+                HungerLavel = int.Parse(hungerLavel),
+                ThirstyLavel = int.Parse(thirstyLavel),
+                GameYear = 0,
+                Age = 0,
+                FeedingPeriod = 0,
+                DrinkingPeriod = 0,
+                IsLastHungerStage = false,
+                IsLastThirstyStage = false
+            };
+
+            if (!String.IsNullOrEmpty(age))
+            {
+                filterModel.GameYear = _petInfoService.DayHours.Ticks * 365;
+                filterModel.Age = filterModel.GameYear * int.Parse(age);
             }
 
-            if (hungerLavel != null && !String.IsNullOrEmpty(hungerLavel) && int.Parse(hungerLavel) != -1)
+            if (!String.IsNullOrEmpty(hungerLavel) && int.Parse(hungerLavel) != -1)
             {
-                feedingPeriod = _petInfoService.FeedingPeriodHours.Ticks;
-                if ((int)HungerLavel.Dead == int.Parse(hungerLavel))
-                    isLastFeedingStage = true;
+                filterModel.FeedingPeriod = _petInfoService.FeedingPeriodHours.Ticks;
+                if ((int)HungerLavel.Dead == filterModel.HungerLavel)
+                    filterModel.IsLastHungerStage = true;
             }
 
-            if (thirstyLavel != null && !String.IsNullOrEmpty(thirstyLavel) && int.Parse(thirstyLavel) != -1)
+            if (!String.IsNullOrEmpty(thirstyLavel) && int.Parse(thirstyLavel) != -1)
             {
-                drinkingPeriod = _petInfoService.DrinkingPeriodHours.Ticks;
-                if ((int)ThirstyLavel.Dead == int.Parse(thirstyLavel))
-                    isLastDrinkingStage = true;
+                filterModel.DrinkingPeriod = _petInfoService.DrinkingPeriodHours.Ticks;
+                if ((int)ThirstyLavel.Dead == filterModel.ThirstyLavel)
+                    filterModel.IsLastThirstyStage = true;
             }
 
-            PaginatedList<PetDTO> pets = await GetPage(page, sortType, ageDateTime, year, hunger, feedingPeriod, isLastFeedingStage, thirsty, drinkingPeriod, isLastDrinkingStage);
+            PaginatedListDTO<PetDTO>? pets = await GetPage(page, sortType, filterModel);
             if (pets == null)
                 return RedirectToAction("Login", "Users");
+
             var vm = new AllPetsViewModel
             {
                 PaginatedList = pets,
                 SortModel = new PetSortModel(sortType),
-                FilterModel = new FilterPetModel(age, int.Parse(hungerLavel), int.Parse(thirstyLavel))
+                FilterModel = new FilterPetViewModel(age, filterModel.HungerLavel, filterModel.ThirstyLavel)
             };
             return View(vm);
         }
 
-        [HttpGet]
         public async Task<IEnumerable<PetDTO>?> GetAllPets()
         {
-            var httpClient = GetHttpClient("Pets");
-
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Get,
-                httpClient.BaseAddress
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<Pet>? pets = await JsonSerializer.DeserializeAsync<IEnumerable<Pet>>(contentStream, options);
-                foreach (var p in pets)
-                {
-                    await IsDeath(p);
-                }
-                return _petService.GetAll(pets.AsEnumerable());
-            }
-            else
-                return null;
+            return await _petService.GetAll();
         }
 
-        [HttpPost]
         public async Task<IActionResult> Create(string name, string appearance)
         {
-            var httpClient = GetHttpClient("Pets");
-
-            var parameters = new Dictionary<string, string>();
-            parameters["Name"] = name;
-            parameters["Appearance"] = appearance;
-            parameters["FarmId"] = HttpContext.User.FindFirstValue(nameof(SecurityToken.FarmId));
-
-            var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
-
-            if (httpResponseMessage.IsSuccessStatusCode)
+            var result = await _petService.Create(name, appearance, GetAuthorizedUserFarmId());
+            if (result != -1)
             {
-                return RedirectToAction("UserFarm", "Farms", new { id = HttpContext.User.FindFirstValue(nameof(SecurityToken.FarmId)) });
+                return RedirectToAction("UserFarm", "Farms", new { id = GetAuthorizedUserFarmId() });
             }
             else
                 return BadRequest();
@@ -208,16 +138,7 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<IActionResult> Feed(int id)
         {
-            var httpClient = GetHttpClient("Pets");
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Put,
-                httpClient.BaseAddress + $"/feed/{id}"
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
+            if (await _petService.Feed(id))
             {
                 return RedirectToAction("GetCurrentUserFarm", "Farms");
             }
@@ -225,49 +146,26 @@ namespace InnoGotchi.Web.Controllers
                 return BadRequest();
         }
 
-        private async Task<bool> IsDeath(Pet pet)
+        private async Task<bool> IsDeath(PetDTO pet)
         {
             long deathTime = pet.LastDrinkingTime.Ticks + _petInfoService.DrinkingPeriodHours.Ticks * (int)ThirstyLavel.Dead;
-            if (DateTime.UtcNow.Ticks <= deathTime)
+            if (DateTime.UtcNow.Ticks >= deathTime)
                 return await Death(pet.Id, deathTime);
             deathTime = pet.LastFeedingTime.Ticks + _petInfoService.FeedingPeriodHours.Ticks * (int)HungerLavel.Dead;
-            if (DateTime.UtcNow.Ticks <= deathTime)
+            if (DateTime.UtcNow.Ticks >= deathTime)
                 return await Death(pet.Id, deathTime);
 
             return false;
         }
 
         public async Task<bool> Death(int id, long deathTime)
-        {   
-            var httpClient = GetHttpClient("Pets");
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Put,
-                httpClient.BaseAddress + $"/death/{id}&{deathTime}"
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            else
-                return false;
+        {
+            return await _petService.Death(id, deathTime);
         }
 
         public async Task<IActionResult> Drink(int id)
         {
-            var httpClient = GetHttpClient("Pets");
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Put,
-                httpClient.BaseAddress + $"/drink/{id}"
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
+            if (await _petService.Drink(id))
             {
                 return RedirectToAction("GetCurrentUserFarm", "Farms");
             }

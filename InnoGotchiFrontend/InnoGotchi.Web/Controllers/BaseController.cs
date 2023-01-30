@@ -1,35 +1,27 @@
-﻿using Hanssens.Net;
-using InnoGotchi.BLL.Identity;
+﻿using InnoGotchi.BLL.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text.Json;
+using System.Security.Claims;
 
 namespace InnoGotchi.Web.Controllers
 {
     public class BaseController : Controller
     {
-        protected IHttpClientFactory _httpClientFactory;
-        protected LocalStorage _localStorage;
-        public BaseController(IHttpClientFactory httpClientFactory, LocalStorage localStorage)
+        protected int GetAuthorizedUserId()
         {
-            _httpClientFactory = httpClientFactory;
-            _localStorage = localStorage;
+            var id = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
+            if (id == null)
+                return -1;
+            else
+                return int.Parse(id);
         }
 
-        protected HttpClient GetHttpClient(string clientName)
+        protected int GetAuthorizedUserFarmId()
         {
-            var httpClient = _httpClientFactory.CreateClient(clientName);
-
-            if (_localStorage.Exists(nameof(SecurityToken)))
-            {
-                string jsonToken = _localStorage.Get<string>(nameof(SecurityToken));
-                SecurityToken? securityToken = JsonSerializer.Deserialize<SecurityToken>(jsonToken);
-                if (securityToken != null)
-                {
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", securityToken.AccessToken);
-                }
-            }
-            return httpClient;
+            string? farmId = HttpContext.User.FindFirstValue(nameof(SecurityToken.FarmId));
+            if (farmId == null)
+                return -1;
+            else
+                return int.Parse(farmId);
         }
     }
 }

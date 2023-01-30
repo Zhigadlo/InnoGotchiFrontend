@@ -1,13 +1,10 @@
-﻿using Hanssens.Net;
-using InnoGotchi.BLL.DTO;
+﻿using InnoGotchi.BLL.DTO;
 using InnoGotchi.BLL.Identity;
 using InnoGotchi.BLL.Services;
-using InnoGotchi.DAL.Models;
 using InnoGotchi.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Text.Json;
 
 namespace InnoGotchi.Web.Controllers
 {
@@ -15,10 +12,8 @@ namespace InnoGotchi.Web.Controllers
     {
         private UserService _userService;
         private ImageService _imageService;
-        public UsersController(IHttpClientFactory httpClientFactory,
-                               UserService userService,
-                               ImageService imageService,
-                               LocalStorage localStorage) : base(httpClientFactory, localStorage)
+        public UsersController(UserService userService,
+                               ImageService imageService)
         {
             _userService = userService;
             _imageService = imageService;
@@ -31,7 +26,7 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<IActionResult> Register()
         {
-            IEnumerable<string> userEmails = (await GetAll()).Select(u => u.Email);
+            IEnumerable<string> userEmails = await _userService.GetAllEmails();
             return View(userEmails);
         }
 
@@ -42,27 +37,11 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<IActionResult> Coloborators()
         {
-            UserDTO? user = await GetCurrentUser();
-            if (user == null)
-                return RedirectToAction("Login");
+            int userId = GetAuthorizedUserId();
+            if (userId == -1)
+                RedirectToAction("Login");
 
-            List<UserDTO> coloborators = new List<UserDTO>();
-            foreach (var rr in user.ReceivedRequests)
-            {
-                if (rr.IsConfirmed)
-                {
-                    var u = await Get(rr.RequestOwnerId);
-                    coloborators.Add(u);
-                }
-            }
-            foreach (var sr in user.SentRequests)
-            {
-                if (sr.IsConfirmed)
-                {
-                    var u = await Get(sr.RequestReceipientId);
-                    coloborators.Add(u);
-                }
-            }
+            var coloborators = await _userService.Coloborators(userId);
             return View(coloborators);
         }
 
@@ -100,11 +79,13 @@ namespace InnoGotchi.Web.Controllers
 
         public async Task<IActionResult> AllUsers()
         {
-            IEnumerable<UserDTO>? usersEnumerable = await GetAll();
+            IEnumerable<UserDTO>? usersEnumerable = await _userService.GetAll();
             if (usersEnumerable == null)
                 return RedirectToAction("Login");
             var users = usersEnumerable.ToList();
-            int authorized_id = int.Parse(HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId)));
+            int authorized_id = GetAuthorizedUserId();
+            if (authorized_id == -1)
+                return RedirectToAction("Login");
             UserDTO authorizedUser = users.ToList().Find(u => u.Id == authorized_id);
             users.Remove(authorizedUser);
             List<UserViewModel> usersVM = new List<UserViewModel>();
@@ -162,25 +143,19 @@ namespace InnoGotchi.Web.Controllers
 
         private async Task<UserDTO?> GetCurrentUser()
         {
-            string userId = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
-            if (userId == null)
+            int userId = GetAuthorizedUserId();
+            if (userId == -1)
             {
                 return null;
             }
-            return await Get(int.Parse(userId));
+            return await Get(userId);
         }
         public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
         {
-            var httpClient = GetHttpClient("Users");
-
-            var parameters = new Dictionary<string, string>();
-            parameters["Id"] = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
-            parameters["OldPassword"] = oldPassword;
-            parameters["NewPassword"] = newPassword;
-            parameters["ConfirmPassword"] = confirmPassword;
-
-            var httpResponseMessage = await httpClient.PutAsync(httpClient.BaseAddress + "/passwordChange", new FormUrlEncodedContent(parameters));
-            if (httpResponseMessage.IsSuccessStatusCode)
+            var userId = GetAuthorizedUserId();
+            if (userId == -1)
+                return RedirectToAction("Login");
+            if (await _userService.ChangePassword(userId, oldPassword, newPassword, confirmPassword))
             {
                 return await Logout();
             }
@@ -189,29 +164,17 @@ namespace InnoGotchi.Web.Controllers
         }
         public async Task<IActionResult> Logout()
         {
-            _localStorage.Remove(nameof(SecurityToken));
+            _userService.RemoveTokenFromLocalStorage();
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> Authenticate(string email, string password)
         {
-            string? token = await Token(email, password);
+            var token = await _userService.Authenticate(email, password);
             if (token != null)
             {
-                var user = await GetUser(email, password);
-                var securityToken = new SecurityToken
-                {
-                    AccessToken = token,
-                    Email = email,
-                    UserName = user.FirstName + " " + user.LastName,
-                    UserId = user.Id,
-                    ExpireAt = DateTime.UtcNow.AddHours(1),
-                    FarmId = user.Farm == null ? -1 : user.Farm.Id
-                };
-                string jsonToken = JsonSerializer.Serialize(securityToken);
-                _localStorage.Store(nameof(SecurityToken), jsonToken);
-                await SignIn(securityToken);
+                await SignIn(token);
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -234,118 +197,20 @@ namespace InnoGotchi.Web.Controllers
             await HttpContext.SignInAsync(claimsPrincipal);
         }
 
-        private async Task<string?> Token(string email, string password)
-        {
-            var httpClient = GetHttpClient("Users");
-            var parameters = new Dictionary<string, string>();
-            parameters["email"] = email;
-            parameters["password"] = password;
-
-            var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress + "/token", new FormUrlEncodedContent(parameters));
-
-            string? token = null;
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                token = (await httpResponseMessage.Content.ReadAsStringAsync()).Replace("\"", String.Empty);
-            }
-
-            return token;
-        }
-        private async Task<UserDTO?> GetUser(string email, string password)
-        {
-            var httpClient = GetHttpClient("Users");
-
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Get,
-                httpClient.BaseAddress + $"/{email}&{password}"
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                var user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
-                return _userService.GetUserDTO(user);
-            }
-            else
-                return null;
-        }
         public async Task<UserDTO?> Get(int id)
         {
-            var httpClient = GetHttpClient("Users");
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Get,
-                httpClient.BaseAddress + $"/{id}"
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                User? user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
-
-                return _userService.GetUserDTO(user);
-            }
-            else
-                return null;
+            return await _userService.Get(id);
         }
         public async Task<IEnumerable<UserDTO>?> GetAll()
         {
-            var httpClient = GetHttpClient("Users");
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Get,
-                httpClient.BaseAddress
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
-                if (users == null)
-                    users = new List<User>();
-                return _userService.GetAll(users);
-            }
-
-            return null;
+            return await _userService.GetAll();
         }
 
-        [HttpPost]
         public async Task<IActionResult> Create(UserDTO? user)
         {
-            User? person = _userService.GetUser(user);
-            person.Avatar = _imageService.GetBytesFromFormFile(user.FormFile);
-
-            var httpClient = GetHttpClient("Users");
-
-            var parameters = new Dictionary<string, string>();
-            parameters["FirstName"] = person.FirstName;
-            parameters["LastName"] = person.LastName;
-            parameters["Password"] = person.Password;
-            parameters["Email"] = person.Email;
-            parameters["Avatar"] = Convert.ToBase64String(person.Avatar);
-
-            var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
-
-            if (httpResponseMessage.IsSuccessStatusCode)
+            user.Avatar = _imageService.GetBytesFromFormFile(user.FormFile);
+            var result = await _userService.Create(user);
+            if (result != -1)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -353,17 +218,12 @@ namespace InnoGotchi.Web.Controllers
                 return BadRequest();
         }
 
-        [HttpPut]
         public async Task<bool> AvatarUpdate(IFormFile FormFile)
         {
-            var httpClient = GetHttpClient("Users");
+            var userId = GetAuthorizedUserId();
+            var appearance = _imageService.GetBytesFromFormFile(FormFile);
 
-            var parameters = new Dictionary<string, string>();
-            parameters["Id"] = HttpContext.User.FindFirstValue(nameof(SecurityToken.UserId));
-            parameters["Avatar"] = Convert.ToBase64String(_imageService.GetBytesFromFormFile(FormFile));
-
-            var httpResponseMessage = await httpClient.PutAsync(httpClient.BaseAddress + "/avatarChange", new FormUrlEncodedContent(parameters));
-            return httpResponseMessage.IsSuccessStatusCode;
+            return await _userService.AvatarUpdate(userId, appearance);
         }
     }
 }

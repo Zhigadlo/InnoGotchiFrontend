@@ -4,7 +4,7 @@
     ViewData["Title"] = "All pets";
 }
 @model AllPetsViewModel;
-@if(Model == null)
+@if(Model.PaginatedList.Items == null)
 {
     <div class="text-center">There are no pets in game yet</div>
 }
