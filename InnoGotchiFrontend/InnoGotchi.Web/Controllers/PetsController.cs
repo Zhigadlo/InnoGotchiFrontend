@@ -17,18 +17,24 @@ namespace InnoGotchi.Web.Controllers
             _petService = petService;
             _petInfoService = petInfoService;
         }
-
+        /// <summary>
+        /// Get pet by id and goes to PetView page
+        /// </summary>
         public async Task<IActionResult> PetView(int id)
         {
             var pet = await Get(id);
             return View(pet);
         }
-
+        /// <summary>
+        /// Gets pet by id
+        /// </summary>
         public async Task<PetDTO?> Get(int id)
         {
             return await _petService.Get(id);
         }
-
+        /// <summary>
+        /// Gets object with all info about page
+        /// </summary>
         public async Task<PaginatedListDTO<PetDTO>?> GetPage(int page, string sortType, PetFilterModelDTO filterModel)
         {
             var pets = await _petService.GetPage(page, sortType, filterModel);
@@ -39,13 +45,13 @@ namespace InnoGotchi.Web.Controllers
                 {
                     if (_petInfoService.IsDeath(p))
                         await _petService.Death(p.Id, p.DeadTime.Ticks);
-                    //await IsDeath(p);
+                    
                     _petInfoService.FillPetDTO(p);
                 });
 
             return pets;
         }
-
+        
         private string GetStringFromSession(string key, string queryName, string defaultValue = "")
         {
             if (HttpContext.Request.Query[queryName].Count() > 0)
@@ -61,7 +67,9 @@ namespace InnoGotchi.Web.Controllers
                 return defaultValue;
             }
         }
-
+        /// <summary>
+        /// Get form fields states and goes to AllPetsView
+        /// </summary>
         public async Task<IActionResult> AllPetsView(int page = 1, string sortType = "happiness_asc")
         {
             string age = GetStringFromSession("filterage", "age");
@@ -119,12 +127,19 @@ namespace InnoGotchi.Web.Controllers
             };
             return View(vm);
         }
-
+        /// <summary>
+        /// Gets all pets
+        /// </summary>
         public async Task<IEnumerable<PetDTO>?> GetAllPets()
         {
             return await _petService.GetAll();
         }
-
+        /// <summary>
+        /// Creates new pet and if creation was successful redirect to UserFarm view
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="appearance"></param>
+        /// <returns></returns>
         public async Task<IActionResult> Create(string name, string appearance)
         {
             var result = await _petService.Create(name, appearance, GetAuthorizedUserFarmId());
@@ -135,7 +150,9 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
-
+        /// <summary>
+        /// Feeds pet by id 
+        /// </summary>
         public async Task<IActionResult> Feed(int id)
         {
             if (await _petService.Feed(id))
@@ -145,24 +162,9 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
-
-        private async Task<bool> IsDeath(PetDTO pet)
-        {
-            long deathTime = pet.LastDrinkingTime.Ticks + _petInfoService.DrinkingPeriodHours.Ticks * (int)ThirstyLavel.Dead;
-            if (DateTime.UtcNow.Ticks >= deathTime)
-                return await Death(pet.Id, deathTime);
-            deathTime = pet.LastFeedingTime.Ticks + _petInfoService.FeedingPeriodHours.Ticks * (int)HungerLavel.Dead;
-            if (DateTime.UtcNow.Ticks >= deathTime)
-                return await Death(pet.Id, deathTime);
-
-            return false;
-        }
-
-        public async Task<bool> Death(int id, long deathTime)
-        {
-            return await _petService.Death(id, deathTime);
-        }
-
+        /// <summary>
+        /// Give a drink to pet by id
+        /// </summary>
         public async Task<IActionResult> Drink(int id)
         {
             if (await _petService.Drink(id))

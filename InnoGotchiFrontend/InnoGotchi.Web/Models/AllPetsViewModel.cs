@@ -2,6 +2,9 @@
 
 namespace InnoGotchi.Web.Models
 {
+    /// <summary>
+    /// Model for AllPetsView
+    /// </summary>
     public class AllPetsViewModel
     {
         public PaginatedListDTO<PetDTO>? PaginatedList { get; set; }

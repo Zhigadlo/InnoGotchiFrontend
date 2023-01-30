@@ -4,6 +4,9 @@ using System.Security.Claims;
 
 namespace InnoGotchi.Web.Controllers
 {
+    /// <summary>
+    /// Controller that have methods for getting info about authorized user
+    /// </summary>
     public class BaseController : Controller
     {
         protected int GetAuthorizedUserId()

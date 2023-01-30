@@ -2,6 +2,9 @@
 
 namespace InnoGotchi.Web.Models
 {
+    /// <summary>
+    /// Model for UserFarm view
+    /// </summary>
     public class UserFarmModel
     {
         public FarmDTO? Farm { get; set; }

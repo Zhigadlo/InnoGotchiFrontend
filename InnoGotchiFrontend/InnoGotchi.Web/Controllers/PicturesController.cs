@@ -18,7 +18,9 @@ namespace InnoGotchi.Web.Controllers
             _imageService = imageService;
             _petService = petService;
         }
-
+        /// <summary>
+        /// Gets all body parts and goes to PetConstructor view
+        /// </summary>
         public async Task<IActionResult> PetConstructor()
         {
             var petsController = new PetsController(_petService, _petInfoService);
@@ -34,12 +36,18 @@ namespace InnoGotchi.Web.Controllers
             };
             return View(vm);
         }
+        /// <summary>
+        /// Goes to view with all pet body parts
+        /// </summary>
+        /// <returns></returns>
         public IActionResult AllBodyParts()
         {
             return View(GetAll());
         }
 
-        [HttpGet]
+        /// <summary>
+        /// Gets all pictures
+        /// </summary>
         public async Task<IEnumerable<PictureDTO>?> GetAll()
         {
             return await _imageService.GetAll();

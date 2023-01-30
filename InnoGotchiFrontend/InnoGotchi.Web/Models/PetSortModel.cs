@@ -1,5 +1,8 @@
 ﻿namespace InnoGotchi.Web.Models
 {
+    /// <summary>
+    /// Model for store pet sort state
+    /// </summary>
     public class PetSortModel
     {
         public string NameState { get; private set; }

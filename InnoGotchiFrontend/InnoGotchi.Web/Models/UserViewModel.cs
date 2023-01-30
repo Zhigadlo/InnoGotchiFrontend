@@ -2,6 +2,9 @@
 
 namespace InnoGotchi.Web.Models
 {
+    /// <summary>
+    /// Model for AllUsers view
+    /// </summary>
     public class UserViewModel
     {
         public UserDTO User { get; set; }

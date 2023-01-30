@@ -6,6 +6,9 @@ using System.Text.Json;
 
 namespace InnoGotchi.Web.Middleware
 {
+    /// <summary>
+    /// This midlleware monitors the relevance of the jwt token
+    /// </summary>
     public class JwtTokenCheckMiddleware
     {
         private readonly RequestDelegate _next;

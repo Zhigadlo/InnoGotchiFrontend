@@ -10,7 +10,9 @@ namespace InnoGotchi.Web.Controllers
         {
             _requestService = requestService;
         }
-
+        /// <summary>
+        /// Sents coloboration request to other user
+        /// </summary>
         public async Task<IActionResult> Create(int receiverId)
         {
             int ownerId = GetAuthorizedUserId();
@@ -24,7 +26,9 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
-
+        /// <summary>
+        /// Confirms coloboration request
+        /// </summary>
         public async Task<IActionResult> Confirm(int requestId, string actionName, string controllerName)
         {
             if (await _requestService.Confirm(requestId))
@@ -34,7 +38,9 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
-
+        /// <summary>
+        /// Deletes coloboration request
+        /// </summary>
         public async Task<IActionResult> Delete(int requestId, string actionName, string controllerName)
         {
             if (await _requestService.Delete(requestId))

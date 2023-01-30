@@ -2,6 +2,9 @@
 
 namespace InnoGotchi.Web.Models
 {
+    /// <summary>
+    /// Model for UserRequests view
+    /// </summary>
     public class UserRequestsViewModel
     {
         public List<KeyValuePair<int, UserDTO>> UsersWhoSentRequest { get; set; }

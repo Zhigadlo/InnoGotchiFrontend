@@ -2,6 +2,9 @@
 
 namespace InnoGotchi.Web.Models
 {
+    /// <summary>
+    /// Model for PetContructorView
+    /// </summary>
     public class PetConstructorViewModel
     {
         public List<PictureDTO> Bodies { get; set; }

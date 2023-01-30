@@ -12,7 +12,9 @@ namespace InnoGotchi.Web.Controllers
         {
             _farmService = farmService;
         }
-
+        /// <summary>
+        /// Gets farm by user id and goes to UserFarm view
+        /// </summary>
         public async Task<IActionResult> UserFarm(int id)
         {
             int authorizedUserId = GetAuthorizedUserId();
@@ -35,7 +37,9 @@ namespace InnoGotchi.Web.Controllers
             userFarmModel.Farm = farm;
             return View("UserFarm", userFarmModel);
         }
-
+        /// <summary>
+        /// Creates farm and if creation was successful goes to UserFarm view
+        /// </summary>
         public async Task<IActionResult> CreateFarm(string name)
         {
             var userId = GetAuthorizedUserId();
@@ -48,13 +52,18 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
-
+        /// <summary>
+        /// Gets authorized user farm and goes to UserFarm view
+        /// </summary>
         public async Task<IActionResult> GetCurrentUserFarm()
         {
             var farmId = GetAuthorizedUserFarmId();
             return await UserFarm(farmId);
         }
-
+        /// <summary>
+        /// Gets all farm names that already in use
+        /// </summary>
+        /// <returns></returns>
         public async Task<IEnumerable<string>?> GetAllFarmNames()
         {
             return await _farmService.GetAllNames();

@@ -18,23 +18,31 @@ namespace InnoGotchi.Web.Controllers
             _userService = userService;
             _imageService = imageService;
         }
-
+        /// <summary>
+        /// Goes to Login view
+        /// </summary>
         public IActionResult Login(string errorMessage)
         {
             return View(errorMessage);
         }
-
+        /// <summary>
+        /// Goes to Register view
+        /// </summary>
         public async Task<IActionResult> Register()
         {
             IEnumerable<string> userEmails = await _userService.GetAllEmails();
             return View(userEmails);
         }
-
+        /// <summary>
+        /// Goes to ChangePasswordView page
+        /// </summary>
         public IActionResult ChangePasswordView()
         {
             return View();
         }
-
+        /// <summary>
+        /// Gets all coloborators and goes to coloborators view
+        /// </summary>
         public async Task<IActionResult> Coloborators()
         {
             int userId = GetAuthorizedUserId();
@@ -44,7 +52,9 @@ namespace InnoGotchi.Web.Controllers
             var coloborators = await _userService.Coloborators(userId);
             return View(coloborators);
         }
-
+        /// <summary>
+        /// Gets all user requests and goes to UserRequests view
+        /// </summary>
         public async Task<IActionResult> UserRequests()
         {
             UserDTO? user = await GetCurrentUser();
@@ -76,7 +86,9 @@ namespace InnoGotchi.Web.Controllers
             };
             return View(vm);
         }
-
+        /// <summary>
+        /// Gets all users and goes to AllUsers view
+        /// </summary>
         public async Task<IActionResult> AllUsers()
         {
             IEnumerable<UserDTO>? usersEnumerable = await _userService.GetAll();
@@ -124,6 +136,9 @@ namespace InnoGotchi.Web.Controllers
             }
             return View(usersVM);
         }
+        /// <summary>
+        /// Updates user avatar and redirect to UserProfile view
+        /// </summary>
         public async Task<IActionResult> ChangeAvatar(IFormFile FormFile)
         {
             bool result = await AvatarUpdate(FormFile);
@@ -132,7 +147,9 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
-
+        /// <summary>
+        /// Goes to UserProfile view
+        /// </summary>
         public async Task<IActionResult> UserProfile()
         {
             UserDTO? user = await GetCurrentUser();
@@ -140,7 +157,9 @@ namespace InnoGotchi.Web.Controllers
                 return RedirectToAction("Login");
             return View(user);
         }
-
+        /// <summary>
+        /// Gets authorized user
+        /// </summary>
         private async Task<UserDTO?> GetCurrentUser()
         {
             int userId = GetAuthorizedUserId();
@@ -150,6 +169,9 @@ namespace InnoGotchi.Web.Controllers
             }
             return await Get(userId);
         }
+        /// <summary>
+        /// Updates user password
+        /// </summary>
         public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
         {
             var userId = GetAuthorizedUserId();
@@ -162,13 +184,18 @@ namespace InnoGotchi.Web.Controllers
             else
                 return View("ChangePasswordView", new ErrorModel { Error = "Old password is wrong" });
         }
+        /// <summary>
+        /// Logout user
+        /// </summary>
         public async Task<IActionResult> Logout()
         {
             _userService.RemoveTokenFromLocalStorage();
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
-
+        /// <summary>
+        /// AUuthenticates user
+        /// </summary>
         public async Task<IActionResult> Authenticate(string email, string password)
         {
             var token = await _userService.Authenticate(email, password);
@@ -180,7 +207,9 @@ namespace InnoGotchi.Web.Controllers
             else
                 return View("Login", new ErrorModel { Error = "Invalid email or password" });
         }
-
+        /// <summary>
+        /// User sign in
+        /// </summary>
         private async Task SignIn(SecurityToken securityToken)
         {
             var claims = new List<Claim>
@@ -196,16 +225,23 @@ namespace InnoGotchi.Web.Controllers
             var claimsPrincipal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(claimsPrincipal);
         }
-
+        /// <summary>
+        /// Gets user by id
+        /// </summary>
         public async Task<UserDTO?> Get(int id)
         {
             return await _userService.Get(id);
         }
+        /// <summary>
+        /// Gets all users
+        /// </summary>
         public async Task<IEnumerable<UserDTO>?> GetAll()
         {
             return await _userService.GetAll();
         }
-
+        /// <summary>
+        /// Create new user
+        /// </summary>
         public async Task<IActionResult> Create(UserDTO? user)
         {
             user.Avatar = _imageService.GetBytesFromFormFile(user.FormFile);
@@ -217,7 +253,9 @@ namespace InnoGotchi.Web.Controllers
             else
                 return BadRequest();
         }
-
+        /// <summary>
+        /// Updates user avatar
+        /// </summary>
         public async Task<bool> AvatarUpdate(IFormFile FormFile)
         {
             var userId = GetAuthorizedUserId();
