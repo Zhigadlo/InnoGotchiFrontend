@@ -3,6 +3,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace InnoGotchi.DAL.Managers
 {
+    /// <summary>
+    /// Class that have access to request entities from server
+    /// </summary>
     public class RequestManager : BaseManager
     {
         public RequestManager(IHttpClientFactory httpClientFactory,
@@ -10,7 +13,9 @@ namespace InnoGotchi.DAL.Managers
                               IConfiguration configuration) : base(httpClientFactory, localStorage, configuration)
         {
         }
-
+        /// <summary>
+        /// Creates coloboration request
+        /// </summary>
         public async Task<bool> Create(int ownerId, int receiverId)
         {
             var httpClient = GetHttpClient("Requests");
@@ -28,7 +33,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return false;
         }
-
+        /// <summary>
+        /// Confirms coloboration request
+        /// </summary>
         public async Task<bool> Confirm(int requestId)
         {
             var httpClient = GetHttpClient("Requests");
@@ -46,7 +53,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return false;
         }
-
+        /// <summary>
+        /// Deletes coloboration request by id from server
+        /// </summary>
         public async Task<bool> Delete(int requestId)
         {
             var httpClient = GetHttpClient("Requests");

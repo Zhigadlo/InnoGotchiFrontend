@@ -1,5 +1,8 @@
 ﻿namespace InnoGotchi.DAL.Models
 {
+    /// <summary>
+    /// Entity for pet filtration
+    /// </summary>
     public class PetFilterModel
     {
         public long Age { get; set; }

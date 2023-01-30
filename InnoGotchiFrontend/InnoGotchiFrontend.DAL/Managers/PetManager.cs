@@ -6,6 +6,9 @@ using System.Text.Json;
 
 namespace InnoGotchi.DAL.Managers
 {
+    /// <summary>
+    /// Class that have access to pet entities from server
+    /// </summary>
     public class PetManager : BaseManager
     {
         public PetManager(IHttpClientFactory httpClientFactory,
@@ -13,7 +16,9 @@ namespace InnoGotchi.DAL.Managers
                           IConfiguration configuration) : base(httpClientFactory, localStorage, configuration)
         {
         }
-
+        /// <summary>
+        /// Gets pet by id from server
+        /// </summary>
         public async Task<Pet?> Get(int id)
         {
             var httpClient = GetHttpClient("Pets");
@@ -39,7 +44,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Gets pets on page with sorting and filatration froma server
+        /// </summary>
         public async Task<PaginatedList<Pet>?> GetPage(int page, string sortType, PetFilterModel filterModel)
         {
             var httpClient = GetHttpClient("Pets");
@@ -89,7 +96,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Gets all pets froma server
+        /// </summary>
         public async Task<IEnumerable<Pet>?> GetAll()
         {
             var httpClient = GetHttpClient("Pets");
@@ -116,7 +125,10 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Gets all pet names from server
+        /// </summary>
+        /// <returns></returns>
         public async Task<IEnumerable<string>?> GetAllNames()
         {
             var httpClient = GetHttpClient("Pets");
@@ -143,7 +155,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Sets dead status to pet by id on server 
+        /// </summary>
         public async Task<bool> Death(int id, long deathTime)
         {
             var httpClient = GetHttpClient("Pets");
@@ -162,7 +176,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return false;
         }
-
+        /// <summary>
+        /// Gives a drink to pet by id
+        /// </summary>
         public async Task<bool> Drink(int id)
         {
             var httpClient = GetHttpClient("Pets");
@@ -181,7 +197,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return false;
         }
-
+        /// <summary>
+        /// Feeds pet by id
+        /// </summary>
         public async Task<bool> Feed(int id)
         {
             var httpClient = GetHttpClient("Pets");
@@ -200,7 +218,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return false;
         }
-
+        /// <summary>
+        /// Sends request to create new pet 
+        /// </summary>
         public async Task<int> Create(string name, string appearance, int farmId)
         {
             var httpClient = GetHttpClient("Pets");

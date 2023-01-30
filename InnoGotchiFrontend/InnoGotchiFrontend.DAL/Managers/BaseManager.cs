@@ -6,6 +6,9 @@ using System.Text.Json;
 
 namespace InnoGotchi.DAL.Managers
 {
+    /// <summary>
+    /// Base class that can provide http client to child classes. Child classes must have access to server.
+    /// </summary>
     public class BaseManager
     {
         protected IHttpClientFactory _httpClientFactory;
@@ -19,7 +22,9 @@ namespace InnoGotchi.DAL.Managers
             _httpClientFactory = httpClientFactory;
             _localStorage = localStorage;
         }
-
+        /// <summary>
+        /// Returns http client and sets header with jwt token if user is authorized 
+        /// </summary>
         protected HttpClient GetHttpClient(string clientName)
         {
             var httpClient = _httpClientFactory.CreateClient(clientName);

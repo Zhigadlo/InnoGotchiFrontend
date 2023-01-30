@@ -5,6 +5,9 @@ using System.Text.Json;
 
 namespace InnoGotchi.DAL.Managers
 {
+    /// <summary>
+    /// Class that have access to picture entities from server
+    /// </summary>
     public class PictureManager : BaseManager
     {
         public PictureManager(IHttpClientFactory httpClientFactory,
@@ -12,7 +15,9 @@ namespace InnoGotchi.DAL.Managers
                               IConfiguration configuration) : base(httpClientFactory, localStorage, configuration)
         {
         }
-
+        /// <summary>
+        /// Gets all pictures from server
+        /// </summary>
         public async Task<IEnumerable<Picture>?> GetAll()
         {
             var httpClient = GetHttpClient("Pictures");

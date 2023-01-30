@@ -6,6 +6,9 @@ using System.Text.Json;
 
 namespace InnoGotchi.DAL.Managers
 {
+    /// <summary>
+    /// Class that have access to user entities from server
+    /// </summary>
     public class UserManager : BaseManager
     {
         public UserManager(IHttpClientFactory httpClientFactory,
@@ -13,7 +16,9 @@ namespace InnoGotchi.DAL.Managers
                           IConfiguration configuration) : base(httpClientFactory, localStorage, configuration)
         {
         }
-
+        /// <summary>
+        /// Gets all emails that already in use from server
+        /// </summary>
         public async Task<IEnumerable<string>?> GetAllEmails()
         {
             var httpClient = GetHttpClient("Users");
@@ -40,7 +45,9 @@ namespace InnoGotchi.DAL.Managers
 
             return null;
         }
-
+        /// <summary>
+        /// Gets all users from server
+        /// </summary>
         public async Task<IEnumerable<User>?> GetAll()
         {
             var httpClient = GetHttpClient("Users");
@@ -67,7 +74,9 @@ namespace InnoGotchi.DAL.Managers
 
             return null;
         }
-
+        /// <summary>
+        /// Creates user 
+        /// </summary>
         public async Task<int> Create(User? user)
         {
             var httpClient = GetHttpClient("Users");
@@ -95,7 +104,11 @@ namespace InnoGotchi.DAL.Managers
             else
                 return -1;
         }
-
+        /// <summary>
+        /// Updates user avatar
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="newavatar"></param>
         public async Task<bool> AvatarUpdate(int userId, byte[] newavatar)
         {
             var httpClient = GetHttpClient("Users");
@@ -107,7 +120,9 @@ namespace InnoGotchi.DAL.Managers
             var httpResponseMessage = await httpClient.PutAsync(httpClient.BaseAddress + "/avatarChange", new FormUrlEncodedContent(parameters));
             return httpResponseMessage.IsSuccessStatusCode;
         }
-
+        /// <summary>
+        /// Gets user jwt token by email and password
+        /// </summary>
         private async Task<SecurityTokenModel?> Token(string email, string password)
         {
             var httpClient = GetHttpClient("Users");
@@ -130,7 +145,9 @@ namespace InnoGotchi.DAL.Managers
 
             return null;
         }
-
+        /// <summary>
+        /// Authenticates user
+        /// </summary>
         public async Task<SecurityTokenModel?> Authenticate(string email, string password)
         {
             var token = await Token(email, password);
@@ -145,12 +162,16 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Removes jwt token from local storage
+        /// </summary>
         public void RemoveTokenFromLocalStorage()
         {
             _localStorage.Remove(_tokenName);
         }
-
+        /// <summary>
+        /// Gets all coloborators by user id from server
+        /// </summary>
         public async Task<IEnumerable<User>?> Coloborators(int id)
         {
             var httpClient = GetHttpClient("Users");
@@ -176,7 +197,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Gets user from server by email and password
+        /// </summary>
         private async Task<User?> GetUser(string email, string password)
         {
             var httpClient = GetHttpClient("Users");
@@ -202,7 +225,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Gets user from server by id
+        /// </summary>
         public async Task<User?> Get(int id)
         {
             var httpClient = GetHttpClient("Users");
@@ -228,7 +253,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Updates user password
+        /// </summary>
         public async Task<bool> ChangePassword(int userId, string oldPassword, string newPassword, string confirmPassword)
         {
             var httpClient = GetHttpClient("Users");

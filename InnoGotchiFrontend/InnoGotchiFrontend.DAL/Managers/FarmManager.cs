@@ -6,6 +6,9 @@ using System.Text.Json;
 
 namespace InnoGotchi.DAL.Managers
 {
+    /// <summary>
+    /// Class that have access to farm entities from server
+    /// </summary>
     public class FarmManager : BaseManager
     {
         public FarmManager(IHttpClientFactory httpClientFactory,
@@ -13,7 +16,9 @@ namespace InnoGotchi.DAL.Managers
                            IConfiguration configuration) : base(httpClientFactory, localStorage, configuration)
         {
         }
-
+        /// <summary>
+        /// Sends farm creation request to server
+        /// </summary>
         public async Task<int> Create(int ownerId, string name)
         {
             var httpClient = GetHttpClient("Farms");
@@ -37,7 +42,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return -1;
         }
-
+        /// <summary>
+        /// Gets farm by id from server 
+        /// </summary>
         public async Task<Farm?> Get(int id)
         {
             var httpClient = GetHttpClient("Farms");
@@ -65,7 +72,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Gets all farms from server
+        /// </summary>
         public async Task<IEnumerable<Farm>?> GetAll()
         {
             var httpClient = GetHttpClient("Farms");
@@ -93,7 +102,9 @@ namespace InnoGotchi.DAL.Managers
             else
                 return null;
         }
-
+        /// <summary>
+        /// Gets all farm names from server
+        /// </summary>
         public async Task<IEnumerable<string>?> GetAllNames()
         {
             var httpClient = GetHttpClient("Farms");
