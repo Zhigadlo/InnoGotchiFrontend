@@ -3,6 +3,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace InnoGotchi.BLL.Services
 {
+    /// <summary>
+    /// Class that manage info about pets
+    /// </summary>
     public class PetInfoService
     {
         public DateTime FeedingPeriodHours { get; private set; }

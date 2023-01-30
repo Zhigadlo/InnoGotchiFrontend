@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace InnoGotchi.BLL.Services
 {
+    /// <summary>
+    /// Class that have ability to get farms data from data access layer
+    /// </summary>
     public class FarmService : BaseService
     {
         private PetInfoService _petInfoService;
@@ -21,7 +24,9 @@ namespace InnoGotchi.BLL.Services
             _petInfoService = new PetInfoService(configuration);
             _farmManager = new FarmManager(httpClientFactory, localStorage, configuration);
         }
-
+        /// <summary>
+        /// Gets farm by id
+        /// </summary>
         public async Task<FarmDTO?> Get(int id)
         {
             var farm = await _farmManager.Get(id);
@@ -36,17 +41,26 @@ namespace InnoGotchi.BLL.Services
             });
             return farmDTO;
         }
-
+        /// <summary>
+        /// Gets all farms
+        /// </summary>
         public async Task<IEnumerable<Farm>?> GetAll()
         {
             return await _farmManager.GetAll();
         }
-
+        /// <summary>
+        /// Gets all farm names
+        /// </summary>
         public async Task<IEnumerable<string>?> GetAllNames()
         {
             return await _farmManager.GetAllNames();
         }
-
+        /// <summary>
+        /// Creates new farm
+        /// </summary>
+        /// <param name="ownerId"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task<int> Create(int ownerId, string name)
         {
             return await _farmManager.Create(ownerId, name);

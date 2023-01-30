@@ -1,5 +1,8 @@
 ﻿namespace InnoGotchi.BLL.Identity
 {
+    /// <summary>
+    /// Entity that contains user jwt token and other authorized user information
+    /// </summary>
     public class SecurityToken
     {
         public string? AccessToken { get; set; }

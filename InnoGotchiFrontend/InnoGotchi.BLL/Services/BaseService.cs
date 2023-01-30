@@ -2,6 +2,9 @@
 
 namespace InnoGotchi.BLL.Services
 {
+    /// <summary>
+    /// Class that contains mapper
+    /// </summary>
     public class BaseService
     {
         protected IMapper _mapper;

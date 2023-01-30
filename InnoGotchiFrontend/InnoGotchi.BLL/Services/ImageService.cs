@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace InnoGotchi.BLL.Services
 {
+    /// <summary>
+    /// Class that have ability to get pictures data from data access layer
+    /// </summary>
     public class ImageService : BaseService
     {
         private PictureManager _pictureManager;
@@ -17,12 +20,19 @@ namespace InnoGotchi.BLL.Services
         {
             _pictureManager = new PictureManager(httpClientFactory, localStorage, configuration);
         }
-
+        /// <summary>
+        /// Gets all pictures
+        /// </summary>
         public async Task<IEnumerable<PictureDTO>> GetAll()
         {
             var pictures = await _pictureManager.GetAll();
             return _mapper.Map<IEnumerable<PictureDTO>>(pictures);
         }
+        /// <summary>
+        /// Gets byte array from form file
+        /// </summary>
+        /// <param name="fileForm"></param>
+        /// <returns></returns>
         public byte[]? GetBytesFromFormFile(IFormFile fileForm)
         {
             if (fileForm != null)

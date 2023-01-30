@@ -8,6 +8,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace InnoGotchi.BLL.Services
 {
+    /// <summary>
+    /// Class that have ability to get pets data from data access layer
+    /// </summary>
     public class PetService : BaseService
     {
         private PetInfoService _petInfoService;
@@ -20,14 +23,18 @@ namespace InnoGotchi.BLL.Services
             _petInfoService = new PetInfoService(configuration);
             _petManager = new PetManager(httpClientFactory, localStorage, configuration);
         }
-
+        /// <summary>
+        /// Gets pet by id
+        /// </summary>
         public async Task<PetDTO?> Get(int id)
         {
             var pet = await _petManager.Get(id);
             var petDTO = _mapper.Map<PetDTO>(pet);
             return _petInfoService.FillPetDTO(petDTO);
         }
-
+        /// <summary>
+        /// Gets all pets
+        /// </summary>
         public async Task<IEnumerable<PetDTO>?> GetAll()
         {
             var pets = await _petManager.GetAll();
@@ -43,12 +50,16 @@ namespace InnoGotchi.BLL.Services
             }
             return result;
         }
-
+        /// <summary>
+        /// Gets all pet names
+        /// </summary>
         public async Task<IEnumerable<string>?> GetAllNames()
         {
             return await _petManager.GetAllNames();
         }
-
+        /// <summary>
+        /// Gets page by number with pets. This page was sorted and filtrated.
+        /// </summary>
         public async Task<PaginatedListDTO<PetDTO>?> GetPage(int page, string sortType, PetFilterModelDTO filterModel)
         {
             var pets = await _petManager.GetPage(page, sortType, _mapper.Map<PetFilterModel>(filterModel));
@@ -65,22 +76,30 @@ namespace InnoGotchi.BLL.Services
 
             return result;
         }
-
+        /// <summary>
+        /// Creates new pet
+        /// </summary>
         public async Task<int> Create(string name, string appearance, int farmId)
         {
             return await _petManager.Create(name, appearance, farmId);
         }
-
+        /// <summary>
+        /// Feeds pet by id
+        /// </summary>
         public async Task<bool> Feed(int id)
         {
             return await _petManager.Feed(id);
         }
-
+        /// <summary>
+        /// Gives a drink to pet by id
+        /// </summary>
         public async Task<bool> Drink(int id)
         {
             return await _petManager.Drink(id);
         }
-
+        /// <summary>
+        /// Sets dead status to pet
+        /// </summary>
         public async Task<bool> Death(int id, long deathTime)
         {
             return await _petManager.Death(id, deathTime);
