@@ -1,30 +1,34 @@
 ﻿using AutoMapper;
-using InnoGotchi.BLL.DTO;
-using InnoGotchi.DAL.Models;
+using Hanssens.Net;
+using InnoGotchi.DAL.Managers;
+using Microsoft.Extensions.Configuration;
 
 namespace InnoGotchi.BLL.Services
 {
     public class RequestService : BaseService
     {
-        public RequestService(IMapper mapper) : base(mapper)
+        private RequestManager _requestManager;
+        public RequestService(IMapper mapper,
+                              IHttpClientFactory httpClientFactory,
+                              LocalStorage localStorage,
+                              IConfiguration configuration) : base(mapper)
         {
+            _requestManager = new RequestManager(httpClientFactory, localStorage, configuration);
         }
 
-        public bool IsExist(int ownerId, int receipientId, IEnumerable<ColoborationRequestDTO> requests)
+        public async Task<bool> Create(int ownerId, int receiverId)
         {
-            ColoborationRequestDTO? request = requests.FirstOrDefault(r => r.RequestOwnerId == ownerId
-                                                                        && r.RequestReceipientId == receipientId);
-            return requests.Contains(request);
+            return await _requestManager.Create(ownerId, receiverId);
         }
 
-        public ColoborationRequestDTO? GetColoborationRequestDTO(ColoborationRequest request)
+        public async Task<bool> Confirm(int requestId)
         {
-            return _mapper.Map<ColoborationRequestDTO>(request);
+            return await _requestManager.Confirm(requestId);
         }
 
-        public IEnumerable<ColoborationRequestDTO>? GetColoborationRequestsDTO(IEnumerable<ColoborationRequest> requests)
+        public async Task<bool> Delete(int requestId)
         {
-            return _mapper.Map<IEnumerable<ColoborationRequestDTO>>(requests);
+            return await _requestManager.Delete(requestId);
         }
     }
 }
