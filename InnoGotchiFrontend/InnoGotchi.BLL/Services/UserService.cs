@@ -84,6 +84,24 @@ namespace InnoGotchi.BLL.Services
             return _mapper.Map<IEnumerable<UserDTO>>(coloborators);
         }
         /// <summary>
+        /// Gets all users that sent request to user by id
+        /// </summary>
+        /// <param name="id">User that receved requests id</param>
+        public async Task<IEnumerable<UserDTO>?> SentRequestUsers(int id)
+        {
+            var sentRequestUsers = await _userManager.SentRequestUsers(id);
+            return _mapper.Map<IEnumerable<UserDTO>>(sentRequestUsers);
+        }
+        /// <summary>
+        /// Gets all users that received requests to user by id
+        /// </summary>
+        /// <param name="id">User that sent id</param>
+        public async Task<IEnumerable<UserDTO>?> ReceivedRequestUsers(int id)
+        {
+            var receivedRequestUsers = await _userManager.ReceivedRequestUsers(id);
+            return _mapper.Map<IEnumerable<UserDTO>>(receivedRequestUsers);
+        }
+        /// <summary>
         /// Updates user password 
         /// </summary>
         public async Task<bool> ChangePassword(int userId, string oldPassword, string newPassword, string confirm)

@@ -57,32 +57,17 @@ namespace InnoGotchi.Web.Controllers
         /// </summary>
         public async Task<IActionResult> UserRequests()
         {
-            UserDTO? user = await GetCurrentUser();
-            if (user == null)
+            int userId = GetAuthorizedUserId();
+            if (userId == -1)
                 return RedirectToAction("Login");
-            List<KeyValuePair<int, UserDTO>> usersWhoSentRequest = new List<KeyValuePair<int, UserDTO>>();
-            foreach (var rr in user.ReceivedRequests)
-            {
-                if (rr.IsConfirmed == false)
-                {
-                    var u = await Get(rr.RequestOwnerId);
+            
+            var usersWhoSentRequest = await _userService.SentRequestUsers(userId);
+            var usersWhoReceivedRequest = await _userService.ReceivedRequestUsers(userId);
 
-                    usersWhoSentRequest.Add(KeyValuePair.Create(rr.Id, u));
-                }
-            };
-            List<KeyValuePair<int, UserDTO>> usersWhoReceivedRequest = new List<KeyValuePair<int, UserDTO>>();
-            foreach (var sr in user.SentRequests)
-            {
-                if (sr.IsConfirmed == false)
-                {
-                    var u = await Get(sr.RequestReceipientId);
-                    usersWhoReceivedRequest.Add(KeyValuePair.Create(sr.Id, u));
-                }
-            };
             UserRequestsViewModel vm = new UserRequestsViewModel()
             {
-                UsersWhoSentRequest = usersWhoSentRequest,
-                UsersWhoReceivedRequest = usersWhoReceivedRequest
+                UsersWhoSentRequest = usersWhoSentRequest.ToList(),
+                UsersWhoReceivedRequest = usersWhoReceivedRequest.ToList()
             };
             return View(vm);
         }

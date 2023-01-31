@@ -198,6 +198,64 @@ namespace InnoGotchi.DAL.Managers
                 return null;
         }
         /// <summary>
+        /// Gets all users that sent request to user by id from server
+        /// </summary>
+        /// <param name="id">User id</param>
+        public async Task<IEnumerable<User>?> SentRequestUsers(int id)
+        {
+            var httpClient = GetHttpClient("Users");
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Get,
+                httpClient.BaseAddress + $"/sentRequestUsers/{id}"
+            );
+
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
+
+                return users;
+            }
+            else
+                return null;
+        }
+        /// <summary>
+        /// Gets all users that received request from user by id from server
+        /// </summary>
+        /// <param name="id">User id</param>
+        public async Task<IEnumerable<User>?> ReceivedRequestUsers(int id)
+        {
+            var httpClient = GetHttpClient("Users");
+            var httpRequestMessage = new HttpRequestMessage
+            (
+                HttpMethod.Get,
+                httpClient.BaseAddress + $"/receivedRequestUsers/{id}"
+            );
+
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
+
+                return users;
+            }
+            else
+                return null;
+        }
+        /// <summary>
         /// Gets user from server by email and password
         /// </summary>
         private async Task<User?> GetUser(string email, string password)
