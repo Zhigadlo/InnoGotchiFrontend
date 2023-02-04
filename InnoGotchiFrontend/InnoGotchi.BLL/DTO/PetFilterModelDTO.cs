@@ -2,15 +2,15 @@
 {
     public class PetFilterModelDTO
     {
-        public long Age { get; set; }
-        public long GameYear { get; set; }
+        public long Age { get; set; } = 0;
+        public long GameYear { get; set; } = 0;
 
-        public int HungerLavel { get; set; }
-        public long FeedingPeriod { get; set; }
-        public bool IsLastHungerStage { get; set; }
+        public int HungerLavel { get; set; } = -1;
+        public long FeedingPeriod { get; set; } = 0;
+        public bool IsLastHungerStage { get; set; } = false;
 
-        public int ThirstyLavel { get; set; }
-        public long DrinkingPeriod { get; set; }
-        public bool IsLastThirstyStage { get; set; }
+        public int ThirstyLavel { get; set; } = -1;
+        public long DrinkingPeriod { get; set; } = 0;
+        public bool IsLastThirstyStage { get; set; } = false;
     }
 }

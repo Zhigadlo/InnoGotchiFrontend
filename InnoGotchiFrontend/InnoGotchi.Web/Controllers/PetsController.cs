@@ -77,23 +77,11 @@ namespace InnoGotchi.Web.Controllers
 
             string hungerLavel = GetStringFromSession("filterhunger", "hungerLavel");
             HttpContext.Session.SetString("filterhunger", hungerLavel);
-            hungerLavel = String.IsNullOrEmpty(hungerLavel) ? "-1" : hungerLavel;
 
             string thirstyLavel = GetStringFromSession("filterthirsty", "thirstyLavel");
             HttpContext.Session.SetString("filterthirsty", thirstyLavel);
-            thirstyLavel = String.IsNullOrEmpty(thirstyLavel) ? "-1" : thirstyLavel;
 
-            var filterModel = new PetFilterModelDTO()
-            {
-                HungerLavel = int.Parse(hungerLavel),
-                ThirstyLavel = int.Parse(thirstyLavel),
-                GameYear = 0,
-                Age = 0,
-                FeedingPeriod = 0,
-                DrinkingPeriod = 0,
-                IsLastHungerStage = false,
-                IsLastThirstyStage = false
-            };
+            var filterModel = new PetFilterModelDTO();
 
             if (!String.IsNullOrEmpty(age))
             {
@@ -103,6 +91,7 @@ namespace InnoGotchi.Web.Controllers
 
             if (!String.IsNullOrEmpty(hungerLavel) && int.Parse(hungerLavel) != -1)
             {
+                filterModel.HungerLavel = int.Parse(hungerLavel);
                 filterModel.FeedingPeriod = _petInfoService.FeedingPeriodHours.Ticks;
                 if ((int)HungerLavel.Dead == filterModel.HungerLavel)
                     filterModel.IsLastHungerStage = true;
@@ -110,6 +99,7 @@ namespace InnoGotchi.Web.Controllers
 
             if (!String.IsNullOrEmpty(thirstyLavel) && int.Parse(thirstyLavel) != -1)
             {
+                filterModel.ThirstyLavel = int.Parse(thirstyLavel);
                 filterModel.DrinkingPeriod = _petInfoService.DrinkingPeriodHours.Ticks;
                 if ((int)ThirstyLavel.Dead == filterModel.ThirstyLavel)
                     filterModel.IsLastThirstyStage = true;

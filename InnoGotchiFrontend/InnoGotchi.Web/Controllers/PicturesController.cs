@@ -28,10 +28,10 @@ namespace InnoGotchi.Web.Controllers
             IEnumerable<PictureDTO>? allPictures = await GetAll();
             PetConstructorViewModel vm = new PetConstructorViewModel
             {
-                Bodies = allPictures.Where(p => p.Description.ToLower() == "body").ToList(),
-                Eyes = allPictures.Where(p => p.Description.ToLower() == "eyes").ToList(),
-                Noses = allPictures.Where(p => p.Description.ToLower() == "nose").ToList(),
-                Mouths = allPictures.Where(p => p.Description.ToLower() == "mouth").ToList(),
+                Bodies = allPictures.Where(p => p.Description.ToLower() == "body"),
+                Eyes = allPictures.Where(p => p.Description.ToLower() == "eyes"),
+                Noses = allPictures.Where(p => p.Description.ToLower() == "nose"),
+                Mouths = allPictures.Where(p => p.Description.ToLower() == "mouth"),
                 PetNames = petNames
             };
             return View(vm);

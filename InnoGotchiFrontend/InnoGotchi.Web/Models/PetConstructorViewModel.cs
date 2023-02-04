@@ -7,10 +7,10 @@ namespace InnoGotchi.Web.Models
     /// </summary>
     public class PetConstructorViewModel
     {
-        public List<PictureDTO> Bodies { get; set; }
-        public List<PictureDTO> Eyes { get; set; }
-        public List<PictureDTO> Noses { get; set; }
-        public List<PictureDTO> Mouths { get; set; }
+        public IEnumerable<PictureDTO> Bodies { get; set; }
+        public IEnumerable<PictureDTO> Eyes { get; set; }
+        public IEnumerable<PictureDTO> Noses { get; set; }
+        public IEnumerable<PictureDTO> Mouths { get; set; }
         public IEnumerable<string> PetNames { get; set; }
 
     }
