@@ -45,13 +45,13 @@ namespace InnoGotchi.Web.Controllers
                 {
                     if (_petInfoService.IsDeath(p))
                         await _petService.Death(p.Id, p.DeadTime.Ticks);
-                    
+
                     _petInfoService.FillPetDTO(p);
                 });
 
             return pets;
         }
-        
+
         private string GetStringFromSession(string key, string queryName, string defaultValue = "")
         {
             if (HttpContext.Request.Query[queryName].Count() > 0)

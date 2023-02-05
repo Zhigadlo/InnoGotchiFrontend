@@ -60,12 +60,13 @@ namespace InnoGotchi.Web.Controllers
             int userId = GetAuthorizedUserId();
             if (userId == -1)
                 return RedirectToAction("Login");
-            
+
             var usersWhoSentRequest = await _userService.SentRequestUsers(userId);
             var usersWhoReceivedRequest = await _userService.ReceivedRequestUsers(userId);
 
             UserRequestsViewModel vm = new UserRequestsViewModel()
             {
+                AuthorizedId = userId,
                 UsersWhoSentRequest = usersWhoSentRequest.ToList(),
                 UsersWhoReceivedRequest = usersWhoReceivedRequest.ToList()
             };

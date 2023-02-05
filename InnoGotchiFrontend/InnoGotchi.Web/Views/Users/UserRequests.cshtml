@@ -24,8 +24,8 @@
                             @item.FirstName @item.LastName
                         </td>
                         <td>
-                            <a class="btn btn-sm btn-success" asp-controller="Requests" asp-action="Confirm" asp-route-requestId="@item.Id" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Accept</a>
-                            <a class="btn btn-sm btn-danger" asp-controller="Requests" asp-action="Delete" asp-route-requestId="@item.Id" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Deny</a>
+                            <a class="btn btn-sm btn-success" asp-controller="Requests" asp-action="Confirm" asp-route-requestId="@item.GetSentRequestId(Model.AuthorizedId)" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Accept</a>
+                            <a class="btn btn-sm btn-danger" asp-controller="Requests" asp-action="Delete" asp-route-requestId="@item.GetSentRequestId(Model.AuthorizedId)" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Deny</a>
                         </td>
                     </tr>
                 }
@@ -52,7 +52,7 @@
                             @item.FirstName @item.LastName
                         </td>
                         <td>
-                            <a class="btn btn-sm btn-danger" asp-controller="Requests" asp-action="Delete" asp-route-requestId="@item.Id" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Cancel</a>
+                            <a class="btn btn-sm btn-danger" asp-controller="Requests" asp-action="Delete" asp-route-requestId="@item.GetReceivedRequestId(Model.AuthorizedId)" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Cancel</a>
                         </td>
                     </tr>
                 }

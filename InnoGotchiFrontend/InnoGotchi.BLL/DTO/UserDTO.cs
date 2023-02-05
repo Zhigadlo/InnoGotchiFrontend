@@ -14,5 +14,27 @@ namespace InnoGotchi.BLL.DTO
         public FarmDTO Farm { get; set; }
         public List<ColoborationRequestDTO> SentRequests { get; set; }
         public List<ColoborationRequestDTO> ReceivedRequests { get; set; }
+
+        public int GetSentRequestId(int receipientId)
+        {
+            var request = SentRequests.FirstOrDefault(sr => sr.RequestOwnerId == this.Id
+                                                         && sr.RequestReceipientId == receipientId);
+
+            if (request == null)
+                return -1;
+
+            return request.Id;
+        }
+
+        public int GetReceivedRequestId(int ownerId)
+        {
+            var request = ReceivedRequests.FirstOrDefault(sr => sr.RequestOwnerId == ownerId
+                                                          && sr.RequestReceipientId == this.Id);
+
+            if (request == null)
+                return -1;
+
+            return request.Id;
+        }
     }
 }
