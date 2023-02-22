@@ -7,7 +7,7 @@ namespace InnoGotchi.Web.Models
     /// </summary>
     public class AllPetsViewModel
     {
-        public PaginatedListDTO<PetDTO>? PaginatedList { get; set; }
+        public PaginatedListDTO<List<PetDTO>>? PaginatedList { get; set; }
         public PetSortModel? SortModel { get; set; }
         public FilterPetViewModel? FilterModel { get; set; }
     }

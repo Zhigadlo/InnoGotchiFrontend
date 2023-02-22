@@ -47,7 +47,7 @@ namespace InnoGotchi.DAL.Managers
         /// <summary>
         /// Gets pets on page with sorting and filatration froma server
         /// </summary>
-        public async Task<PaginatedList<Pet>?> GetPage(int page, string sortType, PetFilterModel filterModel)
+        public async Task<PaginatedList<List<Pet>>?> GetPage(int page, string sortType, PetFilterModel filterModel)
         {
             var httpClient = GetHttpClient("Pets");
             var path = new StringBuilder($"/getPage/?page={page}&sortType={sortType}");
@@ -87,9 +87,9 @@ namespace InnoGotchi.DAL.Managers
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                PaginatedList<Pet>? pets = await JsonSerializer.DeserializeAsync<PaginatedList<Pet>>(contentStream, options);
+                PaginatedList<List<Pet>>? pets = await JsonSerializer.DeserializeAsync<PaginatedList<List<Pet>>>(contentStream, options);
                 if (pets == null)
-                    pets = new PaginatedList<Pet>();
+                    pets = new PaginatedList<List<Pet>>();
 
                 return pets;
             }

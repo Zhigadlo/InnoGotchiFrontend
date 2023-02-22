@@ -40,9 +40,9 @@ namespace InnoGotchi.Web.Controllers
         /// Goes to view with all pet body parts
         /// </summary>
         /// <returns></returns>
-        public IActionResult AllBodyParts()
+        public async Task<IActionResult> AllBodyParts()
         {
-            return View(GetAll());
+            return View(await GetAll());
         }
 
         /// <summary>

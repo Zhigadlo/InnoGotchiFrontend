@@ -60,14 +60,14 @@ namespace InnoGotchi.BLL.Services
         /// <summary>
         /// Gets page by number with pets. This page was sorted and filtrated.
         /// </summary>
-        public async Task<PaginatedListDTO<PetDTO>?> GetPage(int page, string sortType, PetFilterModelDTO filterModel)
+        public async Task<PaginatedListDTO<List<PetDTO>>?> GetPage(int page, string sortType, PetFilterModelDTO filterModel)
         {
             var pets = await _petManager.GetPage(page, sortType, _mapper.Map<PetFilterModel>(filterModel));
 
             if (pets == null)
                 return null;
 
-            PaginatedListDTO<PetDTO>? result = new PaginatedListDTO<PetDTO>
+            PaginatedListDTO<List<PetDTO>>? result = new PaginatedListDTO<List<PetDTO>>
             {
                 TotalPages = pets.TotalPages,
                 PageIndex = pets.PageIndex,

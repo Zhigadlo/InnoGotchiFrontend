@@ -35,11 +35,11 @@ namespace InnoGotchi.Web.Controllers
         /// <summary>
         /// Gets object with all info about page
         /// </summary>
-        public async Task<PaginatedListDTO<PetDTO>?> GetPage(int page, string sortType, PetFilterModelDTO filterModel)
+        public async Task<PaginatedListDTO<List<PetDTO>>?> GetPage(int page, string sortType, PetFilterModelDTO filterModel)
         {
             var pets = await _petService.GetPage(page, sortType, filterModel);
             if (pets == null)
-                pets = new PaginatedListDTO<PetDTO>();
+                pets = new PaginatedListDTO<List<PetDTO>>();
             else
                 pets.Items?.ForEach(async p =>
                 {
@@ -105,7 +105,7 @@ namespace InnoGotchi.Web.Controllers
                     filterModel.IsLastThirstyStage = true;
             }
 
-            PaginatedListDTO<PetDTO>? pets = await GetPage(page, sortType, filterModel);
+            PaginatedListDTO<List<PetDTO>>? pets = await GetPage(page, sortType, filterModel);
             if (pets == null)
                 return RedirectToAction("Login", "Users");
 

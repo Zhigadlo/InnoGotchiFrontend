@@ -1,4 +1,4 @@
-﻿@model IEnumerable<string>;
+﻿@model IEnumerable<string>?;
 <form asp-action="Create" asp-controller="Users" method="post" enctype="multipart/form-data" id="register_form" onsubmit="return isValidForm()">
     <h3>Registration form</h3>
     <div class="form-floating mb-3">
@@ -35,11 +35,13 @@
 <script>
     var emails = [];
     var isEmailValid = false;
-    @foreach (var email in Model)
+    @if (Model != null)
     {
-        @:emails.push('@email');
+        @foreach (var email in Model)
+        {
+            @:emails.push('@email');
+        }
     }
-
     console.log(emails);
     var register_form = document.getElementById('register_form');
     register_form.onsubmit = function(){
