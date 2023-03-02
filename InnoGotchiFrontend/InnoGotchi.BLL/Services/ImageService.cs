@@ -35,17 +35,15 @@ namespace InnoGotchi.BLL.Services
         /// <returns></returns>
         public byte[]? GetBytesFromFormFile(IFormFile fileForm)
         {
-            if (fileForm != null)
-            {
-                byte[]? imageData = null;
-                using (var binaryReader = new BinaryReader(fileForm.OpenReadStream()))
-                {
-                    imageData = binaryReader.ReadBytes((int)fileForm.Length);
-                }
-                return imageData;
-            }
-            else
+            if (fileForm == null)
                 return null;
+
+            byte[]? imageData = null;
+            using (var binaryReader = new BinaryReader(fileForm.OpenReadStream()))
+            {
+                imageData = binaryReader.ReadBytes((int)fileForm.Length);
+            }
+            return imageData;
         }
     }
 }

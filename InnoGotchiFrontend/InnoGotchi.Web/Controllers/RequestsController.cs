@@ -20,11 +20,9 @@ namespace InnoGotchi.Web.Controllers
                 return RedirectToAction("Login", "Users");
 
             if (await _requestService.Create(ownerId, receiverId))
-            {
                 return RedirectToAction("AllUsers", "Users");
-            }
-            else
-                return BadRequest();
+            
+            return BadRequest();
         }
         /// <summary>
         /// Confirms coloboration request
@@ -32,11 +30,9 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> Confirm(int requestId, string actionName, string controllerName)
         {
             if (await _requestService.Confirm(requestId))
-            {
                 return RedirectToAction(actionName, controllerName);
-            }
-            else
-                return BadRequest();
+            
+            return BadRequest();
         }
         /// <summary>
         /// Deletes coloboration request
@@ -44,11 +40,9 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> Delete(int requestId, string actionName, string controllerName)
         {
             if (await _requestService.Delete(requestId))
-            {
                 return RedirectToAction(actionName, controllerName);
-            }
-            else
-                return BadRequest();
+            
+            return BadRequest();
         }
     }
 }

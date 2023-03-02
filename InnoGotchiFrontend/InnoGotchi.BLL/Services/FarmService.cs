@@ -33,7 +33,7 @@ namespace InnoGotchi.BLL.Services
             if (farm == null)
                 return null;
             var farmDTO = _mapper.Map<FarmDTO>(farm);
-            farmDTO.Pets.ForEach(p =>
+            farmDTO.Pets.ForEach(async p =>
             {
                 if (_petInfoService.IsDeath(p))
                     _petManager.Death(p.Id, p.DeadTime.Ticks);

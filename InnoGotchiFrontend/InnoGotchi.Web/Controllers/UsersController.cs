@@ -97,26 +97,23 @@ namespace InnoGotchi.Web.Controllers
                 var sentRequest = authorizedUser.SentRequests.FirstOrDefault(sr => sr.RequestReceipientId == user.Id);
                 var receivedRequest = authorizedUser.ReceivedRequests.FirstOrDefault(sr => sr.RequestOwnerId == user.Id);
 
+                userVM.RequestState = RequestState.NotUsed;
                 if (sentRequest != null)
                 {
+                    userVM.RequestState = RequestState.Sent;
                     if (sentRequest.IsConfirmed)
                         userVM.RequestState = RequestState.Confirmed;
-                    else
-                        userVM.RequestState = RequestState.Sent;
 
                     userVM.RequestId = sentRequest.Id;
                 }
-                else if (receivedRequest != null)
+                if (receivedRequest != null)
                 {
+                    userVM.RequestState = RequestState.Received;
                     if (receivedRequest.IsConfirmed)
                         userVM.RequestState = RequestState.Confirmed;
-                    else
-                        userVM.RequestState = RequestState.Received;
 
                     userVM.RequestId = receivedRequest.Id;
                 }
-                else
-                    userVM.RequestState = RequestState.NotUsed;
 
                 usersVM.Add(userVM);
             }
@@ -130,8 +127,8 @@ namespace InnoGotchi.Web.Controllers
             bool result = await AvatarUpdate(FormFile);
             if (result)
                 return RedirectToAction("UserProfile");
-            else
-                return BadRequest();
+            
+            return BadRequest();
         }
         /// <summary>
         /// Goes to UserProfile view
@@ -150,9 +147,8 @@ namespace InnoGotchi.Web.Controllers
         {
             int userId = GetAuthorizedUserId();
             if (userId == -1)
-            {
                 return null;
-            }
+            
             return await Get(userId);
         }
         /// <summary>
@@ -163,12 +159,11 @@ namespace InnoGotchi.Web.Controllers
             var userId = GetAuthorizedUserId();
             if (userId == -1)
                 return RedirectToAction("Login");
+
             if (await _userService.ChangePassword(userId, oldPassword, newPassword, confirmPassword))
-            {
                 return await Logout();
-            }
-            else
-                return View("ChangePasswordView", new ErrorModel { Error = "Old password is wrong" });
+            
+            return View("ChangePasswordView", new ErrorModel { Error = "Old password is wrong" });
         }
         /// <summary>
         /// Logout user
@@ -185,13 +180,11 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> Authenticate(string email, string password)
         {
             var token = await _userService.Authenticate(email, password);
-            if (token != null)
-            {
-                await SignIn(token);
-                return RedirectToAction("Index", "Home");
-            }
-            else
+            if (token == null)
                 return View("Login", new ErrorModel { Error = "Invalid email or password" });
+
+            await SignIn(token);
+            return RedirectToAction("Index", "Home");
         }
         /// <summary>
         /// User sign in
@@ -232,12 +225,10 @@ namespace InnoGotchi.Web.Controllers
         {
             user.Avatar = _imageService.GetBytesFromFormFile(user.FormFile);
             var result = await _userService.Create(user);
-            if (result != -1)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            else
+            if (result == -1)
                 return BadRequest();
+
+            return RedirectToAction("Index", "Home");
         }
         /// <summary>
         /// Updates user avatar

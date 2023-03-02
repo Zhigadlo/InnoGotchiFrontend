@@ -27,11 +27,9 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
             if (httpResponseMessage.IsSuccessStatusCode)
-            {
                 return true;
-            }
-            else
-                return false;
+            
+            return false;
         }
         /// <summary>
         /// Confirms coloboration request
@@ -47,11 +45,9 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
             if (httpResponseMessage.IsSuccessStatusCode)
-            {
                 return true;
-            }
-            else
-                return false;
+            
+            return false;
         }
         /// <summary>
         /// Deletes coloboration request by id from server
@@ -67,11 +63,9 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
             if (httpResponseMessage.IsSuccessStatusCode)
-            {
                 return true;
-            }
-            else
-                return false;
+
+            return false;
         }
     }
 }

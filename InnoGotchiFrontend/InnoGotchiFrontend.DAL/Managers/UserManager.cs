@@ -30,20 +30,18 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<string>? emails = await JsonSerializer.DeserializeAsync<IEnumerable<string>>(contentStream, options);
-                if (emails == null)
-                    emails = new List<string>();
-                return emails;
-            }
+            if (!httpResponseMessage.IsSuccessStatusCode)
+                return null;
 
-            return null;
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            IEnumerable<string>? emails = await JsonSerializer.DeserializeAsync<IEnumerable<string>>(contentStream, options);
+            if (emails == null)
+                emails = new List<string>();
+            return emails;
         }
         /// <summary>
         /// Gets all users from server
@@ -59,20 +57,18 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
-                if (users == null)
-                    users = new List<User>();
-                return users;
-            }
+            if (!httpResponseMessage.IsSuccessStatusCode)
+                return null;
 
-            return null;
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
+            if (users == null)
+                users = new List<User>();
+            return users;
         }
         /// <summary>
         /// Creates user 
@@ -90,19 +86,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                int userId = await JsonSerializer.DeserializeAsync<int>(contentStream, options);
-
-                return userId;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return -1;
+
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            int userId = await JsonSerializer.DeserializeAsync<int>(contentStream, options);
+
+            return userId;
         }
         /// <summary>
         /// Updates user avatar
@@ -132,18 +126,16 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress + "/token", new FormUrlEncodedContent(parameters));
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                SecurityTokenModel? token = await JsonSerializer.DeserializeAsync<SecurityTokenModel>(contentStream, options);
-                return token;
-            }
+            if (!httpResponseMessage.IsSuccessStatusCode)
+                return null;
 
-            return null;
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            SecurityTokenModel? token = await JsonSerializer.DeserializeAsync<SecurityTokenModel>(contentStream, options);
+            return token;
         }
         /// <summary>
         /// Authenticates user
@@ -151,16 +143,12 @@ namespace InnoGotchi.DAL.Managers
         public async Task<SecurityTokenModel?> Authenticate(string email, string password)
         {
             var token = await Token(email, password);
-            if (token != null)
-            {
-                var user = await GetUser(email, password);
-
-                string jsonToken = JsonSerializer.Serialize(token);
-                _localStorage.Store(_tokenName, jsonToken);
-                return token;
-            }
-            else
+            if (token == null)
                 return null;
+
+            string jsonToken = JsonSerializer.Serialize(token);
+            _localStorage.Store(_tokenName, jsonToken);
+            return token;
         }
         /// <summary>
         /// Removes jwt token from local storage
@@ -183,19 +171,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
-
-                return users;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
+
+            return users;
         }
         /// <summary>
         /// Gets all users that sent request to user by id from server
@@ -212,19 +198,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
-
-                return users;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
+
+            return users;
         }
         /// <summary>
         /// Gets all users that received request from user by id from server
@@ -241,47 +225,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
-
-                return users;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
-        }
-        /// <summary>
-        /// Gets user from server by email and password
-        /// </summary>
-        private async Task<User?> GetUser(string email, string password)
-        {
-            var httpClient = GetHttpClient("Users");
 
-            var httpRequestMessage = new HttpRequestMessage
-            (
-                HttpMethod.Get,
-                httpClient.BaseAddress + $"/{email}&{password}"
-            );
-
-            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
             {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                var user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
-                return user;
-            }
-            else
-                return null;
+                PropertyNameCaseInsensitive = true
+            };
+            IEnumerable<User>? users = await JsonSerializer.DeserializeAsync<IEnumerable<User>>(contentStream, options);
+
+            return users;
         }
         /// <summary>
         /// Gets user from server by id
@@ -297,19 +251,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                User? user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
-
-                return user;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            User? user = await JsonSerializer.DeserializeAsync<User>(contentStream, options);
+
+            return user;
         }
         /// <summary>
         /// Updates user password
@@ -326,11 +278,9 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.PutAsync(httpClient.BaseAddress + "/passwordChange", new FormUrlEncodedContent(parameters));
             if (httpResponseMessage.IsSuccessStatusCode)
-            {
                 return true;
-            }
-            else
-                return false;
+
+            return false;
         }
     }
 }

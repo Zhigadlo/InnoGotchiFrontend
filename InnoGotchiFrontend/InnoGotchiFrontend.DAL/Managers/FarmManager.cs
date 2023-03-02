@@ -28,19 +28,17 @@ namespace InnoGotchi.DAL.Managers
             parameters["OwnerId"] = ownerId.ToString();
 
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                int farmId = JsonSerializer.Deserialize<int>(await httpResponseMessage.Content.ReadAsStringAsync());
-                string? jsonToken = _localStorage.Get<string>(_tokenName);
-                SecurityTokenModel securityToken = JsonSerializer.Deserialize<SecurityTokenModel>(jsonToken);
-                securityToken.FarmId = farmId;
-                _localStorage.Remove(_tokenName);
-                jsonToken = JsonSerializer.Serialize(securityToken);
-                _localStorage.Store(_tokenName, jsonToken);
-                return farmId;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return -1;
+            
+            int farmId = JsonSerializer.Deserialize<int>(await httpResponseMessage.Content.ReadAsStringAsync());
+            string? jsonToken = _localStorage.Get<string>(_tokenName);
+            SecurityTokenModel securityToken = JsonSerializer.Deserialize<SecurityTokenModel>(jsonToken);
+            securityToken.FarmId = farmId;
+            _localStorage.Remove(_tokenName);
+            jsonToken = JsonSerializer.Serialize(securityToken);
+            _localStorage.Store(_tokenName, jsonToken);
+            return farmId;
         }
         /// <summary>
         /// Gets farm by id from server 
@@ -56,21 +54,19 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                if (contentStream.Length == 0)
-                    return null;
-                Farm? farm = await JsonSerializer.DeserializeAsync<Farm>(contentStream, options);
-
-                return farm;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+            
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            if (contentStream.Length == 0)
+                return null;
+            Farm? farm = await JsonSerializer.DeserializeAsync<Farm>(contentStream, options);
+
+            return farm;
         }
         /// <summary>
         /// Gets all farms from server
@@ -86,21 +82,19 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                if (contentStream.Length == 0)
-                    return null;
-                IEnumerable<Farm>? farms = await JsonSerializer.DeserializeAsync<IEnumerable<Farm>>(contentStream, options);
-
-                return farms;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+            
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            if (contentStream.Length == 0)
+                return null;
+            IEnumerable<Farm>? farms = await JsonSerializer.DeserializeAsync<IEnumerable<Farm>>(contentStream, options);
+
+            return farms;
         }
         /// <summary>
         /// Gets all farm names from server
@@ -116,21 +110,19 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                if (contentStream.Length == 0)
-                    return null;
-                IEnumerable<string>? names = await JsonSerializer.DeserializeAsync<IEnumerable<string>>(contentStream, options);
-
-                return names;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+            
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            if (contentStream.Length == 0)
+                return null;
+            IEnumerable<string>? names = await JsonSerializer.DeserializeAsync<IEnumerable<string>>(contentStream, options);
+
+            return names;
         }
     }
 }

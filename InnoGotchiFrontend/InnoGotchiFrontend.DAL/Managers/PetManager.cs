@@ -30,19 +30,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                Pet? pet = await JsonSerializer.DeserializeAsync<Pet>(contentStream, options);
-
-                return pet;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+            
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            Pet? pet = await JsonSerializer.DeserializeAsync<Pet>(contentStream, options);
+
+            return pet;
         }
         /// <summary>
         /// Gets pets on page with sorting and filatration froma server
@@ -80,21 +78,19 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                PaginatedList<List<Pet>>? pets = await JsonSerializer.DeserializeAsync<PaginatedList<List<Pet>>>(contentStream, options);
-                if (pets == null)
-                    pets = new PaginatedList<List<Pet>>();
-
-                return pets;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+            
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            PaginatedList<List<Pet>>? pets = await JsonSerializer.DeserializeAsync<PaginatedList<List<Pet>>>(contentStream, options);
+            if (pets == null)
+                pets = new PaginatedList<List<Pet>>();
+
+            return pets;
         }
         /// <summary>
         /// Gets all pets froma server
@@ -111,19 +107,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<Pet>? pets = await JsonSerializer.DeserializeAsync<IEnumerable<Pet>>(contentStream, options);
-
-                return pets;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+            
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            IEnumerable<Pet>? pets = await JsonSerializer.DeserializeAsync<IEnumerable<Pet>>(contentStream, options);
+
+            return pets;
         }
         /// <summary>
         /// Gets all pet names from server
@@ -141,19 +135,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<string>? names = await JsonSerializer.DeserializeAsync<IEnumerable<string>>(contentStream, options);
-
-                return names;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+            
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            IEnumerable<string>? names = await JsonSerializer.DeserializeAsync<IEnumerable<string>>(contentStream, options);
+
+            return names;
         }
         /// <summary>
         /// Sets dead status to pet by id on server 
@@ -170,11 +162,9 @@ namespace InnoGotchi.DAL.Managers
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
             if (httpResponseMessage.IsSuccessStatusCode)
-            {
                 return true;
-            }
-            else
-                return false;
+            
+            return false;
         }
         /// <summary>
         /// Gives a drink to pet by id
@@ -191,11 +181,9 @@ namespace InnoGotchi.DAL.Managers
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
             if (httpResponseMessage.IsSuccessStatusCode)
-            {
                 return true;
-            }
-            else
-                return false;
+
+            return false;
         }
         /// <summary>
         /// Feeds pet by id
@@ -212,11 +200,9 @@ namespace InnoGotchi.DAL.Managers
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
             if (httpResponseMessage.IsSuccessStatusCode)
-            {
                 return true;
-            }
-            else
-                return false;
+
+            return false;
         }
         /// <summary>
         /// Sends request to create new pet 
@@ -232,19 +218,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.PostAsync(httpClient.BaseAddress, new FormUrlEncodedContent(parameters));
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                int petId = await JsonSerializer.DeserializeAsync<int>(contentStream, options);
-
-                return petId;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return -1;
+            
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            int petId = await JsonSerializer.DeserializeAsync<int>(contentStream, options);
+
+            return petId;
         }
     }
 }

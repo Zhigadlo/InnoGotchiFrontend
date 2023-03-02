@@ -30,19 +30,17 @@ namespace InnoGotchi.DAL.Managers
 
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                IEnumerable<Picture>? pictures = await JsonSerializer.DeserializeAsync<IEnumerable<Picture>>(contentStream, options);
-
-                return pictures;
-            }
-            else
+            if (!httpResponseMessage.IsSuccessStatusCode)
                 return null;
+            
+            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            IEnumerable<Picture>? pictures = await JsonSerializer.DeserializeAsync<IEnumerable<Picture>>(contentStream, options);
+
+            return pictures;
         }
     }
 }

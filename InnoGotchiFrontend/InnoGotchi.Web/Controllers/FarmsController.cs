@@ -47,10 +47,10 @@ namespace InnoGotchi.Web.Controllers
                 return RedirectToAction("Login", "Users");
             var farmId = await _farmService.Create(userId, name);
 
-            if (farmId != -1)
-                return await UserFarm(farmId);
-            else
+            if (farmId == -1)
                 return BadRequest();
+
+            return await UserFarm(farmId);     
         }
         /// <summary>
         /// Gets authorized user farm and goes to UserFarm view

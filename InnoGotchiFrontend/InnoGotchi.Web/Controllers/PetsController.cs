@@ -40,14 +40,6 @@ namespace InnoGotchi.Web.Controllers
             var pets = await _petService.GetPage(page, sortType, filterModel);
             if (pets == null)
                 pets = new PaginatedListDTO<List<PetDTO>>();
-            else
-                pets.Items?.ForEach(async p =>
-                {
-                    if (_petInfoService.IsDeath(p))
-                        await _petService.Death(p.Id, p.DeadTime.Ticks);
-
-                    _petInfoService.FillPetDTO(p);
-                });
 
             return pets;
         }
@@ -55,17 +47,12 @@ namespace InnoGotchi.Web.Controllers
         private string GetStringFromSession(string key, string queryName, string defaultValue = "")
         {
             if (HttpContext.Request.Query[queryName].Count() > 0)
-            {
                 return HttpContext.Request.Query[queryName][0];
-            }
-            else if (HttpContext.Session.Keys.Contains(key))
-            {
+            
+            if (HttpContext.Session.Keys.Contains(key))
                 return HttpContext.Session.GetString(key);
-            }
-            else
-            {
-                return defaultValue;
-            }
+            
+            return defaultValue;
         }
         /// <summary>
         /// Get form fields states and goes to AllPetsView
@@ -133,12 +120,10 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> Create(string name, string appearance)
         {
             var result = await _petService.Create(name, appearance, GetAuthorizedUserFarmId());
-            if (result != -1)
-            {
-                return RedirectToAction("UserFarm", "Farms", new { id = GetAuthorizedUserFarmId() });
-            }
-            else
+            if (result == -1)
                 return BadRequest();
+
+            return RedirectToAction("UserFarm", "Farms", new { id = GetAuthorizedUserFarmId() });
         }
         /// <summary>
         /// Feeds pet by id 
@@ -146,11 +131,9 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> Feed(int id)
         {
             if (await _petService.Feed(id))
-            {
                 return RedirectToAction("GetCurrentUserFarm", "Farms");
-            }
-            else
-                return BadRequest();
+            
+            return BadRequest();
         }
         /// <summary>
         /// Give a drink to pet by id
@@ -158,11 +141,9 @@ namespace InnoGotchi.Web.Controllers
         public async Task<IActionResult> Drink(int id)
         {
             if (await _petService.Drink(id))
-            {
                 return RedirectToAction("GetCurrentUserFarm", "Farms");
-            }
-            else
-                return BadRequest();
+            
+            return BadRequest();
         }
     }
 }

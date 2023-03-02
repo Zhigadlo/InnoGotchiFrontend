@@ -74,6 +74,14 @@ namespace InnoGotchi.BLL.Services
                 Items = _mapper.Map<List<PetDTO>>(pets.Items)
             };
 
+            result.Items.ForEach(async p =>
+            {
+                if (_petInfoService.IsDeath(p))
+                    Death(p.Id, p.DeadTime.Ticks);
+
+                _petInfoService.FillPetDTO(p);
+            });
+
             return result;
         }
         /// <summary>
