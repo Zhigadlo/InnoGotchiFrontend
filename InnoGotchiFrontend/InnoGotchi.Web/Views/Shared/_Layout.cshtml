@@ -1,0 +1,77 @@
+﻿@using InnoGotchi.BLL.Identity;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - InnoGotchi.Web</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/InnoGotchi.Web.styles.css" asp-append-version="true" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">InnoGotchiGame</a>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav m-md-2 flex-grow-1">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Farms" asp-action="GetCurrentUserFarm">Farm</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Users" asp-action="AllUsers">Find friends</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Pets" asp-action="AllPetsView">All pets</a>
+                            </li>
+                        }
+                    </ul>
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <ul class="navbar-nav m-md-2">
+                            <li class="navbar-nav flex-grow-0">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Users" asp-action="Login">Login</a>
+                            </li>
+                            <li class="navbar-nav flex-grow-0">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Users" asp-action="Register">Registration</a>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav m-md-2">
+                            <li class="navbar-nav flex-grow-0">
+                                <a class="nav-link text-light position-relative" asp-area="" asp-controller="Users" asp-action="Coloborators">Coloborators</a>
+                            </li>
+                            <li class="navbar-nav flex-grow-0">
+                                <a class="nav-link text-light position-relative" asp-area="" asp-controller="Users" asp-action="UserRequests">Friendship requests</a>
+                            </li>
+                            <li class="navbar-nav flex-grow-0">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Users" asp-action="UserProfile">Hello @User.Identity.Name</a>
+                            </li>
+                            <li class="navbar-nav flex-grow-0">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
+                            </li>
+                        </ul>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

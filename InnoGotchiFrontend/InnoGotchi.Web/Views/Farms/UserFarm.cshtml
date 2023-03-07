@@ -1,0 +1,168 @@
+﻿@using InnoGotchi.BLL.DTO;
+@model UserFarmModel
+
+@if (Model.Farm.Id == -1)
+{
+    <h1>You have no farm yet</h1>
+    <form method="post" asp-controller="Farms" asp-action="CreateFarm" onsubmit="return isValidForm()">
+        <div class="form-floating mb-3">
+            <input id="name_input" name="name" type="text" class="form-control" placeholder="farm_name" required />
+            <label for="name_input">Enter farm name</label>
+            <div id="password_help" class="form-text">Farm name must contain english letters or numbers</div>
+        </div>
+        <div id="error_message" class="text-danger h6" style="display:none">There is a farm with such name</div>
+        <input id="create_input" class="btn btn-outline-dark" type="submit" value="Create farm" />
+    </form>
+    <script>
+        var farmNames = [];
+        var error_message = document.getElementById('error_message');
+        var name_input = document.getElementById('name_input');
+        var create_input = document.getElementById('create_input');
+
+        var isValid = false;
+
+        @foreach (var name in Model.FarmNames)
+        {
+            @:farmNames.push('@name');
+        }
+
+        console.log(farmNames);
+
+        name_input.addEventListener('keyup', nameValidate);
+        name_input.addEventListener('change', nameValidate);
+
+        function nameValidate(){
+            let name = name_input.value;
+            error_message.style.display = 'block';
+            if (!farmNames.includes(name)) {
+                if (error_message.classList.contains('text-danger')) {
+                    error_message.classList.remove('text-danger');
+                }
+                if (!error_message.classList.contains('text-success')) {
+                    error_message.classList.add('text-success');
+                }
+                error_message.innerText = 'This farm name is available :)';
+                isValid = true;
+            }
+            else {
+                if (!error_message.classList.contains('text-danger')) {
+                    error_message.classList.add('text-danger');
+                }
+                if (error_message.classList.contains('text-success')) {
+                    error_message.classList.remove('text-success');
+                }
+                error_message.innerText = 'This farm name is already in use:(';
+                isValid = false;
+            }
+        }
+
+        function isValidForm(){
+            return isValid;
+        }
+
+    </script>
+}
+else
+{
+
+    <div>
+        <h1>Farm statistic</h1>
+        <h6>Farm name: @Model.Farm.Name</h6>
+        <h6>Pets count: @Model.Farm.Pets.Count</h6>
+        <h6>Creation date: @Model.Farm.CreateTime.ToShortDateString()</h6>
+        <h6>Creation time: @Model.Farm.CreateTime.ToShortTimeString()</h6>
+        <h6>Alive pets count: @Model.Farm.GetAlivePetsCount</h6>
+        <h6>Dead pets count: @Model.Farm.GetDeadPetsCount</h6>
+        <h6>Average pet age: @Model.Farm.GetAveragePetsAge</h6>
+        <h6>Average period between feedings: @Model.Farm.GetAverageFeedingPeriod per pet day</h6>
+        <h6>Average period between drinkings: @Model.Farm.GetAverageDrinkingPeriod per pet day</h6>
+        <h6>Average happiness pet days count: @Model.Farm.GetAverageHappinessDays</h6>
+    </div>
+
+    @if (Model.Farm.Pets == null || Model.Farm.Pets.Count() == 0)
+    {
+        @if (Model.AuthorizedUserId == Model.Farm.OwnerId)
+        {
+            <div>
+                <a class="btn btn-outline-dark" asp-action="PetConstructor" asp-controller="Pictures">Create new pet</a>
+            </div>
+        }
+    }
+    else
+    {
+        <h1 class="text-center">Pets list</h1>
+        @if (Model.AuthorizedUserId == Model.Farm.OwnerId)
+        {
+            <div>
+                <a class="btn btn-outline-dark" asp-action="PetConstructor" asp-controller="Pictures">Create new pet</a>
+            </div>
+        }
+        <div class="text-center">
+
+            <table class="table">
+                <tr>
+                    <th>Appearance</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Pet state</th>
+                    <th>Hungry state</th>
+                    <th>Thirsty state</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model.Farm.Pets)
+                {
+                    <tr>
+                        <td>
+                            <img src="data:image/svg+xml;base64,@(item.Appearance)" width="100" height="100" />
+                        </td>
+                        <td>@item.Name</td>
+                        <td>@item.Age</td>
+                        <td>@item.State</td>
+                        <td>@item.HungerLavel</td>
+                        <td>@item.ThirstyLavel</td>
+                        @if (item.State == PetState.Dead)
+                        {
+                            <td></td>
+                            <td></td>
+                        }
+                        else
+                        {
+                            @if (item.HungerLavel == HungerLavel.Full)
+                            {
+                                <td>
+                                    <a class="btn btn-outline-success disabled">feed</a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <a class="btn btn-outline-success" asp-action="Feed" asp-controller="Pets" asp-route-id="@item.Id">feed</a>
+                                </td>
+                            }
+
+
+                            @if (item.ThirstyLavel == ThirstyLavel.Full)
+                            {
+                                <td>
+                                    <a class="btn btn-outline-info disabled">drink</a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <a class="btn btn-outline-info" asp-action="Drink" asp-controller="Pets" asp-route-id="@item.Id">drink</a>
+                                </td>
+                            }
+                        }
+
+                        <td>
+                            <a class="btn btn-outline-dark" asp-action="PetView" asp-controller="Pets" asp-route-id="@item.Id">details</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+}

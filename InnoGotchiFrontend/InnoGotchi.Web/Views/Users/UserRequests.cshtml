@@ -1,0 +1,93 @@
+﻿@model UserRequestsViewModel;
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+        <a class="menu nav-link active" aria-current="page" href="#">Received requests</a>
+  </li>
+  <li class="nav-item">
+        <a class="menu nav-link" href="#" aria-current="page">Sent requests</a>
+  </li>
+</ul>
+<div id="main">
+    <div name="received_requests" class="items text-center" style="display:block;">
+        @if (Model.UsersWhoSentRequest.Count > 0)
+        {
+            <table class="table">
+                <tr>
+                    <th></th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model.UsersWhoSentRequest)
+                {
+                    <tr>
+                        <td align="left">
+                            <img src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="60" height="60" />
+                            @item.FirstName @item.LastName
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-success" asp-controller="Requests" asp-action="Confirm" asp-route-requestId="@item.GetSentRequestId(Model.AuthorizedId)" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Accept</a>
+                            <a class="btn btn-sm btn-danger" asp-controller="Requests" asp-action="Delete" asp-route-requestId="@item.GetSentRequestId(Model.AuthorizedId)" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Deny</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <h1>Nobody sent you any requests yet</h1>
+        }
+    </div>
+    <div name="sent_requests" class="items text-center" style="display:none;">
+        @if (Model.UsersWhoReceivedRequest.Count > 0)
+        {
+            <table class="table">
+                <tr>
+                    <th></th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model.UsersWhoReceivedRequest)
+                {
+                    <tr>
+                        <td align="left">
+                            <img src="data:image/png;base64,@(Convert.ToBase64String(item.Avatar))" width="60" height="60" />
+                            @item.FirstName @item.LastName
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-danger" asp-controller="Requests" asp-action="Delete" asp-route-requestId="@item.GetReceivedRequestId(Model.AuthorizedId)" asp-route-actionName="UserRequests" asp-route-controllerName="Users">Cancel</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <h1>You haven't sent any requests yet</h1>
+        }
+    </div>
+</div>
+
+<script>
+    let btns = document.querySelectorAll('.menu');
+    
+    let items = document.querySelectorAll('.items');
+    console.log(items);
+    for (let i = 0; i < btns.length; i++) {
+        btns[i].addEventListener("click", function() {    
+            
+            btns.forEach(function(el){
+                el.classList.remove('active');
+            });
+
+            for(let j = 0; j < items.length; j++){
+                if(j === i){
+                   
+                    items[j].style.display = 'block';
+                }
+                else{
+                    items[j].style.display = 'none';
+                }
+            }
+
+            this.classList.toggle('active');
+        });
+    }
+</script>

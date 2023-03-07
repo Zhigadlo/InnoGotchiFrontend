@@ -1,0 +1,47 @@
+﻿@using InnoGotchi.BLL.DTO;
+@model PetDTO;
+<div class="text-center">
+    <h1 class="display-4">@Model.Name</h1>
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col">
+                <img src="data:image/svg+xml;base64,@(Model.Appearance)" width="400" height="400" />
+            </div>
+            <div class="col text-md-start">
+                <h6>Age: @Model.Age</h6>
+                <h6>Born date: @Model.CreateTime.ToShortDateString()</h6>
+                <h6>Born time: @Model.CreateTime.ToShortTimeString()</h6>
+                <h6>Average drinking period: @Model.AverageDrinkingPeriod per pet day</h6>
+                <h6>Average feeding period: @Model.AverageFeedingPeriod per pet day</h6>
+                <h6>Happiness pet days count: @Model.HappinessDaysCount</h6>
+                @if (Model.State == PetState.Dead)
+                {
+                    <h6>Dead date: @Model.DeadTime.ToShortDateString()</h6>
+                    <h6>Dead time: @Model.DeadTime.ToShortTimeString()</h6>
+                }
+                else
+                {
+                    <h6>Hunger lavel: @Model.HungerLavel</h6>
+                    <h6>Thirsty lavel: @Model.ThirstyLavel</h6>
+                    @if (Model.ThirstyLavel != ThirstyLavel.Full)
+                    {
+                        <a class="btn btn-outline-info" asp-action="Drink" asp-controller="Pets" asp-route-id="@Model.Id">drink</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-info disabled">drink</a>
+                    }
+
+                    @if(Model.HungerLavel != HungerLavel.Full)
+                    {
+                        <a class="btn btn-outline-success" asp-action="Feed" asp-controller="Pets" asp-route-id="@Model.Id">feed</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-success disabled">feed</a>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

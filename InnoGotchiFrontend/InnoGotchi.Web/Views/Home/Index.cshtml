@@ -1,0 +1,16 @@
+﻿@using InnoGotchi.BLL.Services;
+@using Microsoft.AspNetCore.Authorization;
+@model PetInfoService
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="text-center">
+    <h1 class="display-4">Welcome to InnoGotchi Game :)</h1>
+    <p class="display-10">
+        This is game where you have ability to create your own farm for pets. This farm can be created only once. In this farm you can create you own pets. 
+        After pet creation you need to feed them, like in tomogotchi:) After 1 real day hungry and thirsty state become lower by one lavel. 
+        There are four lavels <span class="text-success">Full</span>, <span class="text-warning">Normal</span>, <span class="text-danger">Hungry</span> or <span class="text-danger">Thirty</span> and <span class="text-secondary">Dead</span>. Full - is first pet state after creating. If one of state became Dead your pet will die:(
+        Don't let your pets die. Farm and every pet has a statstic. Year for pet is our 1 week. In this game can be other players. You can sent request for coloboration and became coloborators. Coloborators can feed pets of each other but can't create new pets not in their own farm.
+        This is all information that can by helpful for playing :)
+    </p>
+</div>

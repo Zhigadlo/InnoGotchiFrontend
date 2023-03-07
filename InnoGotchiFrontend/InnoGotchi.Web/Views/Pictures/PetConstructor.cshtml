@@ -1,0 +1,409 @@
+﻿@model PetConstructorViewModel;
+
+<form id="petCreate" method="post" asp-action="Create" asp-controller="Pets" onsubmit="return isValidForm()">
+    <h1>Pet constructor</h1>
+    <div class="form-floating mb-3">
+        <input id="petname_input" class="form-control" type="text" name="name" placeholder="petname" required/>
+        <label for="petname_input" class="form-label">Name</label>
+        <div id="error_message" class="text-danger h6" style="display:none">There is a pet with such name</div>
+        <div id="password_help" class="form-text">Pet name must contain english letters or numbers</div>
+    </div>
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col">
+                <style type="text/css">
+                    .static {
+                        cursor: not-allowed;
+                    }
+
+                    .draggable, .draggable-group {
+                        cursor: move;
+                    }
+                </style>
+                <div class="mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" id="pet" width="500" height="500" onload="makeDraggable(evt)">
+                        <rect width="100%" height="100%" style="fill:white;stroke-width:1;stroke:black" />
+                        <image class="draggable" name="body" x="-25" y="-20" width="600" height="600" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies.First().Image))" />
+                        <image class="draggable" name="eyes" x="190" y="100" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes.First().Image))" />
+                        <image class="draggable" name="nose" x="190" y="140" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses.First().Image))" />
+                        <image class="draggable" name="mouth" x="190" y="170" width="100" height="100" xlink:href="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths.First().Image))" />
+                    </svg>
+                </div>
+                <div class="mb-3">
+                    <input type="submit" id="submit" onsubmit="getSvg()" value="Create pet" class="btn btn-outline-dark" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-outline-dark" onclick="setPrevBodyHref()">←Previsous body</a>
+                    </div>
+                    <div class="col align-text-center">
+                        <img name="body_icon" width="100" height="100" style="border:solid 1px;" src="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Bodies.First().Image))" />
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-outline-dark" onclick="setNextBodyHref()">Next body→</a>
+                    </div>
+                    <label for="body_size" class="form-label">Body size:</label>
+                    <input type="range" class="form-range" id="body_size" min="10" max="100" value="60" step="1" />
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-outline-dark" onclick="setPrevEyesHref()">←Previous eyes</a>
+                    </div>
+                    <div class="col">
+                        <img name="eyes_icon" width="100" height="100" style="border:solid 1px;" src="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Eyes.First().Image))" />
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-outline-dark" onclick="setNextEyesHref()">Next eyes→</a>
+                    </div>
+                    <label for="eyes_size" class="form-label">Eyes size:</label>
+                    <input type="range" class="form-range" id="eyes_size" min="10" max="100" value="25" step="1" />
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-outline-dark" onclick="setPrevNoseHref()">←Previous nose</a>
+                    </div>
+                    <div class="col">
+                        <img name="nose_icon" width="100" height="100" style="border:solid 1px;" src="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Noses.First().Image))" />
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-outline-dark" onclick="setNextNoseHref()">Next nose→</a>
+                    </div>
+                    <label for="nose_size" class="form-label">Nose size:</label>
+                    <input type="range" class="form-range" id="nose_size" min="10" max="100" value="25" step="1" />
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-outline-dark" onclick="setPrevMouthHref()">←Previous mouth</a>
+                    </div>
+                    <div class="col">
+                        <img name="mouth_icon" width="100" height="100" style="border:solid 1px;" src="data:image/svg+xml;base64,@(Convert.ToBase64String(Model.Mouths.First().Image))" />
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-outline-dark" onclick="setNextMouthHref()">Next mouth→</a>
+                    </div>
+                    <label for="mouth_size" class="form-label">Mouth size:</label>
+                    <input type="range" class="form-range" id="mouth_size" min="10" max="100" value="25" step="1" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="text" name="appearance" onforminput="getSvg()" hidden/>
+    
+</form>
+
+<script>
+    var petNames = [];
+    var error_message = document.getElementById('error_message');
+    var petname_input = document.getElementById('petname_input');
+    var create_input = document.getElementById('submit');
+
+    var isValid = false; 
+
+    @foreach (var name in Model.PetNames)
+    {
+        @:petNames.push('@name');
+    }
+
+    console.log(petNames);
+
+    petname_input.addEventListener('keyup', validateName);
+    petname_input.addEventListener('change', validateName);
+
+    function validateName(){
+        let name = petname_input.value;
+        error_message.style.display = 'block';
+        if(!petNames.includes(name)){
+            if(error_message.classList.contains('text-danger')){
+                error_message.classList.remove('text-danger');
+            }
+            if(!error_message.classList.contains('text-success')){
+                error_message.classList.add('text-success');
+            }
+            error_message.innerText = 'This pet name is available :)';
+            isValid = true;
+        }
+        else{
+            if(!error_message.classList.contains('text-danger')){
+                error_message.classList.add('text-danger');
+            }
+            if(error_message.classList.contains('text-success')){
+                error_message.classList.remove('text-success');
+            }
+            error_message.innerText = 'This pet name is already in use:(';
+            isValid = false;
+        }
+    }
+
+    function isValidForm(){
+        return isValid;
+    }
+
+    var bodyImage = $('image[name="body"]');
+    var eyesImage = $('image[name="eyes"]');
+    var noseImage = $('image[name="nose"]');
+    var mouthImage = $('image[name="mouth"]');
+
+    var maxBodyHeight = 1000;
+    var maxBodyWidth = 1000;
+    var maxEyesHeight = 400;
+    var maxEyesWidth = 400;
+    var maxNoseHeight = 400;
+    var maxNoseWidth = 400;
+    var maxMouthHeight = 400;
+    var maxMouthWidth = 400;
+
+    $("#body_size").change(function(){
+        let value = $(this).val();
+        
+        bodyImage.attr('height', maxBodyHeight * value * 0.01);
+        bodyImage.attr('width', maxBodyWidth * value * 0.01);
+    });
+
+    $("#eyes_size").change(function () {
+        let value = $(this).val();
+
+        eyesImage.attr('height', maxEyesHeight * value * 0.01);
+        eyesImage.attr('width', maxEyesWidth * value * 0.01);
+    });
+
+    $("#nose_size").change(function () {
+        let value = $(this).val();
+
+        noseImage.attr('height', maxNoseHeight * value * 0.01);
+        noseImage.attr('width', maxNoseWidth * value * 0.01);
+    });
+
+    $("#mouth_size").change(function () {
+        let value = $(this).val();
+
+        mouthImage.attr('height', maxMouthHeight * value * 0.01);
+        mouthImage.attr('width', maxMouthWidth * value * 0.01);
+    });
+</script>
+
+<script type="text/javascript">
+
+    var bodyNumber = 0;
+    var eyesNumber = 0;
+    var noseNumber = 0;
+    var mouthNumber = 0;
+    var bodies = [];
+    var eyes = [];
+    var noses = [];
+    var mouths = [];
+
+    var form = document.getElementById('petCreate');
+    form.addEventListener('submit', () => {
+        var svg = new XMLSerializer().serializeToString(document.getElementById("pet"));
+        document.querySelector('[name="appearance"]').setAttribute('value', btoa(svg));
+        console.log(document.querySelector('[name="appearance"]').getAttribute('value'));
+    });
+
+    @foreach (var body in Model.Bodies)
+    {
+        @:var bytes = [];
+        @foreach (var imByte in @body.Image)
+        {
+            @:bytes.push(@imByte)
+        }
+        @:bodies.push("data:image/svg+xml;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(bytes))));
+    }
+
+    @foreach (var eyes in Model.Eyes)
+    {
+        @:var bytes = [];
+        @foreach (var imByte in eyes.Image)
+        {
+            @:bytes.push(@imByte)
+        }
+        @:eyes.push("data:image/svg+xml;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(bytes))));
+    }
+
+    @foreach (var nose in Model.Noses)
+    {
+        @:var bytes = [];
+        @foreach (var imByte in nose.Image)
+        {
+            @:bytes.push(@imByte)
+        }
+        @:noses.push("data:image/svg+xml;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(bytes))));
+    }
+
+    @foreach (var mouth in Model.Mouths)
+    {
+        @:var bytes = [];
+        @foreach (var imByte in mouth.Image)
+        {
+            @:bytes.push(@imByte)
+        }
+        @:mouths.push("data:image/svg+xml;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(bytes))));
+    }
+
+    function setNextBodyHref() {
+        if (bodyNumber + 1 > bodies.length - 1) {
+            bodyNumber = 0;
+        }
+        else {
+            bodyNumber += 1;
+        }
+    
+        document.querySelector('[name="body"]').setAttribute('href', bodies[bodyNumber]);
+        document.querySelector('[name="body_icon"]').setAttribute('src', bodies[bodyNumber]);
+    }
+
+    function setPrevBodyHref() {
+        if (bodyNumber - 1 < 0) {
+            bodyNumber = bodies.length - 1;
+        }
+        else {
+            bodyNumber -= 1;
+        }
+
+        document.querySelector('[name="body"]').setAttribute('href', bodies[bodyNumber]);
+        document.querySelector('[name="body_icon"]').setAttribute('src', bodies[bodyNumber]);
+    }
+
+    function setNextEyesHref() {
+        if (eyesNumber + 1 > eyes.length - 1) {
+            eyesNumber = 0;
+        }
+        else {
+            eyesNumber += 1;
+        }
+
+        document.querySelector('[name="eyes"]').setAttribute('href', eyes[eyesNumber]);
+        document.querySelector('[name="eyes_icon"]').setAttribute('src', eyes[eyesNumber]);
+    }
+
+    function setPrevEyesHref() {
+        if (eyesNumber - 1 < 0) {
+            eyesNumber = eyes.length - 1;
+        }
+        else {
+            eyesNumber -= 1;
+        }
+
+        document.querySelector('[name="eyes"]').setAttribute('href', eyes[eyesNumber]);
+        document.querySelector('[name="eyes_icon"]').setAttribute('src', eyes[eyesNumber]);
+    }
+
+    function setNextNoseHref() {
+        if (noseNumber + 1 > noses.length - 1) {
+            noseNumber = 0;
+        }
+        else {
+            noseNumber += 1;
+        }
+
+        document.querySelector('[name="nose"]').setAttribute('href', noses[noseNumber]);
+        document.querySelector('[name="nose_icon"]').setAttribute('src', noses[noseNumber]);
+    }
+
+    function setPrevNoseHref() {
+        if (noseNumber - 1 < 0) {
+            noseNumber = noses.length - 1;
+        }
+        else {
+            noseNumber -= 1;
+        }
+
+        document.querySelector('[name="nose"]').setAttribute('href', noses[noseNumber]);
+        document.querySelector('[name="nose_icon"]').setAttribute('src', noses[noseNumber]);
+    }
+
+    function setNextMouthHref() {
+        if (mouthNumber + 1 > mouths.length - 1) {
+            mouthNumber = 0;
+        }
+        else {
+            mouthNumber += 1;
+        }
+
+        document.querySelector('[name="mouth"]').setAttribute('href', mouths[mouthNumber]);
+        document.querySelector('[name="mouth_icon"]').setAttribute('src', mouths[mouthNumber]);
+    }
+
+    function setPrevMouthHref() {
+        if (mouthNumber - 1 < 0) {
+            mouthNumber = mouths.length - 1;
+        }
+        else {
+            mouthNumber -= 1;
+        }
+
+        document.querySelector('[name="mouth"]').setAttribute('href', mouths[mouthNumber]);
+        document.querySelector('[name="mouth_icon"]').setAttribute('src', mouths[mouthNumber]);
+    }
+
+    function makeDraggable(evt) {
+        var svg = evt.target;
+
+        svg.addEventListener('mousedown', startDrag);
+        svg.addEventListener('mousemove', drag);
+        svg.addEventListener('mouseup', endDrag);
+        svg.addEventListener('mouseleave', endDrag);
+        svg.addEventListener('touchstart', startDrag);
+        svg.addEventListener('touchmove', drag);
+        svg.addEventListener('touchend', endDrag);
+        svg.addEventListener('touchleave', endDrag);
+        svg.addEventListener('touchcancel', endDrag);
+
+        function getMousePosition(evt) {
+            var CTM = svg.getScreenCTM();
+            if (evt.touches) { evt = evt.touches[0]; }
+            return {
+                x: (evt.clientX - CTM.e) / CTM.a,
+                y: (evt.clientY - CTM.f) / CTM.d
+            };
+        }
+
+        var selectedElement, offset, transform;
+
+        function initialiseDragging(evt) {
+            offset = getMousePosition(evt);
+
+            // Make sure the first transform on the element is a translate transform
+            var transforms = selectedElement.transform.baseVal;
+
+            if (transforms.length === 0 || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+                // Create an transform that translates by (0, 0)
+                var translate = svg.createSVGTransform();
+                translate.setTranslate(0, 0);
+                selectedElement.transform.baseVal.insertItemBefore(translate, 0);
+            }
+
+            // Get initial translation
+            transform = transforms.getItem(0);
+            offset.x -= transform.matrix.e;
+            offset.y -= transform.matrix.f;
+        }
+
+        function startDrag(evt) {
+            if (evt.target.classList.contains('draggable')) {
+                selectedElement = evt.target;
+                initialiseDragging(evt);
+            } else if (evt.target.parentNode.classList.contains('draggable-group')) {
+                selectedElement = evt.target.parentNode;
+                initialiseDragging(evt);
+            }
+        }
+
+        function drag(evt) {
+            if (selectedElement) {
+                evt.preventDefault();
+                var coord = getMousePosition(evt);
+                transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
+            }
+        }
+
+        function endDrag(evt) {
+            selectedElement = false;
+        }
+    }
+
+</script>
